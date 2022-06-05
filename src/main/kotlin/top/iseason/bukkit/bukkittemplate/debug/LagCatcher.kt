@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.debug
+package top.iseason.bukkit.bukkittemplate.debug
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 object LagCatcher {

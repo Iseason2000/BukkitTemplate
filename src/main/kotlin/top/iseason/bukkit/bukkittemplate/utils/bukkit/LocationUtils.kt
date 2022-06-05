@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.utils.bukkit
+package top.iseason.bukkit.bukkittemplate.utils.bukkit
 
 import org.bukkit.Location
 import org.bukkit.util.Vector

@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.common
+package top.iseason.bukkit.bukkittemplate.common
 
 import org.bukkit.scheduler.BukkitRunnable
 import top.iseason.bukkit.bukkittemplate.plugin

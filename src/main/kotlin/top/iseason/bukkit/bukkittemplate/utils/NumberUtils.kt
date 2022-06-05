@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.utils
+package top.iseason.bukkit.bukkittemplate.utils
 
 import kotlin.math.abs
 

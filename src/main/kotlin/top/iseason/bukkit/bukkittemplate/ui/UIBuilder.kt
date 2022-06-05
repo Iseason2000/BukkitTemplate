@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.ui
+package top.iseason.bukkit.bukkittemplate.ui
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory

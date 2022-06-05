@@ -1,13 +1,14 @@
-package top.iseason.bukkit.bukkittemplate.core.config
+package top.iseason.bukkit.bukkittemplate.config
 
-import top.iseason.bukkit.bukkittemplate.core.debug.debug
+import org.bukkit.configuration.MemorySection
+import top.iseason.bukkit.bukkittemplate.debug.debug
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
-import top.iseason.bukkit.bukkittemplate.core.common.submit
-import top.iseason.bukkit.bukkittemplate.core.config.annotations.Comment
-import top.iseason.bukkit.bukkittemplate.core.config.annotations.FilePath
-import top.iseason.bukkit.bukkittemplate.core.config.annotations.Key
-import top.iseason.bukkit.bukkittemplate.core.debug.info
+import top.iseason.bukkit.bukkittemplate.common.submit
+import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
+import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
+import top.iseason.bukkit.bukkittemplate.config.annotations.Key
+import top.iseason.bukkit.bukkittemplate.debug.info
 import top.iseason.bukkit.bukkittemplate.plugin
 import java.io.File
 import java.io.FileInputStream
@@ -57,7 +58,7 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     init {
         ConfigWatcher.fromFile(configPath.absoluteFile)
         configs[configPath.absolutePath] = this
-        loadAsync()
+        loadAsync(false)
     }
 
     fun setUpdate(enable: Boolean) {
@@ -92,7 +93,6 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     fun save(notify: Boolean = true) {
         update(false)
         onSaved?.invoke(config)
-        updateTime = System.currentTimeMillis()
         if (notify)
             info("Config $configPath was saved!")
     }
@@ -114,7 +114,6 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
             return
         }
         onLoaded?.invoke(config)
-        updateTime = System.currentTimeMillis()
         if (notify)
             info("Config $configPath was reloaded!")
     }
@@ -125,7 +124,9 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
      * @return 更新成功返回true
      */
     private fun update(isReadOnly: Boolean): Boolean {
-        if (System.currentTimeMillis() - updateTime < 1000L) return false
+        val currentTimeMillis = System.currentTimeMillis()
+        if (currentTimeMillis - updateTime < 1500L) return false
+        updateTime = currentTimeMillis
         sleep(200L)
         val loadConfiguration = YamlConfiguration.loadConfiguration(configPath)
         val temp = YamlConfiguration()
@@ -146,7 +147,10 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
                 }
             }
             if (isReadOnly) {
-                val value = loadConfiguration.get(key.key)
+                var value = loadConfiguration.get(key.key)
+                if (Map::class.java.isAssignableFrom(key.field.type) && value != null) {
+                    value = (value as MemorySection).getValues(false)
+                }
                 if (value != null) {
                     //获取修改的键值
                     try {

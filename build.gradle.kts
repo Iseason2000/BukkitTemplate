@@ -1,29 +1,68 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.processClassModels
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 plugins {
     kotlin("jvm") version "1.6.21"
-    application
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-group = "top.iseason.bukkit"
+// 插件名称，在settings.gradle.kts 修改
+val pluginName = rootProject.name
+//包名
+group = "top.iseason.bukkit.${pluginName.toLowerCaseAsciiOnly()}"
+// 作者
+val author = "Iseason"
+// jar包输出路径
+val jarOutputFile = "E:\\mc\\1.18 server\\plugins"
+//插件版本
 version = "1.0-SNAPSHOT"
 
+val groupS = group
 repositories {
     mavenCentral()
+    mavenLocal()
+    maven {
+        name = "spigot"
+        url = uri("https://hub.spigotmc.org/nexus/content/repositories/public/")
+    }
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
-}
+    implementation(kotlin("stdlib-jdk8"))
+//    implementation(kotlin("reflect"))
+    implementation("org.bstats:bstats-bukkit:3.0.0")
+    compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
 
-tasks.test {
-    useJUnitPlatform()
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-application {
-    mainClass.set("MainKt")
+tasks {
+    shadowJar {
+        mergeServiceFiles()
+        relocate("org.bstats", "$groupS.lib.bstats")
+        relocate("top.iseason.bukkit.bukkittemplate", "$groupS.core")
+        minimize()
+        destinationDirectory.set(file(jarOutputFile))
+        archiveFileName.set("${project.name}-${project.version}.jar")
+    }
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+    processResources {
+        filesMatching("plugin.yml") {
+            expand(
+                "main" to "$groupS.core.TemplatePlugin",
+                "name" to pluginName,
+                "version" to project.version,
+                "author" to author
+            )
+        }
+    }
+}
+tasks.named<Jar>("jar") {
+    includeEmptyDirs = false
 }

@@ -1,7 +1,7 @@
-package top.iseason.bukkit.bukkittemplate.core.ui
+package top.iseason.bukkit.bukkittemplate.ui
 
-import top.iseason.bukkit.bukkittemplate.core.common.submit
-import top.iseason.bukkit.bukkittemplate.core.debug.warn
+import top.iseason.bukkit.bukkittemplate.common.submit
+import top.iseason.bukkit.bukkittemplate.debug.warn
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent

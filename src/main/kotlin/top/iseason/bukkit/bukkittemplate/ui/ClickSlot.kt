@@ -1,7 +1,8 @@
-package top.iseason.bukkit.bukkittemplate.core.ui
+package top.iseason.bukkit.bukkittemplate.ui
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.isAir
 
 /**
  * 可点击的Slot
@@ -28,7 +29,7 @@ abstract class ClickSlot(
         }
         get() {
             val item = baseInventory?.getItem(index)
-            return if (item == null || item.type.isAir) rawItemStack
+            return if (item == null || item.type.isAir()) rawItemStack
             else item
         }
 

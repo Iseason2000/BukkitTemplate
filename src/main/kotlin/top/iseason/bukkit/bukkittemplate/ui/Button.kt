@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.ui
+package top.iseason.bukkit.bukkittemplate.ui
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack

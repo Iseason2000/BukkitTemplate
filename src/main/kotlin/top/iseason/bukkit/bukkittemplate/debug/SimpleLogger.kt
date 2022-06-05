@@ -1,5 +1,5 @@
 
-package top.iseason.bukkit.bukkittemplate.core.debug
+package top.iseason.bukkit.bukkittemplate.debug
 
 import top.iseason.bukkit.bukkittemplate.plugin
 

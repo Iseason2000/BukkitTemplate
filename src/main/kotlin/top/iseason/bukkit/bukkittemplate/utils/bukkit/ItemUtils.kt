@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.utils.bukkit
+package top.iseason.bukkit.bukkittemplate.utils.bukkit
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -16,6 +16,14 @@ inline fun <T : ItemStack> T.applyMeta(block: ItemMeta.() -> Unit): T {
 
 fun ItemStack.subtract(count: Int) {
     val i = amount - count
-    if (i <= 0) type = Material.VOID_AIR
+    if (i <= 0) type = Material.AIR
     else amount = i
+}
+
+fun Material.isAir(): Boolean = when (this.name) {
+    "VOID_AIR",
+    "CAVE_AIR",
+    "AIR",
+    "LEGACY_AIR" -> true
+    else -> false
 }

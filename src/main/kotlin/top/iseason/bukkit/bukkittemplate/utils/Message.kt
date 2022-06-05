@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.core.utils
+package top.iseason.bukkit.bukkittemplate.utils
 
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor

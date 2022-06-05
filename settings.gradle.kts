@@ -1,3 +1,3 @@
 
-rootProject.name = "BukkitTemplate"
+rootProject.name = "TemplatePlugin"
 

@@ -1,0 +1,5 @@
+name: ${name}
+main: ${main}
+version: ${version}
+authors: [ ${ author } ]
+#api-version: 1.16

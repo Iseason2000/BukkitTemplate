@@ -1,8 +1,7 @@
-package top.iseason.bukkit.bukkittemplate.core.ui
+package top.iseason.bukkit.bukkittemplate.ui
 
 import org.bukkit.Bukkit
 import org.bukkit.inventory.Inventory
-import top.iseason.bukkit.bukkittemplate.core.ui.BaseUI
 
 /**
  * 箱子界面

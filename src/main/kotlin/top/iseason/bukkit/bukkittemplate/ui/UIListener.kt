@@ -1,7 +1,7 @@
-package top.iseason.bukkit.bukkittemplate.core.ui
+package top.iseason.bukkit.bukkittemplate.ui
 
-import top.iseason.bukkit.bukkittemplate.core.common.submit
-import top.iseason.bukkit.bukkittemplate.core.debug.debug
+import top.iseason.bukkit.bukkittemplate.common.submit
+import top.iseason.bukkit.bukkittemplate.debug.debug
 import org.bukkit.Bukkit
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.EventHandler
@@ -12,7 +12,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.core.utils.bukkit.subtract
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.isAir
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
 
 /**
  * 负责所有UI的监听动作
@@ -143,7 +144,7 @@ fun InventoryClickEvent.ioEvent() {
         PLACE_SOME -> {
             if (rawSlot in 0 until inventory.size) {
                 //处理占位符
-                inputItem = if (cursor?.type?.isAir == true) null
+                inputItem = if (cursor?.type?.isAir() == true) null
                 else Pair(rawSlot, cursor!!.clone()).apply {
                     if (action == PLACE_ONE) second.amount = 1
                     val currentItem = currentItem

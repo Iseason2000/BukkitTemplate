@@ -2,7 +2,7 @@ package top.iseason.bukkit.templateplugin
 
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
 
-object Test : KotlinPlugin() {
+object TemplatePlugin : KotlinPlugin() {
     override fun onLoad() {
 //        println("load")
     }
