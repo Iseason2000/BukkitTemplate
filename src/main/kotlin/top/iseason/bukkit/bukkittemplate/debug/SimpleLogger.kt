@@ -1,18 +1,18 @@
-
 package top.iseason.bukkit.bukkittemplate.debug
 
-import top.iseason.bukkit.bukkittemplate.plugin
+import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+
 
 var isDebugEnabled: Boolean = true
 fun info(message: Any?) {
-    plugin.logger.info(message.toString())
+    TemplatePlugin.getPlugin().logger.info(message.toString())
 }
 
 fun debug(message: Any?) {
     if (!isDebugEnabled) return
-    plugin.logger.info(message.toString())
+    TemplatePlugin.getPlugin().logger.info(message.toString())
 }
 
 fun warn(message: Any?) {
-    plugin.logger.warning(message.toString())
+    TemplatePlugin.getPlugin().logger.warning(message.toString())
 }

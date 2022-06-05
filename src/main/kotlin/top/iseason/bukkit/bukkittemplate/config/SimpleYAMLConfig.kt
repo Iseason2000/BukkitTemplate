@@ -1,21 +1,22 @@
+
 package top.iseason.bukkit.bukkittemplate.config
 
 import org.bukkit.configuration.MemorySection
-import top.iseason.bukkit.bukkittemplate.debug.debug
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
+import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 import top.iseason.bukkit.bukkittemplate.common.submit
 import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
 import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
 import top.iseason.bukkit.bukkittemplate.config.annotations.Key
+import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.debug.info
-import top.iseason.bukkit.bukkittemplate.plugin
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Thread.sleep
-import java.nio.file.*
+import java.nio.file.Files
 import java.util.*
 
 abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdate: Boolean = true) {
@@ -71,7 +72,7 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     private fun normalizeFileStr(file: String) = file.replace('\\', File.separatorChar).replace('/', File.separatorChar)
 
     private fun getPath(): File {
-        val dataFolder = plugin.dataFolder
+        val dataFolder = TemplatePlugin.getPlugin().dataFolder
         if (defaultPath != null) return File(dataFolder, normalizeFileStr(defaultPath)).absoluteFile
         val annotation = this::class.java.getAnnotation(FilePath::class.java)
         require(annotation != null) { "path must not null" }

@@ -1,7 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.config
 
 import org.bukkit.scheduler.BukkitRunnable
-import top.iseason.bukkit.bukkittemplate.plugin
+import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -43,7 +43,7 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
             if (existWatcher != null) return existWatcher
             val configWatcher = ConfigWatcher(parentFile)
             folders[folder] = configWatcher
-            configWatcher.runTaskLaterAsynchronously(plugin, 40L)
+            configWatcher.runTaskLaterAsynchronously(TemplatePlugin.getPlugin(), 40L)
             return configWatcher
         }
 

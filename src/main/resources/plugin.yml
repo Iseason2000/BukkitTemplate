@@ -3,3 +3,11 @@ main: ${main}
 version: ${version}
 authors: [ ${ author } ]
 #api-version: 1.16
+runtime-libraries:
+  relocation-prefix: 'top.iseason.bukkit.bukkittemplate.lib' # Required if we want to relocate libraries
+  libraries-folder: '@Server:libraries' # If not defined, it will be 'libs'
+  libraries:
+    kotlin:
+      groupId: org.jetbrains.kotlin
+      artifactId: kotlin-stdlib
+      version: ${kotlinVersion}

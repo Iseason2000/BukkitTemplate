@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.ir.backend.js.transformers.irToJs.processClassModels
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
+val kotlinVersion = "1.6.21"
 plugins {
     kotlin("jvm") version "1.6.21"
     id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -26,12 +26,18 @@ repositories {
         name = "spigot"
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/public/")
     }
+    maven {
+        name = "jitpack"
+        url = uri("https://jitpack.io")
+    }
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
+    compileOnly(kotlin("stdlib-jdk8"))
 //    implementation(kotlin("reflect"))
     implementation("org.bstats:bstats-bukkit:3.0.0")
+//    implementation("com.github.ReflxctionDev:PluginLib:1.3")
+    compileOnly("me.lucko:jar-relocator:1.5")
     compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
 
 }
@@ -58,7 +64,8 @@ tasks {
                 "main" to "$groupS.core.TemplatePlugin",
                 "name" to pluginName,
                 "version" to project.version,
-                "author" to author
+                "author" to author,
+                "kotlinVersion" to kotlinVersion,
             )
         }
     }
