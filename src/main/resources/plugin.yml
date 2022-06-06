@@ -4,21 +4,37 @@ version: ${version}
 authors: [ ${ author } ]
 #api-version: 1.16
 runtime-libraries:
-  libraries-folder: '@Server:libraries' # If not defined, it will be 'libs'
+  libraries-folder: '@Server:libraries' # If not defined, it will be 'libraries'
   libraries:
     kotlin-stdlib:
+      repository: https://maven.aliyun.com/repository/public
       groupId: org.jetbrains.kotlin
       artifactId: kotlin-stdlib
       version: ${kotlinVersion}
     kotlin-stdlib-common:
+      repository: https://maven.aliyun.com/repository/public
       groupId: org.jetbrains.kotlin
       artifactId: kotlin-stdlib-common
       version: ${kotlinVersion}
     kotlin-stdlib-jdk7:
+      repository: https://maven.aliyun.com/repository/public
       groupId: org.jetbrains.kotlin
       artifactId: kotlin-stdlib-jdk7
       version: ${kotlinVersion}
     kotlin-stdlib-jdk8:
+      repository: https://maven.aliyun.com/repository/public
       groupId: org.jetbrains.kotlin
       artifactId: kotlin-stdlib-jdk8
       version: ${kotlinVersion}
+# reflection lib
+#    kotlin-reflect:
+#      repository: https://maven.aliyun.com/repository/public
+#      groupId: org.jetbrains.kotlin
+#      artifactId: kotlin-reflect
+#      version: ${kotlinVersion}
+# coroutines lib
+#    kotlinx-coroutines-core:
+#      repository: https://maven.aliyun.com/repository/public
+#      groupId: org.jetbrains.kotlinx
+#      artifactId: kotlinx-coroutines-core
+#      version: 1.6.2

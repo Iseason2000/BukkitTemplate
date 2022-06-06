@@ -1,10 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
-val kotlinVersion = "1.6.21"
 plugins {
-    kotlin("jvm") version "1.6.21"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    kotlin("jvm")
+    id("com.github.johnrengelman.shadow")
 }
 
 // 插件名称，在settings.gradle.kts 修改
@@ -33,10 +32,16 @@ repositories {
 }
 
 dependencies {
+    //基础库
     compileOnly(kotlin("stdlib-jdk8"))
-//    implementation(kotlin("reflect"))
+
+//    反射库
+//    compileOnly(kotlin("reflect"))
+
+//    协程库
+//    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+
     implementation("org.bstats:bstats-bukkit:3.0.0")
-//    implementation("com.github.ReflxctionDev:PluginLib:1.3")
     compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
 
 }
@@ -64,7 +69,7 @@ tasks {
                 "name" to pluginName,
                 "version" to project.version,
                 "author" to author,
-                "kotlinVersion" to kotlinVersion,
+                "kotlinVersion" to rootProject.properties["kotlinVersion"],
             )
         }
     }
