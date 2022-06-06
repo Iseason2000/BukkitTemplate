@@ -23,10 +23,10 @@ object Config : SimpleYAMLConfig() {
     var map = mutableMapOf("test" to mutableMapOf("1" to mutableMapOf('1' to 2), "2" to "2"), "test2" to 2)
 
     override val onLoaded: FileConfiguration.() -> Unit = {
-        println("loaded")
+//        println("loaded")
     }
     override val onSaved: (FileConfiguration.() -> Unit) = {
-        println("saved")
+//        println("saved")
     }
 
 }

@@ -1,4 +1,3 @@
-
 package top.iseason.bukkit.bukkittemplate.config
 
 import org.bukkit.configuration.MemorySection
@@ -42,9 +41,17 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     var config = YamlConfiguration.loadConfiguration(configPath)
 
     private val keys = mutableListOf<ConfigKey>().also { list ->
+        //判断是否全为键值
+        if (this@SimpleYAMLConfig.javaClass.getAnnotation(Key::class.java) != null) {
+            this::class.java.declaredFields.forEach {
+                if ("INSTANCE" == it.name) return@forEach
+                list.add(ConfigKey(it.name.replace("__", ".").replace('_', '-'), it, null))
+            }
+            return@also
+        }
         this::class.java.declaredFields.forEach {
             val keyAnnotation = it.getAnnotation(Key::class.java) ?: return@forEach
-            val key = keyAnnotation.key.ifEmpty { it.name.replace('_', '.') }
+            val key = keyAnnotation.key.ifEmpty { it.name.replace("__", ".").replace('_', '-') }
             val comments = mutableListOf<String>()
             it.getAnnotationsByType(Comment::class.java).forEach { an ->
                 //注释内容遍历
@@ -126,9 +133,9 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
      */
     private fun update(isReadOnly: Boolean): Boolean {
         val currentTimeMillis = System.currentTimeMillis()
-        if (currentTimeMillis - updateTime < 1500L) return false
+        if (currentTimeMillis - updateTime < 2000L) return false
         updateTime = currentTimeMillis
-        sleep(200L)
+        sleep(300L)
         val loadConfiguration = YamlConfiguration.loadConfiguration(configPath)
         val temp = YamlConfiguration()
         val commentMap = mutableMapOf<String, String>()

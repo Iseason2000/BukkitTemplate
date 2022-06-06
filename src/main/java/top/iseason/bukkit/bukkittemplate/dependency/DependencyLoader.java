@@ -29,15 +29,12 @@ import static java.util.Objects.requireNonNull;
  * This class is immutable, hence is thread-safe. However, certain methods like {@link #load(Class)} are
  * most likely <em>not thread-safe</em>.
  */
-public class PluginLib {
+public class DependencyLoader {
 
-    private static final IsolatedClassLoader loader = new IsolatedClassLoader(new URL[0], PluginLib.class.getClassLoader());
-    private static final List<PluginLib> toInstall = new ArrayList<>();
+    private static final IsolatedClassLoader loader = new IsolatedClassLoader(new URL[0], DependencyLoader.class.getClassLoader());
+    private static final List<DependencyLoader> toInstall = new ArrayList<>();
     private static final Supplier<LibrariesOptions> librariesOptions = memoize(() -> {
-        Map<?, ?> map = (Map<?, ?>) new Yaml().load(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
-
-        String name = map.get("name").toString();
-        String folder = "libs";
+        Map<?, ?> map = new Yaml().load(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
         if (map.containsKey("runtime-libraries"))
             return LibrariesOptions.fromMap(((Map<String, Object>) map.get("runtime-libraries")));
         return null;
@@ -46,26 +43,11 @@ public class PluginLib {
         Map<?, ?> map = new Yaml().load(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
 
         String name = map.get("name").toString();
-
         LibrariesOptions options = librariesOptions.get();
-
         String folder = options.librariesFolder;
-        String prefix = options.relocationPrefix == null ? null : options.relocationPrefix;
-        requireNonNull(prefix, "relocation-prefix must be defined in runtime-libraries!");
-        Set<Relocation> globalRelocations = new HashSet<>();
-        for (Entry<String, String> global : options.globalRelocations.entrySet()) {
-            globalRelocations.add(new Relocation(global.getKey(), prefix + "." + global.getValue()));
-        }
         for (Entry<String, RuntimeLib> lib : options.libraries.entrySet()) {
             RuntimeLib runtimeLib = lib.getValue();
             Builder b = runtimeLib.builder();
-            if (runtimeLib.relocation != null && !runtimeLib.relocation.isEmpty())
-                for (Entry<String, String> s : runtimeLib.relocation.entrySet()) {
-                    b.relocate(new Relocation(s.getKey(), prefix + "." + s.getValue()));
-                }
-            for (Relocation relocation : globalRelocations) {
-                b.relocate(relocation);
-            }
             toInstall.add(b.build());
         }
         File file;
@@ -75,16 +57,13 @@ public class PluginLib {
         return file;
     });
     public final String groupId, artifactId, version, repository;
-    public final Set<Relocation> relocationRules;
-    private final boolean hasRelocations;
 
-    public PluginLib(String groupId, String artifactId, String version, String repository, Set<Relocation> relocationRules) {
+
+    public DependencyLoader(String groupId, String artifactId, String version, String repository) {
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
         this.repository = repository;
-        this.relocationRules = Collections.unmodifiableSet(relocationRules);
-        hasRelocations = !relocationRules.isEmpty();
     }
 
     public static IsolatedClassLoader getLoader() {
@@ -149,8 +128,8 @@ public class PluginLib {
 
     public static void loadLibs() {
         libFile.get();
-        for (PluginLib pluginLib : toInstall) {
-            pluginLib.load(TemplatePlugin.class);
+        for (DependencyLoader dependencyLoader : toInstall) {
+            dependencyLoader.load(TemplatePlugin.class);
         }
     }
 
@@ -167,16 +146,15 @@ public class PluginLib {
         LibrariesOptions options = librariesOptions.get();
         if (options == null) return;
         String name = artifactId + "-" + version;
-        System.out.println("Loading lib " + name + ". this may take a while!");
+        Bukkit.getLogger().info("[DependencyLoader] Loading libraries " + name + " please wait");
         File parent = libFile.get();
-        File saveLocation = new File(parent, name + ".jar");
-        if (hasRelocations) {
-            File relocated = new File(parent, name + "-relocated.jar");
-            if (relocated.exists()) return;
-        }
+        String folder = parent.toString() + File.separatorChar + groupId.replace('.', File.separatorChar) + File.separatorChar + artifactId + File.separatorChar + version;
+        File saveLocation = new File(folder, name + ".jar");
+        //不存在则下载
         if (!saveLocation.exists()) {
             try {
                 URL url = asURL();
+                saveLocation.getParentFile().mkdirs();
                 saveLocation.createNewFile();
                 try (InputStream is = url.openStream()) {
                     Files.copy(is, saveLocation.toPath(), REPLACE_EXISTING);
@@ -188,23 +166,6 @@ public class PluginLib {
         if (!saveLocation.exists()) {
             throw new RuntimeException("Unable to download dependency: " + artifactId);
         }
-        if (hasRelocations) {
-            File old = saveLocation;
-            File relocated = new File(parent, name + "-relocated.jar");
-            if (!relocated.exists()) {
-                try {
-                    relocated.createNewFile();
-                    FileRelocator.remap(saveLocation, new File(parent, name + "-relocated.jar"), relocationRules);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (options.deleteAfterRelocation)
-                        old.delete();
-                }
-            }
-            saveLocation = relocated;
-        }
-
         try {
             loader.addURL(saveLocation.toURI().toURL());
         } catch (Exception e) {
@@ -236,14 +197,11 @@ public class PluginLib {
                 ", artifactId='" + artifactId + '\'' +
                 ", version='" + version + '\'' +
                 ", repository='" + repository + '\'' +
-                ", relocationRules=" + relocationRules +
-                ", hasRelocations=" + hasRelocations +
                 '}';
     }
 
     public static class Builder {
 
-        private final Set<Relocation> relocations = new LinkedHashSet<>();
         private String url = null;
         private String group, artifact, version, repository = "https://repo1.maven.org/maven2/";
 
@@ -358,26 +316,15 @@ public class PluginLib {
         }
 
         /**
-         * Adds a new relocation rule
+         * Constructs a {@link DependencyLoader} from the provided values
          *
-         * @param relocation New relocation rule to add
-         * @return This builder
-         */
-        public Builder relocate(@NotNull Relocation relocation) {
-            relocations.add(n(relocation, "relocation is null!"));
-            return this;
-        }
-
-        /**
-         * Constructs a {@link PluginLib} from the provided values
-         *
-         * @return A new, immutable {@link PluginLib} instance.
+         * @return A new, immutable {@link DependencyLoader} instance.
          * @throws NullPointerException if any of the required properties is not provided.
          */
-        public PluginLib build() {
+        public DependencyLoader build() {
             if (url != null)
-                return new StaticURLPluginLib(group, n(artifact, "artifactId"), n(version, "version"), repository, relocations, url);
-            return new PluginLib(n(group, "groupId"), n(artifact, "artifactId"), n(version, "version"), n(repository, "repository"), relocations);
+                return new StaticURLDependencyLoader(group, n(artifact, "artifactId"), n(version, "version"), repository, url);
+            return new DependencyLoader(n(group, "groupId"), n(artifact, "artifactId"), n(version, "version"), n(repository, "repository"));
         }
 
     }
@@ -385,19 +332,13 @@ public class PluginLib {
     @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
     private static class LibrariesOptions {
 
-        private String relocationPrefix = null;
-        private String librariesFolder = "libs";
-        private boolean deleteAfterRelocation = false;
-        private Map<String, String> globalRelocations = Collections.emptyMap();
+        private String librariesFolder = "libraries";
         private Map<String, RuntimeLib> libraries = Collections.emptyMap();
 
         public static LibrariesOptions fromMap(@NotNull Map<String, Object> map) {
             LibrariesOptions options = new LibrariesOptions();
-            options.relocationPrefix = (String) map.get("relocation-prefix");
             options.librariesFolder = (String) map.getOrDefault("libraries-folder", "libs");
             options.librariesFolder = options.librariesFolder.replace('\\', File.separatorChar).replace('/', File.separatorChar);
-            options.globalRelocations = (Map<String, String>) map.getOrDefault("global-relocations", Collections.emptyMap());
-            options.deleteAfterRelocation = (Boolean) map.getOrDefault("delete-after-relocation", false);
             options.libraries = new HashMap<>();
             Map<String, Map<String, Object>> declaredLibs = (Map<String, Map<String, Object>>) map.get("libraries");
             if (declaredLibs != null)
@@ -416,7 +357,6 @@ public class PluginLib {
         private String xml = null;
         private String url = null;
         private String groupId = null, artifactId = null, version = null;
-        private Map<String, String> relocation = null;
         private String repository = null;
 
         static RuntimeLib fromMap(Map<String, Object> map) {
@@ -427,7 +367,6 @@ public class PluginLib {
             lib.artifactId = (String) map.get("artifactId");
             lib.version = (String) map.get("version");
             lib.repository = (String) map.get("repository");
-            lib.relocation = (Map<String, String>) map.get("relocation");
             return lib;
         }
 
@@ -448,12 +387,12 @@ public class PluginLib {
 
     }
 
-    private static class StaticURLPluginLib extends PluginLib {
+    private static class StaticURLDependencyLoader extends DependencyLoader {
 
         private final String url;
 
-        public StaticURLPluginLib(String groupId, String artifactId, String version, String repository, Set<Relocation> relocationRules, String url) {
-            super(groupId, artifactId, version, repository, relocationRules);
+        public StaticURLDependencyLoader(String groupId, String artifactId, String version, String repository, String url) {
+            super(groupId, artifactId, version, repository);
             this.url = url;
         }
 

@@ -37,7 +37,6 @@ dependencies {
 //    implementation(kotlin("reflect"))
     implementation("org.bstats:bstats-bukkit:3.0.0")
 //    implementation("com.github.ReflxctionDev:PluginLib:1.3")
-    compileOnly("me.lucko:jar-relocator:1.5")
     compileOnly("org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT")
 
 }

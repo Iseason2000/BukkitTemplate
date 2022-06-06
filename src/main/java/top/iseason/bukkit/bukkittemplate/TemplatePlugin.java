@@ -2,8 +2,9 @@ package top.iseason.bukkit.bukkittemplate;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
+import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher;
 import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
-import top.iseason.bukkit.bukkittemplate.dependency.PluginLib;
+import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
 import top.iseason.bukkit.bukkittemplate.ui.UIListener;
 
 import java.io.File;
@@ -18,16 +19,15 @@ import java.util.List;
 import java.util.jar.JarFile;
 
 public class TemplatePlugin extends JavaPlugin {
+
+    static {
+        //加载依赖
+        DependencyLoader.loadLibs();
+    }
+
     private static final List<Class<?>> classes = loadClass();
     private static final KotlinPlugin ktPlugin = findInstance();
     private static TemplatePlugin plugin;
-
-    static {
-        //加载重定向库
-//        FileRelocator.loadLibs();
-        //加载依赖
-        PluginLib.loadLibs();
-    }
 
     private static KotlinPlugin findInstance() {
         for (Class<?> aClass : classes) {
@@ -112,12 +112,6 @@ public class TemplatePlugin extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {
-        UIListener.INSTANCE.onDisable();
-        ktPlugin.onDisable();
-    }
-
-    @Override
     public void onEnable() {
         UIListener.INSTANCE.hashCode();
         callConfigsInstance();
@@ -125,5 +119,12 @@ public class TemplatePlugin extends JavaPlugin {
         if (ktPlugin.getBstatsID() > 0) {
             new Metrics(this, ktPlugin.getBstatsID());
         }
+    }
+
+    @Override
+    public void onDisable() {
+        UIListener.INSTANCE.onDisable();
+        ConfigWatcher.Companion.stop();
+        ktPlugin.onDisable();
     }
 }

@@ -43,7 +43,7 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
             if (existWatcher != null) return existWatcher
             val configWatcher = ConfigWatcher(parentFile)
             folders[folder] = configWatcher
-            configWatcher.runTaskLaterAsynchronously(TemplatePlugin.getPlugin(), 40L)
+            configWatcher.runTaskAsynchronously(TemplatePlugin.getPlugin())
             return configWatcher
         }
 

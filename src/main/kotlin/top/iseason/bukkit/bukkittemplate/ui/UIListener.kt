@@ -1,7 +1,5 @@
 package top.iseason.bukkit.bukkittemplate.ui
 
-import top.iseason.bukkit.bukkittemplate.common.submit
-import top.iseason.bukkit.bukkittemplate.debug.debug
 import org.bukkit.Bukkit
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.EventHandler
@@ -12,6 +10,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.common.submit
+import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.isAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
 
@@ -20,7 +20,7 @@ import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
  */
 object UIListener : Listener {
 
-    val playerClickTime = mutableMapOf<HumanEntity, Long>()
+    private val playerClickTime = mutableMapOf<HumanEntity, Long>()
 
     /**
      * 在插件注销时关闭所有UI
