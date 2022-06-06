@@ -6,7 +6,19 @@ authors: [ ${ author } ]
 runtime-libraries:
   libraries-folder: '@Server:libraries' # If not defined, it will be 'libs'
   libraries:
-    kotlin:
+    kotlin-stdlib:
       groupId: org.jetbrains.kotlin
       artifactId: kotlin-stdlib
+      version: ${kotlinVersion}
+    kotlin-stdlib-common:
+      groupId: org.jetbrains.kotlin
+      artifactId: kotlin-stdlib-common
+      version: ${kotlinVersion}
+    kotlin-stdlib-jdk7:
+      groupId: org.jetbrains.kotlin
+      artifactId: kotlin-stdlib-jdk7
+      version: ${kotlinVersion}
+    kotlin-stdlib-jdk8:
+      groupId: org.jetbrains.kotlin
+      artifactId: kotlin-stdlib-jdk8
       version: ${kotlinVersion}
