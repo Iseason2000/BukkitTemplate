@@ -1,20 +1,27 @@
 package top.iseason.bukkit.bukkittemplate.dependency;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.yaml.snakeyaml.Yaml;
+import sun.misc.Unsafe;
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.Map.Entry;
@@ -24,25 +31,23 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Represents a runtime-downloaded plugin library.
- * <p>
- * This class is immutable, hence is thread-safe. However, certain methods like {@link #load(Class)} are
- * most likely <em>not thread-safe</em>.
+ * 加载依赖，如歌不存在则下载
  */
+@SuppressWarnings("restriction")
 public class DependencyLoader {
 
-    private static final IsolatedClassLoader loader = new IsolatedClassLoader(new URL[0], DependencyLoader.class.getClassLoader());
     private static final List<DependencyLoader> toInstall = new ArrayList<>();
+    private static final MethodHandle addUrlHandle;
+    private static final Object ucp;
     private static final Supplier<LibrariesOptions> librariesOptions = memoize(() -> {
-        Map<?, ?> map = new Yaml().load(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
-        if (map.containsKey("runtime-libraries"))
-            return LibrariesOptions.fromMap(((Map<String, Object>) map.get("runtime-libraries")));
+        YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
+        if (yamlConfiguration.contains("runtime-libraries"))
+            return LibrariesOptions.fromMap((yamlConfiguration.getConfigurationSection("runtime-libraries")));
         return null;
     });
     private static final Supplier<File> libFile = memoize(() -> {
-        Map<?, ?> map = new Yaml().load(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
-
-        String name = map.get("name").toString();
+        YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
+        String name = yamlConfiguration.getString("name");
         LibrariesOptions options = librariesOptions.get();
         String folder = options.librariesFolder;
         for (Entry<String, RuntimeLib> lib : options.libraries.entrySet()) {
@@ -56,6 +61,30 @@ public class DependencyLoader {
         file.mkdirs();
         return file;
     });
+
+    static {
+        //通过反射获取ClassLoader addUrl 方法，因为涉及java17 无奈使用UnSafe方法
+        try {
+            Field f = Unsafe.class.getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            Unsafe unsafe = (Unsafe) f.get(null);
+            Field ucpField = URLClassLoader.class.getDeclaredField("ucp");
+            ucp = unsafe.getObject(DependencyLoader.class.getClassLoader(), unsafe.objectFieldOffset(ucpField));
+            Field lookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
+            MethodHandles.Lookup lookup = (MethodHandles.Lookup) unsafe.getObject(unsafe.staticFieldBase(lookupField), unsafe.staticFieldOffset(lookupField));
+            addUrlHandle = lookup.findVirtual(ucp.getClass(), "addURL", MethodType.methodType(void.class, URL.class));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void loadLibs() {
+        libFile.get();
+        for (DependencyLoader dependencyLoader : toInstall) {
+            dependencyLoader.load();
+        }
+    }
+
     public final String groupId, artifactId, version, repository;
 
 
@@ -66,9 +95,6 @@ public class DependencyLoader {
         this.repository = repository;
     }
 
-    public static IsolatedClassLoader getLoader() {
-        return loader;
-    }
 
     /**
      * Creates a standard builder
@@ -126,10 +152,11 @@ public class DependencyLoader {
         }
     }
 
-    public static void loadLibs() {
-        libFile.get();
-        for (DependencyLoader dependencyLoader : toInstall) {
-            dependencyLoader.load(TemplatePlugin.class);
+    public void addURL(URL url) {
+        try {
+            addUrlHandle.invoke(ucp, url);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -139,19 +166,17 @@ public class DependencyLoader {
 
     /**
      * Loads this library and handles any relocations if any.
-     *
-     * @param clazz Class to use its {@link ClassLoader} to load.
      */
-    public void load(Class<? extends TemplatePlugin> clazz) {
+    public void load() {
         LibrariesOptions options = librariesOptions.get();
         if (options == null) return;
         String name = artifactId + "-" + version;
-        Bukkit.getLogger().info("[DependencyLoader] Loading libraries " + name + " please wait");
         File parent = libFile.get();
         String folder = parent.toString() + File.separatorChar + groupId.replace('.', File.separatorChar) + File.separatorChar + artifactId + File.separatorChar + version;
         File saveLocation = new File(folder, name + ".jar");
         //不存在则下载
         if (!saveLocation.exists()) {
+            Bukkit.getLogger().info("[DependencyDownloader] Downloading library " + name + " please wait");
             try {
                 URL url = asURL();
                 saveLocation.getParentFile().mkdirs();
@@ -161,13 +186,11 @@ public class DependencyLoader {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new RuntimeException("Unable to download dependency: " + artifactId);
             }
         }
-        if (!saveLocation.exists()) {
-            throw new RuntimeException("Unable to download dependency: " + artifactId);
-        }
         try {
-            loader.addURL(saveLocation.toURI().toURL());
+            addURL(saveLocation.toURI().toURL());
         } catch (Exception e) {
             throw new RuntimeException("Unable to load dependency: " + saveLocation, e);
         }
@@ -329,19 +352,24 @@ public class DependencyLoader {
 
     }
 
-    @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
+    //    @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
     private static class LibrariesOptions {
 
         private String librariesFolder = "libraries";
         private Map<String, RuntimeLib> libraries = Collections.emptyMap();
 
-        public static LibrariesOptions fromMap(@NotNull Map<String, Object> map) {
+        public static LibrariesOptions fromMap(@NotNull ConfigurationSection section) {
             LibrariesOptions options = new LibrariesOptions();
-            options.librariesFolder = (String) map.getOrDefault("libraries-folder", "libs");
+            options.librariesFolder = section.getString("libraries-folder", "libs");
             options.librariesFolder = options.librariesFolder.replace('\\', File.separatorChar).replace('/', File.separatorChar);
             options.libraries = new HashMap<>();
-            Map<String, Map<String, Object>> declaredLibs = (Map<String, Map<String, Object>>) map.get("libraries");
-            if (declaredLibs != null)
+            Map<String, Map<String, Object>> declaredLibs = new HashMap<>();
+            ConfigurationSection libs = section.getConfigurationSection("libraries");
+            for (String lib : libs.getKeys(false)) {
+                Map<String, Object> values = libs.getConfigurationSection(lib).getValues(true);
+                declaredLibs.put(lib, values);
+            }
+            if (!declaredLibs.isEmpty())
                 for (Entry<String, Map<String, Object>> lib : declaredLibs.entrySet()) {
                     options.libraries.put(lib.getKey(), RuntimeLib.fromMap(lib.getValue()));
                 }

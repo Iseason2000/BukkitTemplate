@@ -18,7 +18,20 @@ import java.lang.Thread.sleep
 import java.nio.file.Files
 import java.util.*
 
-abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdate: Boolean = true) {
+abstract class SimpleYAMLConfig(
+    /**
+     * 默认配置路径，以.yml结尾，覆盖@FilePath
+     */
+    val defaultPath: String? = null,
+    /**
+     * 是否自动重载
+     */
+    var isAutoUpdate: Boolean = true,
+    /**
+     * 重载是否提示,如果你要自定义提示请关闭
+     */
+    var updateNotify: Boolean = true
+) {
 
     /**
      * 更新时间
@@ -89,7 +102,7 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     /**
      * 异步保存配置
      */
-    fun saveAsync(notify: Boolean = true) {
+    fun saveAsync(notify: Boolean = updateNotify) {
         submit(async = true) {
             save(notify)
         }
@@ -98,7 +111,7 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     /**
      * 保存配置
      */
-    fun save(notify: Boolean = true) {
+    fun save(notify: Boolean = updateNotify) {
         update(false)
         onSaved?.invoke(config)
         if (notify)
@@ -108,7 +121,7 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     /**
      * 从文件异步加载配置
      */
-    fun loadAsync(notify: Boolean = true) {
+    fun loadAsync(notify: Boolean = updateNotify) {
         submit(async = true) {
             load(notify)
         }
@@ -117,8 +130,8 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
     /**
      * 从文件加载配置
      */
-    fun load(notify: Boolean = true) {
-        if (!update(isReadOnly = true)) {
+    fun load(notify: Boolean = updateNotify) {
+        if (!update(true)) {
             return
         }
         onLoaded?.invoke(config)
@@ -167,6 +180,7 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
                         debug("Loading config $configPath error! key:${key.key} value: $value")
                     }
                 }
+                return@forEach
             }
             //将数据写入临时配置
             try {
@@ -175,10 +189,12 @@ abstract class SimpleYAMLConfig(val defaultPath: String? = null, var isAutoUpdat
                 debug("setting config $configPath error! key:${key.key}")
             }
         }
-        //保存临时配置，此时注释尚未转换
-        temp.save(configPath)
-        //转换注释
-        commentFile(configPath, commentMap)
+        if (!isReadOnly) {
+            //保存临时配置，此时注释尚未转换
+            temp.save(configPath)
+            //转换注释
+            commentFile(configPath, commentMap)
+        }
         config = loadConfiguration
         return true
     }
