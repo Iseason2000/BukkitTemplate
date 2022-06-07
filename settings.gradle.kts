@@ -1,4 +1,5 @@
-rootProject.name = "TemplatePlugin"
+val pluginName: String by settings
+rootProject.name = pluginName
 
 pluginManagement {
     //kotlin 版本
