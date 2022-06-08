@@ -4,7 +4,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.isAir
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 
 open class Icon(
     val rawItemStack: ItemStack,
@@ -22,7 +22,7 @@ open class Icon(
         }
         get() {
             val item = baseInventory?.getItem(index)
-            return if (item == null || item.type.isAir()) rawItemStack
+            return if (item == null || item.type.checkAir()) rawItemStack
             else item
         }
 

@@ -20,7 +20,7 @@ fun ItemStack.subtract(count: Int) {
     else amount = i
 }
 
-fun Material.isAir(): Boolean = when (this.name) {
+fun Material.checkAir(): Boolean = when (this.name) {
     "VOID_AIR",
     "CAVE_AIR",
     "AIR",

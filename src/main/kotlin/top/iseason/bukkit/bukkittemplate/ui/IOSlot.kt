@@ -1,10 +1,10 @@
 package top.iseason.bukkit.bukkittemplate.ui
 
-import top.iseason.bukkit.bukkittemplate.common.submit
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.giveItems
 import org.bukkit.entity.HumanEntity
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.isAir
+import top.iseason.bukkit.bukkittemplate.common.submit
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.giveItems
 
 /**
  * 物品槽，可以输入和输出物品
@@ -31,7 +31,7 @@ open class IOSlot(
         }
         get() {
             val item = baseInventory?.getItem(index)
-            return if (item != null && !item.type.isAir() && !item.isSimilar(placeholder)) item
+            return if (item != null && !item.type.checkAir() && !item.isSimilar(placeholder)) item
             else null
         }
 

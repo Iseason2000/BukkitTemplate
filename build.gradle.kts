@@ -2,7 +2,6 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.jar.JarOutputStream
-import java.util.regex.Pattern
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -91,7 +90,7 @@ tasks {
             val fileOut = File(jarOutputFile, "${project.name}-${project.version}.jar")
             if (!file.exists()) return@doLast
             //负责删除遗留的空文件夹和复制jar包到输出路径
-            filterJar(file, "top/iseason/bukkit/bukkittemplate.*", fileOut)
+            removeEmpty(file, fileOut)
         }
     }
 }
@@ -99,12 +98,11 @@ tasks {
 fun getProperties(properties: String) = rootProject.properties[properties].toString()
 
 /**
- * 从jar包中删除文件
+ * 从jar包中删除空文件夹
  * @param jarInFileName jar包路径
- * @param skipRegex 正则表达式
  * @param jarOutFileName 输出路径
  */
-fun filterJar(jarInFileName: File, skipRegex: String, jarOutFileName: File) {
+fun removeEmpty(jarInFileName: File, jarOutFileName: File) {
     var entry: ZipEntry?
     val zis: ZipInputStream?
     var jos: JarOutputStream? = null
@@ -112,16 +110,31 @@ fun filterJar(jarInFileName: File, skipRegex: String, jarOutFileName: File) {
     if (!jarInFileName.exists()) return
     try {
         fis = FileInputStream(jarInFileName)
-        val pattern: Pattern = Pattern.compile(skipRegex)
         zis = ZipInputStream(fis)
         jos = JarOutputStream(FileOutputStream(jarOutFileName))
+        val entries = mutableListOf<ZipEntry?>()
+        val bytes = mutableListOf<ByteArray>()
         while (zis.nextEntry.also { entry = it } != null) {
-            if (pattern.matcher(entry!!.name).matches()) continue
-            jos.putNextEntry(entry!!)
-            if (!entry!!.isDirectory) {
-                jos.write(zis.readBytes())
+            entries.add(entry!!)
+            bytes.add(zis.readBytes())
+        }
+        for (i in (entries.size - 1) downTo 0) {
+            val zipEntry = entries[i] ?: continue
+            var hasNext = false
+            for (i2 in (entries.size - 1) downTo 0) {
+                val zipEntry2 = entries[i2] ?: continue
+                if (zipEntry2.name.startsWith(zipEntry.name) && zipEntry2.name != zipEntry.name) {
+                    hasNext = true
+                    break
+                }
+            }
+            if (!hasNext && !zipEntry.isDirectory) {
+                jos.putNextEntry(zipEntry)
+                jos.write(bytes[i])
+                entries[i] = null
             }
         }
+
     } catch (ex: Exception) {
         throw IOException("unable to filter jar:" + ex.message)
     } finally {

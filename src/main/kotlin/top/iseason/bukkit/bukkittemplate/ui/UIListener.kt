@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.common.submit
 import top.iseason.bukkit.bukkittemplate.debug.debug
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.isAir
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
 
 /**
@@ -144,7 +144,7 @@ fun InventoryClickEvent.ioEvent() {
         PLACE_SOME -> {
             if (rawSlot in 0 until inventory.size) {
                 //处理占位符
-                inputItem = if (cursor?.type?.isAir() == true) null
+                inputItem = if (cursor?.type?.checkAir() == true) null
                 else Pair(rawSlot, cursor!!.clone()).apply {
                     if (action == PLACE_ONE) second.amount = 1
                     val currentItem = currentItem
