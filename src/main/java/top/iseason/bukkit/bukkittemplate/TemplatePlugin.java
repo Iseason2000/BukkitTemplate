@@ -27,8 +27,11 @@ public class TemplatePlugin extends JavaPlugin {
 
     private static final List<Class<?>> classes = loadClass();
     private static final KotlinPlugin ktPlugin = findInstance();
-    private static TemplatePlugin plugin;
+    private static TemplatePlugin plugin = null;
 
+    /**
+     * 寻找插件主类单例
+     */
     private static KotlinPlugin findInstance() {
         for (Class<?> aClass : classes) {
             if (KotlinPlugin.class.isAssignableFrom(aClass)) {
@@ -41,9 +44,13 @@ public class TemplatePlugin extends JavaPlugin {
                 }
             }
         }
-        throw new RuntimeException();
+        throw new RuntimeException("can not find plugin instance! you need a object class implement KotlinPlugin");
     }
 
+    /**
+     * 唤醒所有继承SimpleYAMLConfig 的 object类
+     * 目的是为了让插件加载阶段就补全缺失的配置文件
+     */
     private static void callConfigsInstance() {
         for (Class<?> aClass : classes) {
             if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
@@ -58,6 +65,11 @@ public class TemplatePlugin extends JavaPlugin {
         }
     }
 
+    /**
+     * 加载需要的class
+     *
+     * @return 需要的class的集合
+     */
     private static List<Class<?>> loadClass() {
         URL location = TemplatePlugin.class.getProtectionDomain().getCodeSource().getLocation();
         ArrayList<Class<?>> classes = new ArrayList<>();
@@ -97,10 +109,20 @@ public class TemplatePlugin extends JavaPlugin {
         return classes;
     }
 
+    /**
+     * 获取Bukkit插件主类
+     *
+     * @return Bukkit插件主类
+     */
     public static TemplatePlugin getPlugin() {
         return plugin;
     }
 
+    /**
+     * 获取插件主类
+     *
+     * @return 插件主类
+     */
     public static KotlinPlugin getKtPlugin() {
         return ktPlugin;
     }
@@ -113,6 +135,7 @@ public class TemplatePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        //仅为了唤醒object
         UIListener.INSTANCE.hashCode();
         callConfigsInstance();
         ktPlugin.onEnable();

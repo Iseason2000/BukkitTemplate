@@ -3,6 +3,13 @@ package top.iseason.bukkit.bukkittemplate.common
 import org.bukkit.scheduler.BukkitRunnable
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 
+/**
+ * 提交一个任务
+ * @param delay 延迟 单位tick
+ * @param period 循环周期 单位tick
+ * @param async 是否异步
+ * @param task 你的任务
+ */
 fun submit(
     delay: Long = 0,
     period: Long = 0,

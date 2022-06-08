@@ -15,9 +15,13 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Thread.sleep
+import java.lang.reflect.Modifier
 import java.nio.file.Files
 import java.util.*
 
+/**
+ * 一个简单的支持自动重载的配置类，不建议作为数据储存用
+ */
 abstract class SimpleYAMLConfig(
     /**
      * 默认配置路径，以.yml结尾，覆盖@FilePath
@@ -49,20 +53,27 @@ abstract class SimpleYAMLConfig(
     }
 
     /**
-     * 配置对象
+     * 配置对象,修改并不会生效，只能直接修改成员
      */
     var config = YamlConfiguration.loadConfiguration(configPath)
+        private set
 
     private val keys = mutableListOf<ConfigKey>().also { list ->
         //判断是否全为键值
         if (this@SimpleYAMLConfig.javaClass.getAnnotation(Key::class.java) != null) {
             this::class.java.declaredFields.forEach {
-                if ("INSTANCE" == it.name) return@forEach
+//                if ("INSTANCE" == it.name) return@forEach
+                if (Modifier.isFinal(it.modifiers)) {
+                    return@forEach
+                }
                 list.add(ConfigKey(it.name.replace("__", ".").replace('_', '-'), it, null))
             }
             return@also
         }
         this::class.java.declaredFields.forEach {
+            if (Modifier.isFinal(it.modifiers)) {
+                return@forEach
+            }
             val keyAnnotation = it.getAnnotation(Key::class.java) ?: return@forEach
             val key = keyAnnotation.key.ifEmpty { it.name.replace("__", ".").replace('_', '-') }
             val comments = mutableListOf<String>()

@@ -1,3 +1,11 @@
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.jar.JarOutputStream
+import java.util.regex.Pattern
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+
 plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
@@ -55,9 +63,10 @@ tasks {
         minimize()
         relocate("org.bstats", "$groupS.lib.bstats")
         relocate("top.iseason.bukkit.bukkittemplate", "$groupS.lib.core")
-        destinationDirectory.set(file(jarOutputFile))
+//        destinationDirectory.set(file(jarOutputFile))
         archiveFileName.set("${project.name}-${project.version}.jar")
     }
+
     compileJava {
         options.encoding = "UTF-8"
     }
@@ -67,16 +76,56 @@ tasks {
     processResources {
         filesMatching("plugin.yml") {
             expand(
-                "main" to "$groupS.core.TemplatePlugin",
+                "main" to "$groupS.lib.core.TemplatePlugin",
                 "name" to pluginName,
                 "version" to project.version,
                 "author" to author,
-                "kotlinVersion" to getProperties("kotlinVersion"),
+                "kotlinVersion" to getProperties("kotlinVersion")
             )
         }
     }
-
+    task("buildAll") {
+        dependsOn(shadowJar)
+        doLast {
+            val file = File(shadowJar.get().destinationDirectory.get().asFile, "${project.name}-${project.version}.jar")
+            val fileOut = File(jarOutputFile, "${project.name}-${project.version}.jar")
+            if (!file.exists()) return@doLast
+            //负责删除遗留的空文件夹和复制jar包到输出路径
+            filterJar(file, "top/iseason/bukkit/bukkittemplate.*", fileOut)
+        }
+    }
 }
 
-
 fun getProperties(properties: String) = rootProject.properties[properties].toString()
+
+/**
+ * 从jar包中删除文件
+ * @param jarInFileName jar包路径
+ * @param skipRegex 正则表达式
+ * @param jarOutFileName 输出路径
+ */
+fun filterJar(jarInFileName: File, skipRegex: String, jarOutFileName: File) {
+    var entry: ZipEntry?
+    val zis: ZipInputStream?
+    var jos: JarOutputStream? = null
+    var fis: FileInputStream? = null
+    if (!jarInFileName.exists()) return
+    try {
+        fis = FileInputStream(jarInFileName)
+        val pattern: Pattern = Pattern.compile(skipRegex)
+        zis = ZipInputStream(fis)
+        jos = JarOutputStream(FileOutputStream(jarOutFileName))
+        while (zis.nextEntry.also { entry = it } != null) {
+            if (pattern.matcher(entry!!.name).matches()) continue
+            jos.putNextEntry(entry!!)
+            if (!entry!!.isDirectory) {
+                jos.write(zis.readBytes())
+            }
+        }
+    } catch (ex: Exception) {
+        throw IOException("unable to filter jar:" + ex.message)
+    } finally {
+        fis?.close()
+        jos?.close()
+    }
+}
