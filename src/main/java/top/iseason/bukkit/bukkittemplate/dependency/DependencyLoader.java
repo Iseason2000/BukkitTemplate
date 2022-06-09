@@ -42,7 +42,7 @@ public class DependencyLoader {
     private static final Supplier<LibrariesOptions> librariesOptions = memoize(() -> {
         YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
         if (yamlConfiguration.contains("runtime-libraries"))
-            return LibrariesOptions.fromMap((yamlConfiguration.getConfigurationSection("runtime-libraries")));
+            return LibrariesOptions.fromMap((requireNonNull(yamlConfiguration.getConfigurationSection("runtime-libraries"))));
         return null;
     });
     private static final Supplier<File> libFile = memoize(() -> {
@@ -138,10 +138,10 @@ public class DependencyLoader {
     }
 
     /**
-     * A convenience method to check whether a class exists at runtime or not.
+     * 判断类是否存在
      *
-     * @param className Class name to check for
-     * @return true if the class exists, false if otherwise.
+     * @param className 类名
+     * @return true 如果存在的话
      */
     public static boolean classExists(@NotNull String className) {
         try {
@@ -152,6 +152,9 @@ public class DependencyLoader {
         }
     }
 
+    /**
+     * 将URl添加进插件的ClassLoader
+     */
     public void addURL(URL url) {
         try {
             addUrlHandle.invoke(ucp, url);
@@ -165,7 +168,7 @@ public class DependencyLoader {
     }
 
     /**
-     * Loads this library and handles any relocations if any.
+     * 加载这个依赖
      */
     public void load() {
         LibrariesOptions options = librariesOptions.get();
@@ -197,9 +200,9 @@ public class DependencyLoader {
     }
 
     /**
-     * Creates a download {@link URL} for this library.
+     * 创建这个依赖的下载链接
      *
-     * @return The dependency URL
+     * @return 依赖的下载链接
      * @throws MalformedURLException If the URL is malformed.
      */
     public URL asURL() throws MalformedURLException {
@@ -215,7 +218,7 @@ public class DependencyLoader {
 
     @Override
     public String toString() {
-        return "PluginLib{" +
+        return "Dependency{" +
                 "groupId='" + groupId + '\'' +
                 ", artifactId='" + artifactId + '\'' +
                 ", version='" + version + '\'' +
@@ -236,10 +239,7 @@ public class DependencyLoader {
         }
 
         /**
-         * Sets the builder to create a static URL dependency.
-         *
-         * @param url URL of the dependency.
-         * @return This builder
+         * 从直链下载依赖
          */
         public Builder fromURL(@NotNull String url) {
             this.url = n(url, "provided URL is null!");
@@ -247,10 +247,7 @@ public class DependencyLoader {
         }
 
         /**
-         * Sets the group ID of the dependency
-         *
-         * @param group New group ID to set
-         * @return This builder
+         * 设置依赖包名
          */
         public Builder groupId(@NotNull String group) {
             this.group = n(group, "groupId is null!");
@@ -258,10 +255,7 @@ public class DependencyLoader {
         }
 
         /**
-         * Sets the artifact ID of the dependency
-         *
-         * @param artifact New artifact ID to set
-         * @return This builder
+         * 设置依赖ID
          */
         public Builder artifactId(@NotNull String artifact) {
             this.artifact = n(artifact, "artifactId is null!");
@@ -269,10 +263,7 @@ public class DependencyLoader {
         }
 
         /**
-         * Sets the version of the dependency
-         *
-         * @param version New version to set
-         * @return This builder
+         * 设置依赖版本 比如version("1.2.3")
          */
         public Builder version(@NotNull String version) {
             this.version = n(version, "version is null!");
@@ -280,7 +271,7 @@ public class DependencyLoader {
         }
 
         /**
-         * Sets the version of the dependency, by providing the major, minor, build numbers
+         * 设置依赖版本，比如version(1,2,3)
          *
          * @param numbers An array of numbers to join using "."
          * @return This builder
@@ -292,7 +283,7 @@ public class DependencyLoader {
         }
 
         /**
-         * Sets the repository to download the dependency from
+         * 设置仓库地址，默认为maven
          *
          * @param repository New repository to set
          * @return This builder
@@ -303,46 +294,37 @@ public class DependencyLoader {
         }
 
         /**
-         * A convenience method to set the repository to <em>JitPack</em>
-         *
-         * @return This builder
+         * 设置仓库为jitpack
          */
         public Builder jitpack() {
             return repository("https://jitpack.io/");
         }
 
         /**
-         * A convenience method to set the repository to <em>Bintray - JCenter</em>
-         *
-         * @return This builder
+         * 设置仓库为jcenter
          */
         public Builder jcenter() {
             return repository("https://jcenter.bintray.com/");
         }
 
         /**
-         * A convenience method to set the repository to <em>Maven Central</em>
-         *
-         * @return This builder
+         * 设置仓库为mavenCentral
          */
         public Builder mavenCentral() {
             return repository("https://repo1.maven.org/maven2/");
         }
 
         /**
-         * A convenience method to set the repository to <em>Aikar's Repository</em>
-         *
-         * @return This builder
+         * 设置仓库为aikar
          */
         public Builder aikar() {
             return repository("https://repo.aikar.co/content/groups/aikar/");
         }
 
         /**
-         * Constructs a {@link DependencyLoader} from the provided values
+         * 构建依赖，对象不可修改
          *
-         * @return A new, immutable {@link DependencyLoader} instance.
-         * @throws NullPointerException if any of the required properties is not provided.
+         * @throws NullPointerException 如果没有这个依赖
          */
         public DependencyLoader build() {
             if (url != null)
@@ -352,7 +334,6 @@ public class DependencyLoader {
 
     }
 
-    //    @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
     private static class LibrariesOptions {
 
         private String librariesFolder = "libraries";
@@ -365,8 +346,9 @@ public class DependencyLoader {
             options.libraries = new HashMap<>();
             Map<String, Map<String, Object>> declaredLibs = new HashMap<>();
             ConfigurationSection libs = section.getConfigurationSection("libraries");
+            if (libs == null) throw new NullPointerException("必须至少有一个依赖");
             for (String lib : libs.getKeys(false)) {
-                Map<String, Object> values = libs.getConfigurationSection(lib).getValues(true);
+                Map<String, Object> values = requireNonNull(libs.getConfigurationSection(lib)).getValues(true);
                 declaredLibs.put(lib, values);
             }
             if (!declaredLibs.isEmpty())
@@ -378,7 +360,6 @@ public class DependencyLoader {
 
     }
 
-    @SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
     private static class RuntimeLib {
 
         @Language("XML")

@@ -1,15 +1,18 @@
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.jar.JarOutputStream
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-
 plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:4.0.2")
+        classpath("com.guardsquare:proguard-gradle:7.2.2")
+    }
+}
 // 插件名称，请在gradle.properties 修改
 val pluginName = getProperties("pluginName")
 
@@ -26,10 +29,11 @@ val groupS = group
 
 repositories {
 //    阿里的服务器速度快一点
-    maven {
-        name = "aliyun"
-        url = uri("https://maven.aliyun.com/repository/public/")
-    }
+//    maven {
+//        name = "aliyun"
+//        url = uri("https://maven.aliyun.com/repository/public/")
+//    }
+    google()
     mavenCentral()
     mavenLocal()
     maven {
@@ -65,7 +69,6 @@ tasks {
 //        destinationDirectory.set(file(jarOutputFile))
         archiveFileName.set("${project.name}-${project.version}.jar")
     }
-
     compileJava {
         options.encoding = "UTF-8"
     }
@@ -83,62 +86,46 @@ tasks {
             )
         }
     }
-    task("buildAll") {
-        dependsOn(shadowJar)
-        doLast {
-            val file = File(shadowJar.get().destinationDirectory.get().asFile, "${project.name}-${project.version}.jar")
-            val fileOut = File(jarOutputFile, "${project.name}-${project.version}.jar")
-            if (!file.exists()) return@doLast
-            //负责删除遗留的空文件夹和复制jar包到输出路径
-            removeEmpty(file, fileOut)
-        }
+}
+
+tasks.register<proguard.gradle.ProGuardTask>("buildAll") {
+    verbose()
+    injars(tasks.named("shadowJar"))
+    //是否混淆，注销掉启用混淆
+    val obfuscated = getProperties("obfuscated") == "true"
+    if (!obfuscated) {
+        dontobfuscate()
     }
+    dontwarn("java.lang.invoke.MethodHandle")
+    val javaHome = System.getProperty("java.home")
+
+    if (JavaVersion.current() < JavaVersion.toVersion(9)) {
+        libraryjars("$javaHome/lib/rt.jar")
+    } else {
+        libraryjars(
+            mapOf(
+                "jarfilter" to "!**.jar",
+                "filter" to "!module-info.class"
+            ),
+            "$javaHome/jmods/java.base.jmod"
+        )
+    }
+    libraryjars(configurations.compileClasspath.get().files)
+    allowaccessmodification()
+    keep(
+        """
+        class $groupS.lib.core.TemplatePlugin {}
+    """
+    )
+    keep(
+        """
+        class * implements $groupS.lib.core.KotlinPlugin {*;}
+    """
+    )
+    if (obfuscated) {
+        outjars(File(jarOutputFile, "${project.name}-${project.version}-obfuscated.jar"))
+    } else
+        outjars(File(jarOutputFile, "${project.name}-${project.version}.jar"))
 }
 
 fun getProperties(properties: String) = rootProject.properties[properties].toString()
-
-/**
- * 从jar包中删除空文件夹
- * @param jarInFileName jar包路径
- * @param jarOutFileName 输出路径
- */
-fun removeEmpty(jarInFileName: File, jarOutFileName: File) {
-    var entry: ZipEntry?
-    val zis: ZipInputStream?
-    var jos: JarOutputStream? = null
-    var fis: FileInputStream? = null
-    if (!jarInFileName.exists()) return
-    try {
-        fis = FileInputStream(jarInFileName)
-        zis = ZipInputStream(fis)
-        jos = JarOutputStream(FileOutputStream(jarOutFileName))
-        val entries = mutableListOf<ZipEntry?>()
-        val bytes = mutableListOf<ByteArray>()
-        while (zis.nextEntry.also { entry = it } != null) {
-            entries.add(entry!!)
-            bytes.add(zis.readBytes())
-        }
-        for (i in (entries.size - 1) downTo 0) {
-            val zipEntry = entries[i] ?: continue
-            var hasNext = false
-            for (i2 in (entries.size - 1) downTo 0) {
-                val zipEntry2 = entries[i2] ?: continue
-                if (zipEntry2.name.startsWith(zipEntry.name) && zipEntry2.name != zipEntry.name) {
-                    hasNext = true
-                    break
-                }
-            }
-            if (!hasNext && !zipEntry.isDirectory) {
-                jos.putNextEntry(zipEntry)
-                jos.write(bytes[i])
-                entries[i] = null
-            }
-        }
-
-    } catch (ex: Exception) {
-        throw IOException("unable to filter jar:" + ex.message)
-    } finally {
-        fis?.close()
-        jos?.close()
-    }
-}
