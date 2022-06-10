@@ -2,6 +2,7 @@ package top.iseason.bukkit.bukkittemplate;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher;
 import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
@@ -28,6 +29,28 @@ public class TemplatePlugin extends JavaPlugin {
     private static final List<Class<?>> classes = loadClass();
     private static final KotlinPlugin ktPlugin = findInstance();
     private static TemplatePlugin plugin = null;
+
+    private SimpleLogger simpleLogger = null;
+
+    public TemplatePlugin() {
+        if (plugin == null) plugin = this;
+        try {
+            Field logger = JavaPlugin.class.getDeclaredField("logger");
+            logger.setAccessible(true);
+            simpleLogger = new SimpleLogger(this);
+            logger.set(this, simpleLogger);
+            logger.setAccessible(false);
+        } catch (IllegalAccessException | NoSuchFieldException ignored) {
+        }
+        ktPlugin.javaPlugin = this;
+        ktPlugin.init();
+    }
+
+    @NotNull
+    @Override
+    public SimpleLogger getLogger() {
+        return simpleLogger;
+    }
 
     /**
      * 寻找插件主类单例
@@ -129,7 +152,6 @@ public class TemplatePlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        plugin = this;
         ktPlugin.onLoad();
     }
 

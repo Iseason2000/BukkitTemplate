@@ -35,7 +35,6 @@ repositories {
     }
     google()
     mavenCentral()
-    mavenLocal()
     maven {
         name = "spigot"
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/public/")
@@ -44,6 +43,7 @@ repositories {
         name = "jitpack"
         url = uri("https://jitpack.io")
     }
+    mavenLocal()
 }
 
 dependencies {
@@ -56,7 +56,7 @@ dependencies {
 //    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
 
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT")
 
 }
 
