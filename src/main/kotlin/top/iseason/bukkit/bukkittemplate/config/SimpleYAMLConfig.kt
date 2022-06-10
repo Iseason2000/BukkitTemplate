@@ -90,7 +90,7 @@ abstract class SimpleYAMLConfig(
     init {
         ConfigWatcher.fromFile(configPath.absoluteFile)
         configs[configPath.absolutePath] = this
-        loadAsync(false)
+        saveAsync(false)
     }
 
     fun setUpdate(enable: Boolean) {
@@ -165,19 +165,6 @@ abstract class SimpleYAMLConfig(
         val commentMap = mutableMapOf<String, String>()
         keys.forEach { key ->
             //获取并设置注释
-            val comments = key.comments
-            if (comments != null) {
-                for (str in comments) {
-                    val keyS = key.key
-                    val noPathKey = keyS.substring(keyS.lastIndexOf('.') + 1)
-                    //注释识别标识
-                    val random = "comment-${UUID.randomUUID()}"
-                    //传入注释内容，待转换
-                    commentMap["$noPathKey-$random"] = "# $str"
-                    //将注释当作键值写入配置文件
-                    temp.set("${key.key}-$random", "")
-                }
-            }
             if (isReadOnly) {
                 var value = loadConfiguration.get(key.key)
                 if (Map::class.java.isAssignableFrom(key.field.type) && value != null) {
@@ -192,6 +179,19 @@ abstract class SimpleYAMLConfig(
                     }
                 }
                 return@forEach
+            }
+            val comments = key.comments
+            if (comments != null) {
+                for (str in comments) {
+                    val keyS = key.key
+                    val noPathKey = keyS.substring(keyS.lastIndexOf('.') + 1)
+                    //注释识别标识
+                    val random = "comment-${UUID.randomUUID()}"
+                    //传入注释内容，待转换
+                    commentMap["$noPathKey-$random"] = "# $str"
+                    //将注释当作键值写入配置文件
+                    temp.set("${key.key}-$random", "")
+                }
             }
             //将数据写入临时配置
             try {

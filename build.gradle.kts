@@ -29,10 +29,10 @@ val groupS = group
 
 repositories {
 //    阿里的服务器速度快一点
-//    maven {
-//        name = "aliyun"
-//        url = uri("https://maven.aliyun.com/repository/public/")
-//    }
+    maven {
+        name = "aliyun"
+        url = uri("https://maven.aliyun.com/repository/public/")
+    }
     google()
     mavenCentral()
     mavenLocal()
@@ -66,8 +66,7 @@ tasks {
         minimize()
         relocate("org.bstats", "$groupS.lib.bstats")
         relocate("top.iseason.bukkit.bukkittemplate", "$groupS.lib.core")
-//        destinationDirectory.set(file(jarOutputFile))
-        archiveFileName.set("${project.name}-${project.version}.jar")
+//        archiveFileName.set("${project.name}-${project.version}.jar")
     }
     compileJava {
         options.encoding = "UTF-8"
@@ -88,17 +87,20 @@ tasks {
     }
 }
 
-tasks.register<proguard.gradle.ProGuardTask>("buildAll") {
+tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     verbose()
     injars(tasks.named("shadowJar"))
     //是否混淆，注销掉启用混淆
     val obfuscated = getProperties("obfuscated") == "true"
+    val shrink = getProperties("shrink") == "true"
     if (!obfuscated) {
         dontobfuscate()
     }
-    dontwarn("java.lang.invoke.MethodHandle")
+    if (!shrink) {
+        dontshrink()
+    }
+    dontwarn()
     val javaHome = System.getProperty("java.home")
-
     if (JavaVersion.current() < JavaVersion.toVersion(9)) {
         libraryjars("$javaHome/lib/rt.jar")
     } else {
@@ -111,20 +113,15 @@ tasks.register<proguard.gradle.ProGuardTask>("buildAll") {
         )
     }
     libraryjars(configurations.compileClasspath.get().files)
-    allowaccessmodification()
-    keep(
-        """
-        class $groupS.lib.core.TemplatePlugin {}
-    """
-    )
-    keep(
-        """
-        class * implements $groupS.lib.core.KotlinPlugin {*;}
-    """
-    )
-    if (obfuscated) {
+    keep("class $groupS.lib.core.TemplatePlugin {*;}")
+    keep("class * implements $groupS.lib.core.KotlinPlugin {*;}")
+    keep("class * extends $groupS.lib.core.config.SimpleYAMLConfig {*;}")
+    keep("class * implements org.bukkit.event.Listener {*;}")
+    keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
+    keepkotlinmetadata()
+    if (obfuscated)
         outjars(File(jarOutputFile, "${project.name}-${project.version}-obfuscated.jar"))
-    } else
+    else
         outjars(File(jarOutputFile, "${project.name}-${project.version}.jar"))
 }
 
