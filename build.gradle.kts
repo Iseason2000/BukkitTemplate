@@ -56,7 +56,7 @@ dependencies {
 //    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
 
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.19-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.12-R0.1-SNAPSHOT")
 
 }
 

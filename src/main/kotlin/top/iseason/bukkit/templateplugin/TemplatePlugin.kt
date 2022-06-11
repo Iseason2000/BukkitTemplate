@@ -22,6 +22,8 @@ object TemplatePlugin : KotlinPlugin() {
 
     override fun onEnable() {
         info("${ChatColor.GREEN}插件已启用!")
+        myCommands()
+
     }
 
     override fun onDisable() {

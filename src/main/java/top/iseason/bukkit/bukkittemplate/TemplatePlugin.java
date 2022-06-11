@@ -2,7 +2,7 @@ package top.iseason.bukkit.bukkittemplate;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
+import top.iseason.bukkit.bukkittemplate.command.CommandBuilder;
 import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher;
 import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
@@ -30,6 +30,7 @@ public class TemplatePlugin extends JavaPlugin {
     private static final KotlinPlugin ktPlugin = findInstance();
     private static TemplatePlugin plugin = null;
 
+
     private SimpleLogger simpleLogger = null;
 
     public TemplatePlugin() {
@@ -46,9 +47,7 @@ public class TemplatePlugin extends JavaPlugin {
         ktPlugin.init();
     }
 
-    @NotNull
-    @Override
-    public SimpleLogger getLogger() {
+    public SimpleLogger getSimpleLogger() {
         return simpleLogger;
     }
 
@@ -171,5 +170,6 @@ public class TemplatePlugin extends JavaPlugin {
         UIListener.INSTANCE.onDisable();
         ConfigWatcher.Companion.stop();
         ktPlugin.onDisable();
+        CommandBuilder.clearPermissions();
     }
 }
