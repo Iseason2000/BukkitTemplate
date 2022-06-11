@@ -133,13 +133,11 @@ open class CommandNode(
         var node: CommandNode = this
         // 不完整参数
         var incomplete = ""
-        var deep = 0
         for ((index, arg) in args.withIndex()) {
             if (arg.isBlank() && args.getOrNull(index + 1) != null) return emptyList()
             val subNode = node.getSubNode(arg, sender)
             if (subNode == null) {
                 incomplete = arg
-                deep = index
                 break
             }
             node = subNode
