@@ -1,12 +1,10 @@
 package top.iseason.bukkit.bukkittemplate;
 
-import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.iseason.bukkit.bukkittemplate.command.CommandBuilder;
 import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher;
 import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
-import top.iseason.bukkit.bukkittemplate.ui.UIListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -156,18 +154,12 @@ public class TemplatePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        //仅为了唤醒object
-        UIListener.INSTANCE.hashCode();
         callConfigsInstance();
         ktPlugin.onEnable();
-        if (ktPlugin.getBstatsID() > 0) {
-            new Metrics(this, ktPlugin.getBstatsID());
-        }
     }
 
     @Override
     public void onDisable() {
-        UIListener.INSTANCE.onDisable();
         ConfigWatcher.Companion.stop();
         ktPlugin.onDisable();
         CommandBuilder.clearPermissions();

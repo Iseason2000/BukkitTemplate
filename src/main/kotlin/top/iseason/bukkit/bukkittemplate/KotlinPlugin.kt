@@ -1,10 +1,6 @@
 package top.iseason.bukkit.bukkittemplate
 
 abstract class KotlinPlugin {
-    /**
-     * 统计插件的ID
-     */
-    open var bstatsID = -1
 
     /**
      * 获取bukkit插件对象,在onLoad阶段才会被赋值

@@ -21,12 +21,16 @@ object TemplatePlugin : KotlinPlugin() {
     }
 
     override fun onEnable() {
+//        如果使用UI包取消注销
+//        UIListener
         info("${ChatColor.GREEN}插件已启用!")
         command1()
 //        command2()
     }
 
     override fun onDisable() {
+//        如果使用UI包取消注销
+//        UIListener.onDisable()
         info("${ChatColor.YELLOW}插件已卸载!")
     }
 
