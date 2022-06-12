@@ -20,6 +20,8 @@ class TypeParam<T : Any>(
             typeParams[typeParam.type] = typeParam
         }
 
+        fun getTypeParam(clazz: KClass<*>) = typeParams[clazz]
+
         fun removeType(type: KClass<*>) = typeParams.remove(type)
 
         // 可选参数

@@ -7,6 +7,7 @@ import org.bukkit.potion.PotionEffectType
 import top.iseason.bukkit.bukkittemplate.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.command.Param
 import top.iseason.bukkit.bukkittemplate.command.ParamSuggestCache
+import top.iseason.bukkit.bukkittemplate.command.ParmaException
 import top.iseason.bukkit.bukkittemplate.command.commandRoot
 import top.iseason.bukkit.bukkittemplate.utils.sendMessage
 
@@ -25,11 +26,22 @@ fun command1() {
             )) {
             onExecute {
                 val operation = getParam<String>(0)
+                if (operation !in setOf("add", "set", "remove"))
+                    throw ParmaException("&7参数 &c${operation}&7 不是一个有效的操作,支持的有: add、set、remove")
                 val type = getParam<PotionEffectType>(1)
-                val player = getOptionalParam<Player>(2) ?: it as Player
-                val level = getOptionalParam<Int>(3) ?: 0
-                var time = ((getOptionalParam<Double>(4) ?: 10.0) * 20.0).toInt()
-                player.removePotionEffect(type)
+                var player = getOptionalParam<Player>(2)
+                var reduce = 0
+                if (player == null) {
+                    player = it as Player
+                    reduce++
+                }
+                var level = getOptionalParam<Int>(3 - reduce)
+                if (level == null) {
+                    level = 0
+                    reduce++
+                }
+                var time = ((getOptionalParam<Double>(4 - reduce) ?: 10.0) * 20.0).toInt()
+
                 when (operation) {
                     "add" -> {
                         val potionEffect = player.getPotionEffect(type)
@@ -37,9 +49,12 @@ fun command1() {
                         player.addPotionEffect(PotionEffect(type, time, level))
                     }
                     "set" -> {
+                        player.removePotionEffect(type)
                         player.addPotionEffect(PotionEffect(type, time, level))
                     }
-                    else -> {}
+                    else -> {
+                        player.removePotionEffect(type)
+                    }
                 }
                 true
             }
