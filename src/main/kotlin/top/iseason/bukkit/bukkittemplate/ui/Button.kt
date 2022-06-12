@@ -6,12 +6,9 @@ import org.bukkit.inventory.meta.ItemMeta
 
 /**
  * 可点击的按钮
- * @param rawMaterial 按钮默认材质
- * @param rawDisplayName 默认显示名
- * @param rawLore 默认显示lore
  * @param index 位于容器中的位置
  */
-
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 open class Button(
     override val rawItemStack: ItemStack,
     index: Int = 0,
@@ -39,7 +36,7 @@ open class Button(
     var displayName: String
         get() = itemMeta.displayName
         set(value) {
-            itemMeta = itemMeta.apply { setDisplayName(value) }
+            itemMeta = itemMeta.apply { displayName = value }
         }
 
     /**

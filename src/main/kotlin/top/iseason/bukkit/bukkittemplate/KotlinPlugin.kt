@@ -8,11 +8,6 @@ abstract class KotlinPlugin {
     lateinit var javaPlugin: TemplatePlugin
 
     /**
-     * 在插件加载时运行
-     */
-    abstract fun onLoad()
-
-    /**
      * 在插件启用时运行
      */
     abstract fun onEnable()
@@ -22,8 +17,4 @@ abstract class KotlinPlugin {
      */
     abstract fun onDisable()
 
-    /**
-     * 在插件主类初始化之后调用,此时插件尚未加载
-     */
-    abstract fun init()
 }

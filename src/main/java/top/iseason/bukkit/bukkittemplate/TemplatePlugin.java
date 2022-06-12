@@ -1,5 +1,6 @@
 package top.iseason.bukkit.bukkittemplate;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.iseason.bukkit.bukkittemplate.command.CommandBuilder;
 import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher;
@@ -20,35 +21,25 @@ import java.util.jar.JarFile;
 
 public class TemplatePlugin extends JavaPlugin {
 
-    static {
-        //加载依赖
-        DependencyLoader.loadLibs();
-    }
-
-    private static final List<Class<?>> classes = loadClass();
-    private static final KotlinPlugin ktPlugin = findInstance();
+    private static List<Class<?>> classes;
+    private static KotlinPlugin ktPlugin;
     private static TemplatePlugin plugin = null;
 
-
-    private SimpleLogger simpleLogger = null;
+    private static boolean isInit = false;
 
     public TemplatePlugin() {
         if (plugin == null) plugin = this;
-        try {
-            Field logger = JavaPlugin.class.getDeclaredField("logger");
-            logger.setAccessible(true);
-            simpleLogger = new SimpleLogger(this);
-            logger.set(this, simpleLogger);
-            logger.setAccessible(false);
-        } catch (IllegalAccessException | NoSuchFieldException ignored) {
-        }
-        ktPlugin.javaPlugin = this;
-        ktPlugin.init();
+        //防止卡主线程
+        new Thread(() -> {
+            DependencyLoader.loadLibs();
+            classes = loadClass();
+            ktPlugin = findInstance();
+            ktPlugin.javaPlugin = this;
+            isInit = true;
+            Bukkit.getScheduler().runTask(plugin, () -> plugin.onEnable());
+        }).start();
     }
 
-    public SimpleLogger getSimpleLogger() {
-        return simpleLogger;
-    }
 
     /**
      * 寻找插件主类单例
@@ -149,12 +140,8 @@ public class TemplatePlugin extends JavaPlugin {
     }
 
     @Override
-    public void onLoad() {
-        ktPlugin.onLoad();
-    }
-
-    @Override
     public void onEnable() {
+        if (!isInit) return;
         getServer().getPluginManager().registerEvents(UIListener.INSTANCE, this);
         callConfigsInstance();
         ktPlugin.onEnable();

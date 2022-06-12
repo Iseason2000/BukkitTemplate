@@ -19,9 +19,11 @@ import java.lang.reflect.Modifier
 import java.nio.file.Files
 import java.util.*
 
+
 /**
  * 一个简单的支持自动重载的配置类，不建议作为数据储存用
  */
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 abstract class SimpleYAMLConfig(
     /**
      * 默认配置路径，以.yml结尾，覆盖@FilePath
@@ -55,7 +57,7 @@ abstract class SimpleYAMLConfig(
     /**
      * 配置对象,修改并不会生效，只能直接修改成员
      */
-    var config = YamlConfiguration.loadConfiguration(configPath)
+    var config: YamlConfiguration = YamlConfiguration.loadConfiguration(configPath)
         private set
 
     private val keys = mutableListOf<ConfigKey>().also { list ->

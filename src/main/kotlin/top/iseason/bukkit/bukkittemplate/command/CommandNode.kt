@@ -8,14 +8,14 @@ import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
-import top.iseason.bukkit.bukkittemplate.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessages
 import top.iseason.bukkit.bukkittemplate.utils.submit
 import java.util.*
 
-@Suppress("unused")
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 open class CommandNode(
     /**
      * 节点名称

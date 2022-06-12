@@ -4,10 +4,11 @@ import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
-import top.iseason.bukkit.bukkittemplate.SimpleLogger
+import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import java.util.*
 import kotlin.reflect.KClass
 
+@Suppress("unused")
 class TypeParam<T : Any>(
     val type: KClass<T>,
     var errorMessage: (String) -> String = { "Param ${it}is not exist" },

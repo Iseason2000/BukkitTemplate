@@ -3,7 +3,7 @@ package top.iseason.bukkit.bukkittemplate.command
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.potion.PotionEffectType
-import top.iseason.bukkit.bukkittemplate.SimpleLogger
+import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 
 class Params(val params: Array<String>, val node: CommandNode) {
     /**
@@ -41,9 +41,7 @@ open class Param(
      * 建议
      */
     val suggest: (CommandSender.() -> Collection<String>)? = null
-) {
-
-}
+)
 
 object ParamSuggestCache {
     val playerParam: CommandSender.() -> Collection<String> = { Bukkit.getOnlinePlayers().map { it.name } }

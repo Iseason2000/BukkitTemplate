@@ -4,11 +4,11 @@ import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import top.iseason.bukkit.bukkittemplate.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.command.Param
 import top.iseason.bukkit.bukkittemplate.command.ParamSuggestCache
 import top.iseason.bukkit.bukkittemplate.command.ParmaException
 import top.iseason.bukkit.bukkittemplate.command.commandRoot
+import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.utils.sendMessage
 
 fun command1() {

@@ -2,7 +2,7 @@ name: ${name}
 main: ${main}
 version: ${version}
 authors: [ ${ author } ]
-#api-version: 1.16
+api-version: 1.16
 runtime-libraries:
   libraries-folder: '@Server:libraries' # If not defined, it will be 'libraries'
   libraries:

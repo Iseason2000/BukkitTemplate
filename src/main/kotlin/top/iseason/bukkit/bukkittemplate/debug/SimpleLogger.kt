@@ -1,7 +1,6 @@
 package top.iseason.bukkit.bukkittemplate.debug
 
 import org.bukkit.Bukkit
-import top.iseason.bukkit.bukkittemplate.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 
@@ -10,9 +9,15 @@ fun info(message: Any?) {
 }
 
 fun debug(message: Any?) {
-    TemplatePlugin.getPlugin().simpleLogger.debug(message.toString())
+    if (SimpleLogger.isDebug)
+        info(message)
 }
 
 fun warn(message: Any?) {
-    TemplatePlugin.getPlugin().simpleLogger.warning(message.toString())
+    TemplatePlugin.getPlugin().logger.warning(message.toString())
+}
+
+object SimpleLogger {
+    var prefix = "[${TemplatePlugin.getPlugin().description.name}] "
+    var isDebug = false
 }
