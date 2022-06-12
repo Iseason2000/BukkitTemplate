@@ -2,9 +2,9 @@ package top.iseason.bukkit.bukkittemplate.ui
 
 import org.bukkit.entity.HumanEntity
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.common.submit
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.giveItems
+import top.iseason.bukkit.bukkittemplate.utils.submit
 
 /**
  * 物品槽，可以输入和输出物品

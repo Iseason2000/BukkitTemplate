@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     kotlin("jvm")
     id("com.github.johnrengelman.shadow")
@@ -26,7 +28,7 @@ val jarOutputFile = getProperties("jarOutputFile")
 version = getProperties("version")
 
 val groupS = group
-
+val shadowJar: ShadowJar by tasks
 repositories {
 //    阿里的服务器速度快一点
     maven {
@@ -63,10 +65,7 @@ dependencies {
 
 tasks {
     shadowJar {
-        minimize()
-        relocate("org.bstats", "$groupS.lib.bstats")
         relocate("top.iseason.bukkit.bukkittemplate", "$groupS.lib.core")
-//        archiveFileName.set("${project.name}-${project.version}.jar")
     }
     compileJava {
         options.encoding = "UTF-8"
@@ -86,7 +85,12 @@ tasks {
         }
     }
 }
-
+task<com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation>("relocateShadowJar") {
+    target = tasks.shadowJar.get()
+    prefix = "$groupS.lib"
+    shadowJar.minimize()
+}
+tasks.shadowJar.get().dependsOn(tasks.getByName("relocateShadowJar"))
 tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     verbose()
     injars(tasks.named("shadowJar"))

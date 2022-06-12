@@ -10,10 +10,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.common.submit
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
+import top.iseason.bukkit.bukkittemplate.utils.submit
 
 /**
  * 负责所有UI的监听动作

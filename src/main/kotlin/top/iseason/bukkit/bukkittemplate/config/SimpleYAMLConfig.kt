@@ -4,12 +4,12 @@ import org.bukkit.configuration.MemorySection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
-import top.iseason.bukkit.bukkittemplate.common.submit
 import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
 import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
 import top.iseason.bukkit.bukkittemplate.config.annotations.Key
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.debug.info
+import top.iseason.bukkit.bukkittemplate.utils.submit
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
