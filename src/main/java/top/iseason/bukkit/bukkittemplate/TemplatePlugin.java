@@ -5,6 +5,7 @@ import top.iseason.bukkit.bukkittemplate.command.CommandBuilder;
 import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher;
 import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
+import top.iseason.bukkit.bukkittemplate.ui.UIListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -154,12 +155,14 @@ public class TemplatePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getServer().getPluginManager().registerEvents(UIListener.INSTANCE, this);
         callConfigsInstance();
         ktPlugin.onEnable();
     }
 
     @Override
     public void onDisable() {
+        UIListener.INSTANCE.onDisable();
         ConfigWatcher.Companion.stop();
         ktPlugin.onDisable();
         CommandBuilder.clearPermissions();
