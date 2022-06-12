@@ -3,6 +3,8 @@ package top.iseason.bukkit.bukkittemplate.command
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffectType
+import top.iseason.bukkit.bukkittemplate.SimpleLogger
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -37,8 +39,8 @@ class TypeParam<T : Any>(
         }
 
         private fun setDefaultParams() {
-            TypeParam(Player::class, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
-                var player = Bukkit.getPlayer(it)
+            TypeParam(Player::class, errorMessage = { "${SimpleLogger.prefix}&7玩家 &c${it} &7不存在!" }) {
+                var player = Bukkit.getPlayerExact(it)
                 if (player == null && it.length == 36) {
                     player = try {
                         Bukkit.getPlayer(UUID.fromString(it))
@@ -48,7 +50,7 @@ class TypeParam<T : Any>(
                 }
                 player
             }.register()
-            TypeParam(OfflinePlayer::class, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
+            TypeParam(OfflinePlayer::class, errorMessage = { "${SimpleLogger.prefix}&7玩家 &c${it} &7不存在!" }) {
                 var player: OfflinePlayer? = Bukkit.getOfflinePlayer(it)
                 if (!player!!.hasPlayedBefore()) {
                     player = try {
@@ -60,14 +62,14 @@ class TypeParam<T : Any>(
                 }
                 player
             }.register()
-            TypeParam(Int::class, errorMessage = { "&c${it} &7不是一个有效的整数" }) {
+            TypeParam(Int::class, errorMessage = { "${SimpleLogger.prefix}&c${it} &7不是一个有效的整数" }) {
                 try {
                     it.toInt()
                 } catch (e: NumberFormatException) {
                     null
                 }
             }.register()
-            TypeParam(Double::class, errorMessage = { "&c${it} &7不是一个有效的小数" }) {
+            TypeParam(Double::class, errorMessage = { "${SimpleLogger.prefix}&c${it} &7不是一个有效的小数" }) {
                 try {
                     it.toDouble()
                 } catch (e: NumberFormatException) {
@@ -75,6 +77,12 @@ class TypeParam<T : Any>(
                 }
             }.register()
             TypeParam(String::class) { it }.register()
+            TypeParam(
+                PotionEffectType::class,
+                { "${SimpleLogger.prefix}&c${it} &7不是一个有效的药水种类" }
+            ) {
+                PotionEffectType.getByName(it)
+            }.register()
         }
     }
 }

@@ -15,22 +15,50 @@ import java.lang.reflect.Constructor
 @Suppress("unused")
 class CommandBuilder(private val commandNode: CommandNode) {
 
-    fun onExecute(onExecute: CommandNode.(sender: CommandSender) -> Boolean) {
+    /**
+     * 节点执行代码
+     */
+    fun onExecute(onExecute: Params.(sender: CommandSender) -> Boolean): CommandBuilder {
         commandNode.onExecute = onExecute
+        return this
     }
 
-    fun onFailure(onFailure: String) {
+    /**
+     * 执行失败的提示信息
+     */
+    fun onFailure(onFailure: String): CommandBuilder {
         commandNode.failureMessage = onFailure
+        return this
     }
 
-    fun onSuccess(onSuccess: String) {
+    /**
+     * 执行成功的提示信息
+     */
+    fun onSuccess(onSuccess: String): CommandBuilder {
         commandNode.successMessage = onSuccess
+        return this
     }
 
-    fun onNoPermissions(onNoPermissions: String) {
+    /**
+     * 缺少权限的提示信息
+     */
+    fun onNoPermissions(onNoPermissions: String): CommandBuilder {
         commandNode.noPermissionMessage = onNoPermissions
+        return this
     }
 
+    /**
+     * 添加节点
+     */
+    fun node(commandNode: CommandNode): CommandBuilder {
+        this.commandNode.addSubNode(commandNode)
+        pluginPermissions.add(commandNode.permission)
+        return CommandBuilder(commandNode)
+    }
+
+    /**
+     * 添加节点
+     */
     fun node(
         /**
          * 节点名称
@@ -48,15 +76,20 @@ class CommandBuilder(private val commandNode: CommandNode) {
          * 描述
          */
         description: String? = null,
+        async: Boolean = false,
+        params: Array<Param> = emptyArray(),
+        isPlayerOnly: Boolean = false,
         /**
          * 命令执行
          */
-        onScope: CommandBuilder.() -> Unit
-    ) {
-        val commandNode = CommandNode(name, alias, description, default)
+        onScope: (CommandBuilder.() -> Unit)? = null
+    ): CommandBuilder {
+        val commandNode = CommandNode(name, alias, description, default, async, params, isPlayerOnly)
         this.commandNode.addSubNode(commandNode)
         pluginPermissions.add(commandNode.permission)
-        onScope(CommandBuilder(commandNode))
+        val commandBuilder = CommandBuilder(commandNode)
+        onScope?.invoke(commandBuilder)
+        return commandBuilder
     }
 
     companion object {
@@ -87,10 +120,10 @@ class CommandBuilder(private val commandNode: CommandNode) {
             if (commandNode.description != null) {
                 pluginCommand.description = commandNode.description
             }
-            pluginCommand.permission = commandNode.permission.name
             pluginCommand.permissionMessage = commandNode.noPermissionMessage?.toColor()
-            simpleCommandMap.register(commandNode.name, pluginCommand)
+            simpleCommandMap.register(TemplatePlugin.getPlugin().name, pluginCommand)
             pluginCommand.executor = commandNode
+            pluginCommand.tabCompleter = commandNode
             pluginPermissions.add(commandNode.permission)
         }
 
@@ -98,6 +131,10 @@ class CommandBuilder(private val commandNode: CommandNode) {
         fun unregister(commandNode: CommandNode) {
             require(commandNode.parent == null) { "非根命令不需要注销!" }
             Bukkit.getServer().getPluginCommand(commandNode.name).unregister(simpleCommandMap)
+        }
+
+        fun addPermissions(perm: Permission) {
+            pluginPermissions.add(perm)
         }
 
         @JvmStatic
@@ -128,13 +165,18 @@ fun commandRoot(
      * 描述
      */
     description: String? = null,
+    async: Boolean = false,
+    params: Array<Param> = emptyArray(),
+    isPlayerOnly: Boolean = false,
     /**
      * 命令执行
      */
-    onScope: CommandBuilder.() -> Unit
-) {
-    val commandNode = CommandNode(name, alias, description, default)
-    onScope(CommandBuilder(commandNode))
+    onScope: (CommandBuilder.() -> Unit)? = null
+): CommandBuilder {
+    val commandNode = CommandNode(name, alias, description, default, async, params, isPlayerOnly)
+    val commandBuilder = CommandBuilder(commandNode)
+    onScope?.invoke(commandBuilder)
     if (commandNode.parent == null)
         CommandBuilder.register(commandNode)
+    return commandBuilder
 }
