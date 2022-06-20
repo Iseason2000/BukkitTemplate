@@ -10,6 +10,7 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
+import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessages
 import top.iseason.bukkit.bukkittemplate.utils.submit
@@ -25,15 +26,25 @@ open class CommandNode(
      * 节点别名
      */
     val alias: Array<String>? = null,
-
+    /**
+     * 描述
+     */
     val description: String? = null,
     /**
-     * 默认权限
+     * 默认执行权限
      */
     private val default: PermissionDefault = PermissionDefault.TRUE,
-
+    /**
+     * 是否异步执行
+     */
     private val async: Boolean = false,
+    /**
+     * 参数列表
+     */
     val params: Array<Param> = emptyArray(),
+    /**
+     * 是否仅玩家执行
+     */
     val isPlayerOnly: Boolean = false,
     /**
      * 命令执行
@@ -43,6 +54,9 @@ open class CommandNode(
     var permission: Permission =
         Permission("${TemplatePlugin.getPlugin().name.lowercase()}.$name", default)
 
+    /**
+     * 获取父节点
+     */
     var parent: CommandNode? = null
         private set(value) {
             field = value
@@ -69,7 +83,6 @@ open class CommandNode(
     /**
      * 参数类型和建议参数
      */
-//    private var suggest: Array<String>? = null
     var successMessage: String? = CommandNode.successMessage
     var failureMessage: String? = CommandNode.failureMessage
     var noPermissionMessage: String? = CommandNode.noPermissionMessage
@@ -104,6 +117,9 @@ open class CommandNode(
         return commandNode
     }
 
+    /**
+     * 获取命令执行者可见的子节点
+     */
     private fun getSubNodes(sender: CommandSender): Set<CommandNode> {
         val set = mutableSetOf<CommandNode>()
         for (value in subNodes.values) {
@@ -118,10 +134,16 @@ open class CommandNode(
      */
     private fun getRootNode(): CommandNode = parent?.getRootNode() ?: this
 
+    /**
+     * 判断命令执行者是否可用
+     */
     private fun canUse(sender: CommandSender): Boolean {
         return sender.hasPermission(permission)
     }
 
+    /**
+     * 获取子健
+     */
     private fun getKeys(sender: CommandSender): MutableList<String> {
         val mutableListOf = mutableListOf<String>()
         subNodes.forEach { (k, v) ->
@@ -139,7 +161,10 @@ open class CommandNode(
         args: Array<String>
     ): List<String>? {
         require(parent == null) { "只有根节点才能使用" }
-
+        //200毫秒冷却，防止
+        if (!coolDown.check(sender, 200)) {
+            return null
+        }
         var node: CommandNode = this
         // 不完整参数
         var incomplete = ""
@@ -207,21 +232,32 @@ open class CommandNode(
         return true
     }
 
+    /**
+     * 展示用法
+     */
     private fun showUsage(sender: CommandSender) {
         val list = mutableListOf<String>()
         if (usageHeader != null) list.add(usageHeader!!)
         val subs = getSubNodes(sender)
         if (subs.isEmpty() && params.isEmpty()) return
         for (key in subs) {
-            list.add("&7 - &6${key.name} &6${key.getSuggest()} &7${key.description ?: ""}")
+            list.add(usage.format(key.name, key.getSuggest(), key.description ?: ""))
         }
         if (subs.isEmpty() && params.isNotEmpty()) {
-            list.add("&7 - &6${getWholeCommand()} &6${getSuggest()} &7${description ?: ""}")
+            list.add(usage.format(getWholeCommand(), getSuggest(), description ?: ""))
         }
         if (usageFooter != null) list.add(usageFooter!!)
         sender.sendColorMessages(list)
     }
 
+    /**
+     * 注册节点
+     */
+    fun registerRoot() = CommandBuilder.register(this)
+
+    /**
+     * 获取整个命令
+     */
     private fun getWholeCommand(): String {
         var node = this
         var command = name
@@ -232,6 +268,9 @@ open class CommandNode(
         return command
     }
 
+    /**
+     * 获取命令的建议
+     */
     private fun getSuggest(): String {
         val sb = StringBuilder()
         for (pa in params) {
@@ -241,11 +280,22 @@ open class CommandNode(
     }
 
     companion object {
+        // 执行成功的消息
         var successMessage: String? = null
+
+        // 执行失败的消息
         var failureMessage: String? = null
+
+        // 没有权限的消息
         var noPermissionMessage: String? = "${SimpleLogger.prefix}&c你没有该命令的权限: &7%permission%"
-        var usageHeader: String? = "  &7======> &6${TemplatePlugin.getPlugin().name} &7<======"
+
+        // 使用提示消息头
+        var usageHeader: String? = "  &7======> &d${TemplatePlugin.getPlugin().name} &7<======"
+        var usage: String = "&7 - &6%s &a%s &7%s"
+
+        // 使用提示消息尾部
         var usageFooter: String? = " "
+        val coolDown = WeakCoolDown<CommandSender>()
     }
 
 }

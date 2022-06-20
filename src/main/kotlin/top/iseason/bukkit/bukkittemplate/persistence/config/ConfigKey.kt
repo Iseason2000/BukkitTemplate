@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.config
+package top.iseason.bukkit.bukkittemplate.persistence.config
 
 import java.lang.reflect.Field
 

@@ -3,9 +3,9 @@ package top.iseason.bukkit.bukkittemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.iseason.bukkit.bukkittemplate.command.CommandBuilder;
-import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher;
-import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
+import top.iseason.bukkit.bukkittemplate.persistence.config.ConfigWatcher;
+import top.iseason.bukkit.bukkittemplate.persistence.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.ui.UIListener;
 
 import java.io.File;
@@ -25,8 +25,6 @@ public class TemplatePlugin extends JavaPlugin {
     private static KotlinPlugin ktPlugin;
     private static TemplatePlugin plugin = null;
 
-    private static boolean isInit = false;
-
     public TemplatePlugin() {
         if (plugin == null) plugin = this;
         //防止卡主线程
@@ -35,8 +33,10 @@ public class TemplatePlugin extends JavaPlugin {
             classes = loadClass();
             ktPlugin = findInstance();
             ktPlugin.javaPlugin = this;
-            isInit = true;
-            Bukkit.getScheduler().runTask(plugin, () -> plugin.onEnable());
+            plugin.onAsyncLoad();
+            plugin.setEnabled(true);
+            Bukkit.getScheduler().runTask(plugin, () -> plugin.onEnabled());
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.onAsyncEnabled());
         }).start();
     }
 
@@ -139,13 +139,21 @@ public class TemplatePlugin extends JavaPlugin {
         return ktPlugin;
     }
 
-    @Override
-    public void onEnable() {
-        if (!isInit) return;
+    // 比 onEnabled 先调用
+    public void onAsyncLoad() {
+        ktPlugin.onAsyncLoad();
+    }
+
+    public void onEnabled() {
         getServer().getPluginManager().registerEvents(UIListener.INSTANCE, this);
-        callConfigsInstance();
         ktPlugin.onEnable();
     }
+
+    public void onAsyncEnabled() {
+        callConfigsInstance();
+        ktPlugin.onAsyncEnable();
+    }
+
 
     @Override
     public void onDisable() {
@@ -154,4 +162,5 @@ public class TemplatePlugin extends JavaPlugin {
         ktPlugin.onDisable();
         CommandBuilder.clearPermissions();
     }
+
 }

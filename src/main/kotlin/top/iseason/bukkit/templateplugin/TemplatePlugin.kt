@@ -8,11 +8,20 @@ import top.iseason.bukkit.bukkittemplate.utils.toColor
 
 object TemplatePlugin : KotlinPlugin() {
 
+    override fun onAsyncLoad() {
+
+    }
+
     override fun onEnable() {
         SimpleLogger.prefix = "&a[&6${javaPlugin.description.name}&a]&r ".toColor()
         info("${ChatColor.GREEN}插件已启用!")
+
         command1()
 //        command2()
+    }
+
+    override fun onAsyncEnable() {
+
     }
 
     override fun onDisable() {

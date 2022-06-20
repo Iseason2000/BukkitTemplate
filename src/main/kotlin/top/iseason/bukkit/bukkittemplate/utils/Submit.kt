@@ -19,17 +19,17 @@ fun submit(
     check(delay >= 0) { "delay must grater than 0" }
     check(period >= 0) { "period must grater than 0" }
     val submitter = Submitter(delay, period, async, task)
-    if (async) {
-        if (period > 0) {
-            submitter.runTaskTimerAsynchronously(TemplatePlugin.getPlugin(), delay, period)
+    if (submitter.async) {
+        if (submitter.period > 0) {
+            submitter.runTaskTimerAsynchronously(TemplatePlugin.getPlugin(), submitter.delay, submitter.period)
         } else {
-            submitter.runTaskLaterAsynchronously(TemplatePlugin.getPlugin(), delay)
+            submitter.runTaskLaterAsynchronously(TemplatePlugin.getPlugin(), submitter.delay)
         }
     } else {
-        if (period > 0) {
-            submitter.runTaskTimer(TemplatePlugin.getPlugin(), delay, period)
+        if (submitter.period > 0) {
+            submitter.runTaskTimer(TemplatePlugin.getPlugin(), submitter.delay, submitter.period)
         } else {
-            submitter.runTaskLater(TemplatePlugin.getPlugin(), delay)
+            submitter.runTaskLater(TemplatePlugin.getPlugin(), submitter.delay)
         }
     }
 }
