@@ -45,7 +45,9 @@ open class Param(
 
 object ParamSuggestCache {
     val playerParam: CommandSender.() -> Collection<String> = { Bukkit.getOnlinePlayers().map { it.name } }
-    private val potionTypes = PotionEffectType.values().map { it.name.lowercase() }
+    private val potionTypes = PotionEffectType.values().filterNotNull().map {
+        it.name.lowercase()
+    }
     val potionEffects: CommandSender.() -> Collection<String> = { potionTypes }
 }
 

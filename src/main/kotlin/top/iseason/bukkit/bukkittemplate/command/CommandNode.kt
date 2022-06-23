@@ -91,9 +91,8 @@ open class CommandNode(
      * 添加子节点
      */
     fun addSubNode(node: CommandNode) {
-        if (parent == null) {
-            Bukkit.getPluginManager().getPermission(permission.name) ?: Bukkit.getPluginManager()
-                .addPermission(permission)
+        if (parent == null && Bukkit.getPluginManager().getPermission(permission.name) == null) {
+            Bukkit.getPluginManager().addPermission(permission)
         }
         subNodes[node.name] = node
         node.parent = this
@@ -163,14 +162,14 @@ open class CommandNode(
         require(parent == null) { "只有根节点才能使用" }
         //200毫秒冷却，防止
         if (!coolDown.check(sender, 200)) {
-            return null
+            return emptyList()
         }
         var node: CommandNode = this
         // 不完整参数
         var incomplete = ""
         var deep = 0
         for ((index, arg) in args.withIndex()) {
-            if (arg.isBlank() && args.getOrNull(index + 1) != null) return null
+            if (arg.isBlank() && args.getOrNull(index + 1) != null) return emptyList()
             val subNode = node.getSubNode(arg, sender)
             if (subNode == null) {
                 incomplete = arg

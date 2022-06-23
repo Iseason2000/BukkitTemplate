@@ -79,4 +79,4 @@ fun String.toColor(): String {
     return ChatColor.translateAlternateColorCodes('&', temp)
 }
 
-fun String.noColor(): String = ChatColor.stripColor(this)
+fun String.noColor(): String? = ChatColor.stripColor(this)

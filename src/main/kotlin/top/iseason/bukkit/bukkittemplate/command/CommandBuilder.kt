@@ -11,6 +11,8 @@ import org.bukkit.plugin.SimplePluginManager
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 import top.iseason.bukkit.bukkittemplate.utils.toColor
 import java.lang.reflect.Constructor
+import java.util.*
+import java.util.stream.Collectors
 
 @Suppress("unused")
 class CommandBuilder(private val commandNode: CommandNode) {
@@ -93,14 +95,16 @@ class CommandBuilder(private val commandNode: CommandNode) {
     }
 
     companion object {
-        private val pluginPermissions = mutableListOf<Permission>()
-        private val simpleCommandMap: SimpleCommandMap = getCommandMap()
+        private val pluginPermissions = mutableSetOf<Permission>()
+        private val registeredCommands = mutableListOf<PluginCommand>()
+        private val simpleCommandMap: SimpleCommandMap
         private val pluginCommandConstructor: Constructor<PluginCommand> = getPluginCommandConstructor()
-        private fun getCommandMap(): SimpleCommandMap {
+
+        init {
             val simplePluginManager = Bukkit.getServer().pluginManager as SimplePluginManager
-            val declaredField = SimplePluginManager::class.java.getDeclaredField("commandMap")
-            declaredField.isAccessible = true
-            return declaredField.get(simplePluginManager) as SimpleCommandMap
+            val commandMapField = SimplePluginManager::class.java.getDeclaredField("commandMap")
+            commandMapField.isAccessible = true
+            simpleCommandMap = commandMapField.get(simplePluginManager) as SimpleCommandMap
         }
 
         private fun getPluginCommandConstructor(): Constructor<PluginCommand> {
@@ -115,27 +119,36 @@ class CommandBuilder(private val commandNode: CommandNode) {
             val pluginCommand =
                 pluginCommandConstructor.newInstance(commandNode.name, TemplatePlugin.getPlugin()) as PluginCommand
             if (commandNode.alias != null) {
-                pluginCommand.aliases = commandNode.alias.toMutableList()
+                pluginCommand.aliases = Arrays.stream(commandNode.alias).collect(Collectors.toList())
             }
             if (commandNode.description != null) {
                 pluginCommand.description = commandNode.description
             }
             pluginCommand.permissionMessage = commandNode.noPermissionMessage?.toColor()
-            simpleCommandMap.register(TemplatePlugin.getPlugin().name, pluginCommand)
-            pluginCommand.executor = commandNode
+            pluginCommand.setExecutor(commandNode)
             pluginCommand.tabCompleter = commandNode
+            simpleCommandMap.register(TemplatePlugin.getPlugin().name, pluginCommand)
             pluginPermissions.add(commandNode.permission)
+            registeredCommands.add(pluginCommand)
         }
 
         // 注销根命令
         fun unregister(commandNode: CommandNode) {
             require(commandNode.parent == null) { "非根命令不需要注销!" }
-            Bukkit.getServer().getPluginCommand(commandNode.name).unregister(simpleCommandMap)
+            Bukkit.getServer().getPluginCommand(commandNode.name)?.unregister(simpleCommandMap)
+        }
+
+        @JvmStatic
+        fun unregisterAll() {
+            for (registeredCommand in registeredCommands) {
+                registeredCommand.unregister(simpleCommandMap)
+            }
         }
 
         fun addPermissions(perm: Permission) {
             pluginPermissions.add(perm)
         }
+
 
         @JvmStatic
         fun clearPermissions() {
@@ -144,6 +157,15 @@ class CommandBuilder(private val commandNode: CommandNode) {
             }
         }
 
+        @JvmStatic
+        fun updateCommands() {
+            try {
+                Bukkit.getServer().apply {
+                    javaClass.getDeclaredMethod("syncCommands").invoke(this)
+                }
+            } catch (_: Exception) {
+            }
+        }
     }
 
 }

@@ -2,7 +2,7 @@ name: ${name}
 main: ${main}
 version: ${version}
 authors: [ ${ author } ]
-api-version: 1.16
+api-version: 1.13
 runtime-libraries:
   libraries-folder: '@Server:libraries' # If not defined, it will be 'libraries'
   libraries:
@@ -38,3 +38,18 @@ runtime-libraries:
 #      groupId: org.jetbrains.kotlinx
 #      artifactId: kotlinx-coroutines-core
 #      version: 1.6.2
+#    exposed-core:
+#      repository: https://maven.aliyun.com/repository/public
+#      groupId: org.jetbrains.exposed
+#      artifactId: exposed-core
+#      version: ${exposedVersion}
+#    exposed-dao:
+#      repository: https://maven.aliyun.com/repository/public
+#      groupId: org.jetbrains.exposed
+#      artifactId: exposed-dao
+#      version: ${exposedVersion}
+#    exposed-jdbc:
+#      repository: https://maven.aliyun.com/repository/public
+#      groupId: org.jetbrains.exposed
+#      artifactId: exposed-jdbc
+#      version: ${exposedVersion}

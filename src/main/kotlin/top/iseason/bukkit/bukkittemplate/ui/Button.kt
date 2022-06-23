@@ -36,7 +36,7 @@ open class Button(
     var displayName: String
         get() = itemMeta.displayName
         set(value) {
-            itemMeta = itemMeta.apply { displayName = value }
+            itemMeta = itemMeta.apply { setDisplayName(value) }
         }
 
     /**

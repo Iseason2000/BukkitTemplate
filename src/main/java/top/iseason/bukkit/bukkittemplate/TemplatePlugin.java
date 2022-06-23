@@ -141,6 +141,7 @@ public class TemplatePlugin extends JavaPlugin {
 
     // 比 onEnabled 先调用
     public void onAsyncLoad() {
+        callConfigsInstance();
         ktPlugin.onAsyncLoad();
     }
 
@@ -150,8 +151,8 @@ public class TemplatePlugin extends JavaPlugin {
     }
 
     public void onAsyncEnabled() {
-        callConfigsInstance();
         ktPlugin.onAsyncEnable();
+        CommandBuilder.updateCommands();
     }
 
 
@@ -161,6 +162,7 @@ public class TemplatePlugin extends JavaPlugin {
         ConfigWatcher.Companion.stop();
         ktPlugin.onDisable();
         CommandBuilder.clearPermissions();
+        CommandBuilder.unregisterAll();
     }
 
 }

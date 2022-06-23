@@ -16,19 +16,20 @@ buildscript {
     }
 }
 // 插件名称，请在gradle.properties 修改
-val pluginName = getProperties("pluginName")
-
+val pluginName: String by project
 //包名，请在gradle.properties 修改
-group = getProperties("groupId")
-// 作者，请在gradle.properties 修改
-val author = getProperties("author")
-// jar包输出路径，请在gradle.properties 修改
-val jarOutputFile = getProperties("jarOutputFile")
-//插件版本，请在gradle.properties 修改
-version = getProperties("version")
-
+val group: String by project
 val groupS = group
+// 作者，请在gradle.properties 修改
+val author: String by project
+// jar包输出路径，请在gradle.properties 修改
+val jarOutputFile: String by project
+//插件版本，请在gradle.properties 修改
+val version: String by project
+// shadowJar 版本 ，请在gradle.properties 修改
 val shadowJar: ShadowJar by tasks
+// exposed 数据库框架版本，请在gradle.properties 修改
+val exposedVersion: String by project
 repositories {
 //    阿里的服务器速度快一点
     maven {
@@ -57,8 +58,12 @@ dependencies {
 //    协程库
 //    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
 
+    compileOnly("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    compileOnly("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    compileOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.12-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
 
 }
 
@@ -80,7 +85,8 @@ tasks {
                 "name" to pluginName,
                 "version" to project.version,
                 "author" to author,
-                "kotlinVersion" to getProperties("kotlinVersion")
+                "kotlinVersion" to getProperties("kotlinVersion"),
+                "exposedVersion" to exposedVersion
             )
         }
     }
