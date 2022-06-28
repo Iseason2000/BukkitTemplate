@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.persistence.config.annotations
+package top.iseason.bukkit.bukkittemplate.config.annotations
 
 /**
  * 指定配置文件路径

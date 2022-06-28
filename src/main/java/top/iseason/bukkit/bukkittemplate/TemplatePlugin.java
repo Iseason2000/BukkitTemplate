@@ -2,11 +2,7 @@ package top.iseason.bukkit.bukkittemplate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import top.iseason.bukkit.bukkittemplate.command.CommandBuilder;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
-import top.iseason.bukkit.bukkittemplate.persistence.config.ConfigWatcher;
-import top.iseason.bukkit.bukkittemplate.persistence.config.SimpleYAMLConfig;
-import top.iseason.bukkit.bukkittemplate.ui.UIListener;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,19 +59,19 @@ public class TemplatePlugin extends JavaPlugin {
      * 唤醒所有继承SimpleYAMLConfig 的 object类
      * 目的是为了让插件加载阶段就补全缺失的配置文件
      */
-    private static void callConfigsInstance() {
-        for (Class<?> aClass : classes) {
-            if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
-                try {
-                    Field instance = aClass.getDeclaredField("INSTANCE");
-                    instance.setAccessible(true);
-                    instance.get(null);
-                    instance.setAccessible(false);
-                } catch (NoSuchFieldException | IllegalAccessException ignored) {
-                }
-            }
-        }
-    }
+//    private static void callConfigsInstance() {
+//        for (Class<?> aClass : classes) {
+//            if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
+//                try {
+//                    Field instance = aClass.getDeclaredField("INSTANCE");
+//                    instance.setAccessible(true);
+//                    instance.get(null);
+//                    instance.setAccessible(false);
+//                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+//                }
+//            }
+//        }
+//    }
 
     /**
      * 加载需要的class
@@ -108,10 +104,10 @@ public class TemplatePlugin extends JavaPlugin {
                 } catch (ClassNotFoundException e) {
                     return;
                 }
-                if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
-                    classes.add(aClass);
-                    return;
-                }
+//                if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
+//                    classes.add(aClass);
+//                    return;
+//                }
                 if (KotlinPlugin.class.isAssignableFrom(aClass) && !KotlinPlugin.class.getName().equals(aClass.getName())) {
                     classes.add(aClass);
                 }
@@ -141,28 +137,22 @@ public class TemplatePlugin extends JavaPlugin {
 
     // 比 onEnabled 先调用
     public void onAsyncLoad() {
-        callConfigsInstance();
+//        callConfigsInstance();
         ktPlugin.onAsyncLoad();
     }
 
     public void onEnabled() {
-        getServer().getPluginManager().registerEvents(UIListener.INSTANCE, this);
         ktPlugin.onEnable();
     }
 
     public void onAsyncEnabled() {
         ktPlugin.onAsyncEnable();
-        CommandBuilder.updateCommands();
     }
 
 
     @Override
     public void onDisable() {
-        UIListener.INSTANCE.onDisable();
-        ConfigWatcher.Companion.stop();
         ktPlugin.onDisable();
-        CommandBuilder.clearPermissions();
-        CommandBuilder.unregisterAll();
     }
 
 }

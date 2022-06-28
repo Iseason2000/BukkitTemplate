@@ -97,6 +97,7 @@ task<com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation>
     shadowJar.minimize()
 }
 tasks.shadowJar.get().dependsOn(tasks.getByName("relocateShadowJar"))
+
 tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     verbose()
     injars(tasks.named("shadowJar"))
@@ -109,6 +110,7 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     if (!shrink) {
         dontshrink()
     }
+    optimizationpasses(5)
     dontwarn()
     val javaHome = System.getProperty("java.home")
     if (JavaVersion.current() < JavaVersion.toVersion(9)) {
@@ -122,13 +124,15 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
             "$javaHome/jmods/java.base.jmod"
         )
     }
+
     libraryjars(configurations.compileClasspath.get().files)
-    keep("class $groupS.lib.core.TemplatePlugin {*;}")
-    keep("class * implements $groupS.lib.core.KotlinPlugin {*;}")
-    keep("class * extends $groupS.lib.core.config.SimpleYAMLConfig {*;}")
-    keep("class * implements org.bukkit.event.Listener {*;}")
+    keep("class $groupS.lib.core.TemplatePlugin {}")
+    keep(mapOf("allowobfuscation" to true), "class * implements $groupS.lib.core.KotlinPlugin {*;}")
+    keepclassmembers("class * extends $groupS.lib.core.config.SimpleYAMLConfig {*;}")
+    keepclassmembers("class * implements org.bukkit.event.Listener {*;}")
     keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
     keepkotlinmetadata()
+    repackageclasses()
     if (obfuscated)
         outjars(File(jarOutputFile, "${project.name}-${project.version}-obfuscated.jar"))
     else

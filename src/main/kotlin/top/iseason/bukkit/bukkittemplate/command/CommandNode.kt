@@ -169,7 +169,7 @@ open class CommandNode(
         var incomplete = ""
         var deep = 0
         for ((index, arg) in args.withIndex()) {
-            if (arg.isBlank() && args.getOrNull(index + 1) != null) return emptyList()
+            if (arg.isBlank() && args.getOrNull(index + 1) != null) return null
             val subNode = node.getSubNode(arg, sender)
             if (subNode == null) {
                 incomplete = arg
@@ -181,8 +181,8 @@ open class CommandNode(
         val keys = node.getKeys(sender)
         if (keys.isEmpty() && node.params.isNotEmpty()) {
             val last = args.last()
-            return node.params.getOrNull(args.size - deep - 1)?.suggest?.invoke(sender)
-                ?.filter { it.startsWith(last) }
+            val param = node.params.getOrNull(args.size - deep - 1) ?: return null
+            return (param.suggestRuntime?.invoke(sender) ?: param.suggest)?.filter { it.startsWith(last) }
         }
         return keys.filter { it.startsWith(incomplete) }
     }
@@ -252,7 +252,7 @@ open class CommandNode(
     /**
      * 注册节点
      */
-    fun registerRoot() = CommandBuilder.register(this)
+    fun registerAsRoot() = CommandBuilder.register(this)
 
     /**
      * 获取整个命令

@@ -78,8 +78,17 @@ class CommandBuilder(private val commandNode: CommandNode) {
          * 描述
          */
         description: String? = null,
+        /**
+         * 是否异步运行
+         */
         async: Boolean = false,
+        /**
+         * 指定参数
+         */
         params: Array<Param> = emptyArray(),
+        /**
+         * 是否只允许玩家
+         */
         isPlayerOnly: Boolean = false,
         /**
          * 命令执行
@@ -149,8 +158,6 @@ class CommandBuilder(private val commandNode: CommandNode) {
             pluginPermissions.add(perm)
         }
 
-
-        @JvmStatic
         fun clearPermissions() {
             for (pluginPermission in pluginPermissions) {
                 Bukkit.getPluginManager().removePermission(pluginPermission)
@@ -158,6 +165,16 @@ class CommandBuilder(private val commandNode: CommandNode) {
         }
 
         @JvmStatic
+        fun onEnable() {
+            updateCommands()
+        }
+
+        @JvmStatic
+        fun onDisable() {
+            clearPermissions()
+            unregisterAll()
+        }
+
         fun updateCommands() {
             try {
                 Bukkit.getServer().apply {
@@ -187,8 +204,17 @@ fun commandRoot(
      * 描述
      */
     description: String? = null,
+    /**
+     * 是否异步运行
+     */
     async: Boolean = false,
+    /**
+     * 参数列表
+     */
     params: Array<Param> = emptyArray(),
+    /**
+     * 是否仅允许玩家执行
+     */
     isPlayerOnly: Boolean = false,
     /**
      * 命令执行

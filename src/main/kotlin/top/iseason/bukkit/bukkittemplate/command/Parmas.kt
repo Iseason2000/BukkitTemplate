@@ -38,16 +38,19 @@ open class Param(
      */
     val placeholder: String,
     /**
-     * 建议
+     * 建议，存在运行时建议时不会使用
      */
-    val suggest: (CommandSender.() -> Collection<String>)? = null
+    val suggest: Collection<String>? = null,
+    /**
+     * 运行时建议
+     */
+    val suggestRuntime: (CommandSender.() -> Collection<String>)? = null
 )
 
 object ParamSuggestCache {
     val playerParam: CommandSender.() -> Collection<String> = { Bukkit.getOnlinePlayers().map { it.name } }
-    private val potionTypes = PotionEffectType.values().filterNotNull().map {
+    val potionTypes = PotionEffectType.values().filterNotNull().map {
         it.name.lowercase()
     }
-    val potionEffects: CommandSender.() -> Collection<String> = { potionTypes }
 }
 

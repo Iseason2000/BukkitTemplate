@@ -195,6 +195,11 @@ abstract class BaseUI(
         return temp
     }
 
+    fun <T : ClickSlot> T.setup(): T {
+        this@BaseUI.addSlot(this)
+        return this
+    }
+
     companion object {
         /**
          * 从 Inventory 获取 UI 对象

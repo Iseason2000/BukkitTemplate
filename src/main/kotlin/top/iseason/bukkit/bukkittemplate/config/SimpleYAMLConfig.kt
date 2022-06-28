@@ -1,14 +1,14 @@
-package top.iseason.bukkit.bukkittemplate.persistence.config
+package top.iseason.bukkit.bukkittemplate.config
 
 import org.bukkit.configuration.MemorySection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
+import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
+import top.iseason.bukkit.bukkittemplate.config.annotations.Key
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.debug.info
-import top.iseason.bukkit.bukkittemplate.persistence.config.annotations.Comment
-import top.iseason.bukkit.bukkittemplate.persistence.config.annotations.FilePath
-import top.iseason.bukkit.bukkittemplate.persistence.config.annotations.Key
 import top.iseason.bukkit.bukkittemplate.utils.submit
 import java.io.File
 import java.io.FileInputStream

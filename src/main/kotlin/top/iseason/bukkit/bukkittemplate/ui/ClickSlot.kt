@@ -69,14 +69,6 @@ fun <T : ClickSlot> T.onClick(action: (ClickSlot.(InventoryClickEvent) -> Unit)?
 /**
  * 设置依托的UI
  */
-fun <T : ClickSlot> T.setUI(ui: BaseUI): T {
-    ui.addSlots(this)
-    return this
-}
-
-/**
- * 设置依托的UI
- */
 fun Collection<ClickSlot>.setUI(ui: BaseUI) {
     ui.addSlots(*this.toTypedArray())
 }

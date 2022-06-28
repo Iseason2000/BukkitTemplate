@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
@@ -33,6 +34,10 @@ object UIListener : Listener {
             baseUI.ejectItems(it)
             it.closeInventory()
         }
+    }
+
+    fun onEnable() {
+        Bukkit.getPluginManager().registerEvents(this, TemplatePlugin.getPlugin())
     }
 
     @EventHandler

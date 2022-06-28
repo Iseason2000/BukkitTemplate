@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.persistence.config
+package top.iseason.bukkit.bukkittemplate.config
 
 import org.bukkit.scheduler.BukkitRunnable
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
@@ -33,6 +33,12 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
         }
     }
 
+    override fun cancel() {
+        super.cancel()
+        isEnable = false
+        service.close()
+    }
+
     companion object {
         private val folders = mutableMapOf<String, ConfigWatcher>()
 
@@ -47,11 +53,12 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
             return configWatcher
         }
 
-        fun stop() {
-            for (key in folders.values) {
-                key.isEnable = false
-                key.service.close()
+        fun onDisable() {
+            for (v in folders.values) {
+                v.cancel()
             }
+            folders.clear()
         }
+
     }
 }

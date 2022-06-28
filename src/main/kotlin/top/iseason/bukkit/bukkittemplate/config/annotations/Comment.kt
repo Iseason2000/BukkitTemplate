@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.persistence.config.annotations
+package top.iseason.bukkit.bukkittemplate.config.annotations
 
 /**
  * 添加注释
