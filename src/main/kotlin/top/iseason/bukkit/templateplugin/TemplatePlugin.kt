@@ -3,6 +3,7 @@ package top.iseason.bukkit.templateplugin
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
 import top.iseason.bukkit.bukkittemplate.command.CommandBuilder
 import top.iseason.bukkit.bukkittemplate.config.ConfigWatcher
+import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.debug.info
 import top.iseason.bukkit.bukkittemplate.ui.UIListener
@@ -13,9 +14,7 @@ object TemplatePlugin : KotlinPlugin() {
     override fun onAsyncLoad() {
 
         command1()
-//        command3()
         openUICommand()
-
     }
 
     override fun onEnable() {
@@ -30,6 +29,7 @@ object TemplatePlugin : KotlinPlugin() {
     }
 
     override fun onAsyncEnable() {
+        SimpleYAMLConfig.notifyMessage = "&7配置文件 &6%s &7已重载!"
         Config
     }
 

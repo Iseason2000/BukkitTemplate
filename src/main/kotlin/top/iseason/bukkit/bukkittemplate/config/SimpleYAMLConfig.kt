@@ -149,7 +149,7 @@ abstract class SimpleYAMLConfig(
         }
         onLoaded?.invoke(config)
         if (notify)
-            info("Config $configPath was reloaded!")
+            info(notifyMessage.format(configPath.name))
     }
 
     /**
@@ -267,5 +267,8 @@ abstract class SimpleYAMLConfig(
     companion object {
         //监听器列表
         val configs = mutableMapOf<String, SimpleYAMLConfig>()
+
+        //重载提示信息
+        var notifyMessage: String = "Config %s was reloaded!"
     }
 }

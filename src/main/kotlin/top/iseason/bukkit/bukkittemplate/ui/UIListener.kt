@@ -2,6 +2,7 @@ package top.iseason.bukkit.bukkittemplate.ui
 
 import org.bukkit.Bukkit
 import org.bukkit.entity.HumanEntity
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryAction.*
@@ -12,6 +13,7 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.TemplatePlugin
 import top.iseason.bukkit.bukkittemplate.debug.debug
+import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
 import top.iseason.bukkit.bukkittemplate.utils.submit
@@ -21,13 +23,13 @@ import top.iseason.bukkit.bukkittemplate.utils.submit
  */
 object UIListener : Listener {
 
-    private val playerClickTime = mutableMapOf<HumanEntity, Long>()
+    //    private val playerClickTime = mutableMapOf<HumanEntity, Long>()
+    private val clickCoolDown = WeakCoolDown<HumanEntity>()
 
     /**
      * 在插件注销时关闭所有UI
      */
     fun onDisable() {
-        playerClickTime.clear()
         Bukkit.getOnlinePlayers().forEach {
             val baseUI = BaseUI.fromInventory(it.openInventory.topInventory) ?: return
             baseUI.onClose(null)
@@ -51,22 +53,18 @@ object UIListener : Listener {
         val baseUI = BaseUI.fromInventory(event.inventory) ?: return
         baseUI.onClose(event)
         baseUI.ejectItems(event.player)
-        playerClickTime.remove(event.player)
+        clickCoolDown.remove(event.player)
     }
 
     @EventHandler
     fun onInventoryClickEvent(event: InventoryClickEvent) {
         val inventory = event.inventory
         val baseUI = BaseUI.fromInventory(inventory) ?: return
-        val value = playerClickTime[event.whoClicked]
-        val currentTimeMillis = System.currentTimeMillis()
-        if (value != null) {
-            if (currentTimeMillis - value <= baseUI.clickDelay) {
-                event.isCancelled = true
-                return
-            }
+        val whoClicked = event.whoClicked
+        if (clickCoolDown.check(whoClicked, baseUI.clickDelay)) {
+            event.isCancelled = true
+            return
         }
-        playerClickTime[event.whoClicked] = currentTimeMillis
         var isCancelled = false
         val rawSlot = event.rawSlot
         //点击上下锁，优先级大于slot
@@ -91,6 +89,7 @@ object UIListener : Listener {
         event.ioEvent()
         baseUI.onClick(event)
         submit {
+            if (whoClicked is Player) whoClicked.updateInventory()
             baseUI.onClicked(event)
         }
     }

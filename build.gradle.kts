@@ -124,13 +124,13 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
             "$javaHome/jmods/java.base.jmod"
         )
     }
-
+    val allowObf = mapOf("allowobfuscation" to true)
     libraryjars(configurations.compileClasspath.get().files)
     keep("class $groupS.lib.core.TemplatePlugin {}")
-    keep(mapOf("allowobfuscation" to true), "class * implements $groupS.lib.core.KotlinPlugin {*;}")
+    keep(allowObf, "class * implements $groupS.lib.core.KotlinPlugin {*;}")
     keepclassmembers("class * extends $groupS.lib.core.config.SimpleYAMLConfig {*;}")
-    keepclassmembers(mapOf("allowobfuscation" to true), "class * implements org.bukkit.event.Listener {*;}")
-    keepclassmembers(mapOf("allowobfuscation" to true), "class $groupS.lib.core.utils.MessageKt {*;}")
+    keepclassmembers(allowObf, "class * implements org.bukkit.event.Listener {*;}")
+    keepclassmembers(allowObf, "class $groupS.lib.core.utils.MessageKt {*;}")
     keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
     keepkotlinmetadata()
     repackageclasses()
