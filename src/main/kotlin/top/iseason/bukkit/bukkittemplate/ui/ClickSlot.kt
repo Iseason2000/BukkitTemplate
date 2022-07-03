@@ -17,8 +17,7 @@ abstract class ClickSlot(
      */
     override val index: Int = 0
 
-) : Slot {
-
+) : BaseSlot {
 
     /**
      * 与Inventory的ItemStack同步

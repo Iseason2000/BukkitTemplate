@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack
 /**
  * 一个物品槽
  */
-interface Slot {
+interface BaseSlot {
     /**
      * 物品槽的位置
      */
@@ -26,7 +26,7 @@ interface Slot {
     /**
      * 复制Slot到指定Index
      */
-    fun clone(index: Int): Slot
+    fun clone(index: Int): BaseSlot
 
     /**
      * 重置Slot

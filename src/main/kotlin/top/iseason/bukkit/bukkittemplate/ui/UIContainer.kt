@@ -1,16 +1,17 @@
 package top.iseason.bukkit.bukkittemplate.ui
 
+import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 
 /**
  * 多页UI
  */
 @Suppress("unused")
-open class PageableUI(
+open class UIContainer(
     /**
      * 储存多页数组
      */
-    protected val pages: Array<BaseUI?>
+    protected val pages: Array<Pageable?>
 ) {
     val size = pages.size
 
@@ -18,24 +19,43 @@ open class PageableUI(
     protected var currentIndex = 0
 
     /**
+     * 翻页时调用
+     * @param from 源页码
+     * @param to 目标页码
+     */
+    open var onPageChanged: ((from: Int, to: Int) -> Unit)? = null
+
+    /**
      * 获取当前页码的UI
      */
-    open fun getCurrentPage(): BaseUI? = pages[currentIndex]
+    open fun getCurrentPage(): BaseUI? {
+        val pageable = pages[currentIndex] ?: return null
+        pageable.container = this
+        return pageable.getUI()
+    }
 
     /**
      * 获取下一页，并将页码设置为下一页
      */
     open fun nextPage(): BaseUI? {
-        currentIndex = (currentIndex + 1) % size
-        return getCurrentPage()
+        return setPage((currentIndex + 1) % size)
+    }
+
+    open fun nextPage(player: HumanEntity) {
+        player.openInventory(nextPage()?.inventory ?: return)
     }
 
     /**
      * 获取上一页，并将页码设置为上一页
      */
     open fun lastPage(): BaseUI? {
-        currentIndex = (currentIndex - 1) % size
-        return getCurrentPage()
+        var last = currentIndex - 1
+        if (last < 0) last += size
+        return setPage(last)
+    }
+
+    open fun lastPage(player: HumanEntity) {
+        player.openInventory(lastPage()?.inventory ?: return)
     }
 
     /**
@@ -43,6 +63,7 @@ open class PageableUI(
      */
     open fun setPage(page: Int): BaseUI? {
         require(page in 0..size) { "page $page is not exist!" }
+        onPageChanged?.invoke(currentIndex, page)
         currentIndex = page
         return getCurrentPage()
     }
@@ -54,7 +75,7 @@ open class PageableUI(
         require(pages.isNotEmpty()) { "Your pageable ui must possess at lease 1 page" }
         val currentPage = getCurrentPage()
         require(currentPage != null) { "index $currentIndex is not exist!" }
-        player.openInventory(currentPage.baseInventory)
+        player.openInventory(currentPage.inventory)
     }
 
 }

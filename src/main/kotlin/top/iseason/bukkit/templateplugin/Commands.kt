@@ -6,6 +6,7 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import top.iseason.bukkit.bukkittemplate.command.*
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
+import top.iseason.bukkit.bukkittemplate.ui.openPageableUI
 import top.iseason.bukkit.bukkittemplate.ui.openUI
 import top.iseason.bukkit.bukkittemplate.utils.sendMessage
 
@@ -109,7 +110,13 @@ fun command4() {
 
 fun openUICommand() {
     commandRoot("openUI", isPlayerOnly = true).onExecute {
-        (it as Player).openUI<MyUI>()
+        (it as Player).openUI<MyUI> {
+            title = it.displayName
+        }
+        true
+    }
+    commandRoot("openMultiUI", isPlayerOnly = true).onExecute {
+        (it as Player).openPageableUI<MultiUI>()
         true
     }
 }

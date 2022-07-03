@@ -9,7 +9,7 @@ import top.iseason.bukkit.bukkittemplate.utils.bukkit.applyMeta
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.toColor
 
-class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L) {
+class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L), Pageable {
 
     init {
         setBackGround(Icon(ItemStack(Material.STONE), 0))
@@ -37,4 +37,7 @@ class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L) 
             getViewers().lastOrNull()?.sendColorMessage("无法输出")
             false
         }.setup()
+
+    override var container: UIContainer? = null
+    override fun getUI() = this
 }

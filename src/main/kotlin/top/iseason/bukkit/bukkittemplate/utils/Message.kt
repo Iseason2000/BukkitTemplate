@@ -50,7 +50,7 @@ fun sendConsole(messages: Collection<String>?) = messages?.forEach { sendConsole
 fun sendConsole(messages: Array<String>?) = messages?.forEach { sendConsole(it) }
 
 object Message {
-    val colorPattern = Pattern.compile("#[A-F|\\d]{6}", Pattern.CASE_INSENSITIVE)
+    val colorPattern: Pattern = Pattern.compile("#[A-F|\\d]{6}", Pattern.CASE_INSENSITIVE)
     var rgbColorMethod: Method? = null
         private set
 

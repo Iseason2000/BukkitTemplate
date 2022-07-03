@@ -10,7 +10,7 @@ open class Icon(
     val rawItemStack: ItemStack,
     override val index: Int
 
-) : Slot {
+) : BaseSlot {
     override var baseInventory: Inventory? = null
 
     /**

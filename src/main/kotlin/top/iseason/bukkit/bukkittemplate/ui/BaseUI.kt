@@ -7,7 +7,6 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.debug.warn
 import top.iseason.bukkit.bukkittemplate.utils.submit
 
 
@@ -18,13 +17,16 @@ abstract class BaseUI(
      */
     open var clickDelay: Long = 100L
 ) : InventoryHolder {
-    abstract var baseInventory: Inventory
-    final override fun getInventory(): Inventory = baseInventory
+    protected var baseInventory: Inventory? = null
+
+    final override fun getInventory(): Inventory = baseInventory!!
+
+    abstract fun buildInventory(): Inventory
 
     /**
      * 储存各种槽位
      */
-    var slots: Array<Slot?> = arrayOfNulls(size)
+    var slots: Array<BaseSlot?> = arrayOfNulls(size)
 
     /**
      * 当玩家打开界面时，分为上下2个Inventory，是否锁住上部分
@@ -59,13 +61,13 @@ abstract class BaseUI(
     /**
      * 获取正在看这个UI的实体
      */
-    fun getViewers() = baseInventory.viewers
+    fun getViewers(): MutableList<HumanEntity> = inventory.viewers
 
     /**
      * 设置多个槽
      */
-    fun addSlots(vararg slots: Slot) {
-        for (slot in slots) {
+    fun addSlots(vararg baseSlots: BaseSlot) {
+        for (slot in baseSlots) {
             addSlot(slot)
         }
     }
@@ -73,30 +75,20 @@ abstract class BaseUI(
     /**
      * 设置一个槽
      */
-    fun addSlot(slot: Slot) {
-        val index = slot.index
-        try {
-            //清除原有的ItemStack
-            baseInventory.setItem(index, null)
-            this.slots[index] = slot
-            slot.baseInventory = baseInventory
-            if (slot is IOSlot) {
-                baseInventory.setItem(index, slot.placeholder)
-            } else
-                baseInventory.setItem(index, slot.itemStack)
-        } catch (e: IndexOutOfBoundsException) {
-            warn("Slot index was out of bounds(${index}), max index is ${inventory.size}")
-        }
+    private fun addSlot(baseSlot: BaseSlot) {
+        val index = baseSlot.index
+        require(index in 0 until size) { "Slot index was out of bounds(${index}), max index is $size" }
+        this.slots[index] = baseSlot
     }
 
     /**
      * 将一个Slot拷贝多份到其他格子,可变参数版
      */
-    fun addMultiSlots(slot: Slot, vararg others: Int): List<Slot> {
-        val mutableListOf = mutableListOf(slot)
-        addSlot(slot)
+    fun addMultiSlots(baseSlot: BaseSlot, vararg others: Int): List<BaseSlot> {
+        val mutableListOf = mutableListOf(baseSlot)
+        addSlot(baseSlot)
         for (other in others) {
-            val clone = slot.clone(other)
+            val clone = baseSlot.clone(other)
             addSlot(clone)
             mutableListOf.add(clone)
         }
@@ -106,11 +98,11 @@ abstract class BaseUI(
     /**
      * 将一个Slot拷贝多份到其他格子
      */
-    fun addMultiSlots(slot: Slot, others: Iterable<Int>): List<Slot> {
-        val mutableListOf = mutableListOf(slot)
-        addSlot(slot)
+    fun addMultiSlots(baseSlot: BaseSlot, others: Iterable<Int>): List<BaseSlot> {
+        val mutableListOf = mutableListOf(baseSlot)
+        addSlot(baseSlot)
         for (other in others) {
-            val clone = slot.clone(other)
+            val clone = baseSlot.clone(other)
             addSlot(clone)
             mutableListOf.add(clone)
         }
@@ -118,14 +110,31 @@ abstract class BaseUI(
     }
 
     /**
+     * 将UI实例化为游戏Inventory
+     */
+    fun build(): Inventory {
+        baseInventory = buildInventory()
+        for (slot in slots) {
+            if (slot == null) continue
+            //清除原有的ItemStack
+            slot.baseInventory = baseInventory
+            if (slot is IOSlot) {
+                inventory.setItem(slot.index, slot.placeholder)
+            } else
+                inventory.setItem(slot.index, slot.itemStack)
+        }
+        return inventory
+    }
+
+    /**
      * 将Slot 填满Inventory
      */
-    fun setBackGround(slot: Slot): List<Slot> = addMultiSlots(slot, 0 until baseInventory.size)
+    fun setBackGround(baseSlot: BaseSlot): List<BaseSlot> = addMultiSlots(baseSlot, 0 until size)
 
     /**
      * 获取某一槽
      */
-    fun getSlot(index: Int): Slot? = slots.getOrNull(index)
+    fun getSlot(index: Int): BaseSlot? = slots.getOrNull(index)
 
     /**
      * 用于重置界面到初始状态
@@ -163,7 +172,7 @@ abstract class BaseUI(
         for (slot in slots) {
             if (slot == null || slot !is IOSlot) continue
             if (temp == null) break
-            val invItem = baseInventory.getItem(slot.index)
+            val invItem = inventory.getItem(slot.index)
             //不是空的 不是占位符且不相似物品一定不可入
             if (invItem != null && invItem != slot.placeholder && !temp.isSimilar(invItem)) continue
             if (!slot.input(slot, temp)) continue
@@ -195,7 +204,10 @@ abstract class BaseUI(
         return temp
     }
 
-    fun <T : ClickSlot> T.setup(): T {
+    /**
+     * 将UI中的按钮安装到UI上
+     */
+    fun <T : BaseSlot> T.setup(): T {
         this@BaseUI.addSlot(this)
         return this
     }
