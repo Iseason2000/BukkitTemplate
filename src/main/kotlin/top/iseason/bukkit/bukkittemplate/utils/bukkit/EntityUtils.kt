@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 
 /**
  * 给予有物品栏的对象物品,如果是实体且放不下将会放置到实体脚下
- * @param itemStack 待输入的物品
+ * @param itemStacks 待输入的物品
  *
  */
 fun InventoryHolder.giveItems(itemStacks: Array<ItemStack>) {
@@ -18,7 +18,7 @@ fun InventoryHolder.giveItems(itemStacks: Array<ItemStack>) {
 
 /**
  * 给予有物品栏的对象物品,如果是实体且放不下将会放置到实体脚下
- * @param itemStack 待输入的物品
+ * @param itemStacks 待输入的物品
  *
  */
 fun InventoryHolder.giveItems(itemStacks: Collection<ItemStack>) {
@@ -27,7 +27,7 @@ fun InventoryHolder.giveItems(itemStacks: Collection<ItemStack>) {
 
 /**
  * 给予有物品栏的对象物品,如果是实体且放不下将会放置到实体脚下
- * @param itemStack 待输入的物品
+ * @param itemStacks 待输入的物品
  *
  */
 @JvmName("giveItemsVararg")

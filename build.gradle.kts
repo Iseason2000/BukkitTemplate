@@ -63,7 +63,7 @@ dependencies {
     compileOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
 
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.18-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
 
 }
 

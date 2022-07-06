@@ -121,6 +121,9 @@ fun openUICommand() {
     }
 }
 
+/**
+ * 结构命令
+ */
 fun CommandBuilder.testNode() = node("node3") {
     onExecute {
         it.sendMessage("hello")

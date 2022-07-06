@@ -47,7 +47,7 @@ object EasyCoolDown {
 
     /**
      * 检查键值是否在冷却中
-     * @param key 键值
+     * @param obj 键值
      * @param coolDown 冷却时间
      * @return true 表示在冷却
      */

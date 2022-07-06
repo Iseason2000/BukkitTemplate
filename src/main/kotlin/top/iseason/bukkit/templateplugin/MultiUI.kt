@@ -3,7 +3,6 @@ package top.iseason.bukkit.templateplugin
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.debug.info
 import top.iseason.bukkit.bukkittemplate.ui.*
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.applyMeta
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
@@ -12,7 +11,7 @@ import top.iseason.bukkit.bukkittemplate.utils.toColor
 
 class MultiUI : LazyUIContainer(listOf(Page1::class.java, Page2::class.java, Page3::class.java)) {
     override var onPageChanged: ((from: Int, to: Int) -> Unit)? = { from, to ->
-        info("from $from to $to")
+//        info("from $from to $to")
     }
 }
 
