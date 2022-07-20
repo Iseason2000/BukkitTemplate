@@ -26,6 +26,11 @@ runtime-libraries:
       groupId: org.jetbrains.kotlin
       artifactId: kotlin-stdlib-jdk8
       version: ${kotlinVersion}
+    annotations:
+      repository: https://maven.aliyun.com/repository/public
+      groupId: org.jetbrains
+      artifactId: annotations
+      version: "13.0"
 # reflection lib
 #    kotlin-reflect:
 #      repository: https://maven.aliyun.com/repository/public

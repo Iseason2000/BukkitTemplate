@@ -3,6 +3,11 @@ package top.iseason.bukkit.bukkittemplate.utils.bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
+import org.bukkit.util.io.BukkitObjectInputStream
+import org.bukkit.util.io.BukkitObjectOutputStream
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+
 
 /**
  * 修改ItemMeta
@@ -46,4 +51,23 @@ fun Material.checkAir(): Boolean = when (this.name) {
     "AIR",
     "LEGACY_AIR" -> true
     else -> false
+}
+
+object ItemUtils {
+
+    /**
+     * 物品转化为字节
+     */
+    fun toByteArray(item: ItemStack): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        BukkitObjectOutputStream(outputStream).use { it.writeObject(item) }
+        return outputStream.toByteArray()
+    }
+
+    /**
+     * 字节转换为ItemStack
+     */
+    fun fromByteArray(bytes: ByteArray): ItemStack {
+        BukkitObjectInputStream(ByteArrayInputStream(bytes)).use { return it.readObject() as ItemStack }
+    }
 }
