@@ -169,8 +169,7 @@ open class CommandNode(
         var incomplete = ""
         var deep = 0
         for ((index, arg) in args.withIndex()) {
-            if (arg.isBlank() && args.getOrNull(index + 1) != null) return null
-            val subNode = node.getSubNode(arg, sender)
+            val subNode = if (arg.isBlank()) null else node.getSubNode(arg, sender)
             if (subNode == null) {
                 incomplete = arg
                 deep = index
@@ -178,13 +177,16 @@ open class CommandNode(
             }
             node = subNode
         }
+//        println(node.name)
         val keys = node.getKeys(sender)
         if (keys.isEmpty() && node.params.isNotEmpty()) {
             val last = args.last()
             val param = node.params.getOrNull(args.size - deep - 1) ?: return null
-            return (param.suggestRuntime?.invoke(sender) ?: param.suggest)?.filter { it.startsWith(last) }
+            return (param.suggestRuntime?.invoke(sender) ?: param.suggest)?.filter {
+                it.startsWith(last, true)
+            }
         }
-        return keys.filter { it.startsWith(incomplete) }
+        return keys.filter { it.startsWith(incomplete, true) }
     }
 
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
@@ -204,7 +206,7 @@ open class CommandNode(
             } ?: break
             deep++
         }
-        if (node.subNodes.isNotEmpty()) {
+        if (node.subNodes.isNotEmpty() && node.onExecute == null) {
             node.showUsage(sender)
             return true
         }
@@ -217,14 +219,16 @@ open class CommandNode(
         submit(async = node.async) {
             try {
                 if (node.onExecute!!.invoke((Params(params, node)), sender)) {
-                    sender.sendColorMessage(node.successMessage)
-                } else sender.sendColorMessage(node.failureMessage)
+                    if (node.successMessage != null)
+                        sender.sendColorMessage("${SimpleLogger.prefix}${node.successMessage}")
+                } else if (node.failureMessage != null) sender.sendColorMessage("${SimpleLogger.prefix}${node.failureMessage}")
             } catch (e: ParmaException) {
                 //参数错误的提示
-                if (e.typeParam != null) sender.sendColorMessage(e.typeParam.errorMessage(e.arg))
+                if (e.typeParam != null) sender.sendColorMessage("${SimpleLogger.prefix}${e.typeParam.errorMessage(e.arg)}")
                 else {
                     node.showUsage(sender)
-                    sender.sendColorMessage(e.message)
+                    val message = e.message ?: return@submit
+                    sender.sendColorMessage("${SimpleLogger.prefix}$message")
                 }
             }
         }

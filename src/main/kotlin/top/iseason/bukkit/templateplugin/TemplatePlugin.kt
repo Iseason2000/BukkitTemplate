@@ -12,7 +12,6 @@ import top.iseason.bukkit.bukkittemplate.utils.toColor
 object TemplatePlugin : KotlinPlugin() {
 
     override fun onAsyncLoad() {
-
         command1()
         openUICommand()
     }

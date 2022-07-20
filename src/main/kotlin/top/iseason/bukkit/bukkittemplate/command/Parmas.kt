@@ -1,6 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.command
 
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.potion.PotionEffectType
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
@@ -47,9 +48,15 @@ open class Param(
     val suggestRuntime: (CommandSender.() -> Collection<String>)? = null
 )
 
+/**
+ * 参数建议缓存，避免无所谓的内存消耗
+ */
 object ParamSuggestCache {
     val playerParam: CommandSender.() -> Collection<String> = { Bukkit.getOnlinePlayers().map { it.name } }
     val potionTypes = PotionEffectType.values().filterNotNull().map {
+        it.name.lowercase()
+    }
+    val materialTypes = Material.values().map {
         it.name.lowercase()
     }
 }

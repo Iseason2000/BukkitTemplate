@@ -1,6 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.command
 
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
@@ -91,5 +92,8 @@ private fun setDefaultParams() {
         { "${SimpleLogger.prefix}&c${it} &7不是一个有效的药水种类" }
     ) {
         PotionEffectType.getByName(it)
+    }
+    TypeParam(Material::class) {
+        Material.getMaterial(it.uppercase())
     }
 }

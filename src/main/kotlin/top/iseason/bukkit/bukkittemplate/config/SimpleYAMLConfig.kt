@@ -68,7 +68,14 @@ abstract class SimpleYAMLConfig(
                 if (Modifier.isFinal(it.modifiers)) {
                     return@forEach
                 }
-                list.add(ConfigKey(it.name.replace("__", ".").replace('_', '-'), it, null))
+                val comments = mutableListOf<String>()
+                it.getAnnotationsByType(Comment::class.java).forEach { an ->
+                    //注释内容遍历
+                    an.value.forEach { value ->
+                        comments.add(value)
+                    }
+                }
+                list.add(ConfigKey(it.name.replace("__", ".").replace('_', '-'), it, comments))
             }
             return@also
         }
@@ -90,9 +97,10 @@ abstract class SimpleYAMLConfig(
     }
 
     init {
-        ConfigWatcher.fromFile(configPath.absoluteFile)
+        if (isAutoUpdate)
+            ConfigWatcher.fromFile(configPath.absoluteFile)
         configs[configPath.absolutePath] = this
-        saveAsync(false)
+        loadAsync(false)
     }
 
     fun setUpdate(enable: Boolean) {
@@ -126,7 +134,10 @@ abstract class SimpleYAMLConfig(
      */
     fun save(notify: Boolean = updateNotify) {
         update(false)
-        onSaved?.invoke(config)
+        try {
+            onSaved?.invoke(config)
+        } catch (_: Exception) {
+        }
         if (notify)
             info("Config $configPath was saved!")
     }
@@ -147,7 +158,10 @@ abstract class SimpleYAMLConfig(
         if (!update(true)) {
             return
         }
-        onLoaded?.invoke(config)
+        try {
+            onLoaded?.invoke(config)
+        } catch (_: Exception) {
+        }
         if (notify)
             info(notifyMessage.format(configPath.name))
     }
@@ -180,7 +194,6 @@ abstract class SimpleYAMLConfig(
                         debug("Loading config $configPath error! key:${key.key} value: $value")
                     }
                 }
-                return@forEach
             }
             val comments = key.comments
             if (comments != null) {
@@ -202,12 +215,12 @@ abstract class SimpleYAMLConfig(
                 debug("setting config $configPath error! key:${key.key}")
             }
         }
-        if (!isReadOnly) {
-            //保存临时配置，此时注释尚未转换
-            temp.save(configPath)
-            //转换注释
-            commentFile(configPath, commentMap)
-        }
+
+        //保存临时配置，此时注释尚未转换
+        temp.save(configPath)
+        //转换注释
+        commentFile(configPath, commentMap)
+
         config = loadConfiguration
         return true
     }
