@@ -13,9 +13,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class XmlDependency {
     Document doc;
+    private static final Pattern placeHolder = Pattern.compile("\\$\\{(.*)}");
 
     public XmlDependency(File file) throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -36,7 +39,25 @@ public class XmlDependency {
                 Element dependency = (Element) node;
                 String groupId = dependency.getElementsByTagName("groupId").item(0).getTextContent();
                 String artifactId = dependency.getElementsByTagName("artifactId").item(0).getTextContent();
-                String version = dependency.getElementsByTagName("version").item(0).getTextContent();
+                NodeList versionNode = dependency.getElementsByTagName("version");
+                if (versionNode.getLength() == 0) continue;
+                String version = versionNode.item(0).getTextContent();
+                NodeList optionalNode = dependency.getElementsByTagName("optional");
+                if (optionalNode.getLength() != 0) continue;
+                NodeList scopeNode = dependency.getElementsByTagName("scope");
+                if (scopeNode.getLength() != 0) {
+                    String scope = scopeNode.item(0).getTextContent();
+                    if (!(scope.equalsIgnoreCase("compile") || scope.equalsIgnoreCase("runtime"))) {
+                        continue;
+                    }
+                }
+                Matcher matcher = placeHolder.matcher(version);
+                if (matcher.find()) {
+                    String group = matcher.group(1);
+                    NodeList elementsByTagName = doc.getElementsByTagName(group);
+                    if (elementsByTagName.getLength() > 0)
+                        version = elementsByTagName.item(0).getTextContent();
+                }
                 list.add(groupId + ":" + artifactId + ":" + version);
             }
         }

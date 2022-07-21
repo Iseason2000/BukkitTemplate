@@ -130,7 +130,8 @@ public class DependencyDownloader {
         } catch (Exception e) {
             return false;
         }
-        Bukkit.getLogger().info("[DependencyDownloader] Downloading file " + url + " please wait");
+        if (url.toString().endsWith(".jar"))
+            Bukkit.getLogger().info("Downloading " + url);
         try (InputStream is = connection.getInputStream()) {
             Files.copy(is, file.toPath(), REPLACE_EXISTING);
         } catch (Exception e) {
