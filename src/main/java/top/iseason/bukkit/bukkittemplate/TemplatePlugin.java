@@ -2,7 +2,7 @@ package top.iseason.bukkit.bukkittemplate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import top.iseason.bukkit.bukkittemplate.dependency.DependencyLoader;
+import top.iseason.bukkit.bukkittemplate.dependency.DependencyManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +25,8 @@ public class TemplatePlugin extends JavaPlugin {
         if (plugin == null) plugin = this;
         //防止卡主线程
         new Thread(() -> {
-            DependencyLoader.loadLibs();
+            DependencyManager.parsePluginYml();
+//            DependencyLoader.loadLibs();
             classes = loadClass();
             ktPlugin = findInstance();
             ktPlugin.javaPlugin = this;
