@@ -100,6 +100,7 @@ task<com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation>
 tasks.shadowJar.get().dependsOn(tasks.getByName("relocateShadowJar"))
 
 tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
+    group = "minecraft"
     verbose()
     injars(tasks.named("shadowJar"))
     //是否混淆，注销掉启用混淆

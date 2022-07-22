@@ -15,6 +15,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.lang.Thread.sleep
+import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.nio.file.Files
 import java.util.*
@@ -63,7 +64,7 @@ abstract class SimpleYAMLConfig(
     private val keys = mutableListOf<ConfigKey>().also { list ->
         //判断是否全为键值
         if (this@SimpleYAMLConfig.javaClass.getAnnotation(Key::class.java) != null) {
-            this::class.java.declaredFields.forEach {
+            getAllFields().forEach {
 //                if ("INSTANCE" == it.name) return@forEach
                 if (Modifier.isFinal(it.modifiers)) {
                     return@forEach
@@ -79,7 +80,7 @@ abstract class SimpleYAMLConfig(
             }
             return@also
         }
-        this::class.java.declaredFields.forEach {
+        getAllFields().forEach {
             if (Modifier.isFinal(it.modifiers)) {
                 return@forEach
             }
@@ -92,6 +93,9 @@ abstract class SimpleYAMLConfig(
                     comments.add(value)
                 }
             }
+            it.isAccessible = true
+//            it.isAccessible = true
+//            println(it.get(it))
             list.add(ConfigKey(key, it, if (comments.isEmpty()) null else comments))
         }
     }
@@ -189,7 +193,7 @@ abstract class SimpleYAMLConfig(
                 if (value != null) {
                     //获取修改的键值
                     try {
-                        key.setValue(value)
+                        key.setValue(this, value)
                     } catch (e: Exception) {
                         debug("Loading config $configPath error! key:${key.key} value: $value")
                     }
@@ -210,7 +214,7 @@ abstract class SimpleYAMLConfig(
             }
             //将数据写入临时配置
             try {
-                temp.set(key.key, key.getValue())
+                temp.set(key.key, key.getValue(this))
             } catch (e: Exception) {
                 debug("setting config $configPath error! key:${key.key}")
             }
@@ -275,6 +279,17 @@ abstract class SimpleYAMLConfig(
                 }
             }
         }
+    }
+
+    private fun getAllFields(): List<Field> {
+        val fields = mutableListOf<Field>()
+        var superClass: Class<*> = this::class.java
+        while (true) {
+            if (superClass == SimpleYAMLConfig::class.java) break
+            fields.addAll(superClass.declaredFields)
+            superClass = superClass.superclass
+        }
+        return fields
     }
 
     companion object {
