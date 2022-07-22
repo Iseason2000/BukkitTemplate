@@ -23,10 +23,10 @@ public class DependencyManager {
         String folder = libConfigs.getString("libraries-folder");
         if (folder != null) {
             File parent;
-            if (folder.contains("@Plugin:")) {
+            if (folder.startsWith("@Plugin:")) {
                 parent = new File(TemplatePlugin.getPlugin().getDataFolder(), folder.replace("@Plugin:", ""));
             } else {
-                parent = new File(TemplatePlugin.getPlugin().getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), folder);
+                parent = new File(".", folder);
             }
             DependencyDownloader.parent = parent;
         }
@@ -36,6 +36,8 @@ public class DependencyManager {
             for (String repository : repositories) {
                 dd.addRepository(repository);
             }
+        } else {
+            dd.repositories.add("https://repo.maven.apache.org/maven2/");
         }
         List<String> libraries = libConfigs.getStringList("libraries");
         if (libraries != null) {

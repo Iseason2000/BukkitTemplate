@@ -1,7 +1,6 @@
 package top.iseason.bukkit.bukkittemplate.dependency;
 
 import org.bukkit.Bukkit;
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -18,12 +17,11 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class DependencyDownloader {
 
-    public static File parent = new File(TemplatePlugin.getPlugin().getDataFolder().getAbsoluteFile().getParentFile().getParentFile(), "libraries");
+    public static File parent = new File(".", "libraries");
     public List<String> repositories = new ArrayList<>();
     public List<String> dependencies = new ArrayList<>();
 
     public DependencyDownloader() {
-        repositories.add("https://repo.maven.apache.org/maven2/");
     }
 
     /**
