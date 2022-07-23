@@ -183,6 +183,8 @@ abstract class SimpleYAMLConfig(
         val loadConfiguration = YamlConfiguration.loadConfiguration(configPath)
         val temp = YamlConfiguration()
         val commentMap = mutableMapOf<String, String>()
+        //缺了键补上
+        var incomplete = false
         keys.forEach { key ->
             //获取并设置注释
             if (isReadOnly) {
@@ -197,6 +199,8 @@ abstract class SimpleYAMLConfig(
                     } catch (e: Exception) {
                         debug("Loading config $configPath error! key:${key.key} value: $value")
                     }
+                } else {
+                    incomplete = true
                 }
             }
             val comments = key.comments
@@ -219,12 +223,12 @@ abstract class SimpleYAMLConfig(
                 debug("setting config $configPath error! key:${key.key}")
             }
         }
-
-        //保存临时配置，此时注释尚未转换
-        temp.save(configPath)
+        if (!(!incomplete && isReadOnly)) {
+            //保存临时配置，此时注释尚未转换
+            temp.save(configPath)
+        }
         //转换注释
         commentFile(configPath, commentMap)
-
         config = loadConfiguration
         return true
     }
