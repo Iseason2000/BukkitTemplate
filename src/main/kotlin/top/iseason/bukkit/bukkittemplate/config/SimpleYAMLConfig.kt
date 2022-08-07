@@ -1,9 +1,9 @@
 package top.iseason.bukkit.bukkittemplate.config
 
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.MemorySection
-import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
 import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
 import top.iseason.bukkit.bukkittemplate.config.annotations.Key
@@ -14,7 +14,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Thread.sleep
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.nio.file.Files
@@ -25,7 +24,7 @@ import java.util.*
  * 一个简单的支持自动重载的配置类，不建议作为数据储存用
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-abstract class SimpleYAMLConfig(
+open class SimpleYAMLConfig(
     /**
      * 默认配置路径，以.yml结尾，覆盖@FilePath
      */
@@ -39,6 +38,13 @@ abstract class SimpleYAMLConfig(
      */
     var updateNotify: Boolean = true
 ) {
+    constructor(
+        config: ConfigurationSection,
+        isAutoUpdate: Boolean = true,
+        updateNotify: Boolean = true
+    ) : this(null, isAutoUpdate, updateNotify) {
+        this.config = config
+    }
 
     /**
      * 更新时间
@@ -58,13 +64,13 @@ abstract class SimpleYAMLConfig(
     /**
      * 配置对象,修改并不会生效，只能直接修改成员
      */
-    var config: YamlConfiguration = YamlConfiguration.loadConfiguration(configPath)
+    var config: ConfigurationSection = YamlConfiguration.loadConfiguration(configPath)
         private set
 
     private val keys = mutableListOf<ConfigKey>().also { list ->
         //判断是否全为键值
         if (this@SimpleYAMLConfig.javaClass.getAnnotation(Key::class.java) != null) {
-            getAllFields().forEach {
+            this.javaClass.declaredFields.forEach {
 //                if ("INSTANCE" == it.name) return@forEach
                 if (Modifier.isFinal(it.modifiers)) {
                     return@forEach
@@ -104,7 +110,6 @@ abstract class SimpleYAMLConfig(
         if (isAutoUpdate)
             ConfigWatcher.fromFile(configPath.absoluteFile)
         configs[configPath.absolutePath] = this
-        loadAsync(false)
     }
 
     fun setUpdate(enable: Boolean) {
@@ -117,7 +122,7 @@ abstract class SimpleYAMLConfig(
     private fun normalizeFileStr(file: String) = file.replace('\\', File.separatorChar).replace('/', File.separatorChar)
 
     private fun getPath(): File {
-        val dataFolder = TemplatePlugin.getPlugin().dataFolder
+        val dataFolder = BukkitTemplate.getPlugin().dataFolder
         if (defaultPath != null) return File(dataFolder, normalizeFileStr(defaultPath)).absoluteFile
         val annotation = this::class.java.getAnnotation(FilePath::class.java)
         require(annotation != null) { "path must not null" }
@@ -179,7 +184,7 @@ abstract class SimpleYAMLConfig(
         val currentTimeMillis = System.currentTimeMillis()
         if (currentTimeMillis - updateTime < 2000L) return false
         updateTime = currentTimeMillis
-        sleep(300L)
+//        sleep(300L)
         val loadConfiguration = YamlConfiguration.loadConfiguration(configPath)
         val temp = YamlConfiguration()
         val commentMap = mutableMapOf<String, String>()
@@ -191,6 +196,9 @@ abstract class SimpleYAMLConfig(
                 var value = loadConfiguration.get(key.key)
                 if (Map::class.java.isAssignableFrom(key.field.type) && value != null) {
                     value = (value as MemorySection).getValues(false)
+                } else if (SimpleYAMLConfig::class.java.isAssignableFrom(key.field.type) && value != null) {
+                    value = SimpleYAMLConfig(value as MemorySection, this.isAutoUpdate, false)
+                    value.load(false)
                 }
                 if (value != null) {
                     //获取修改的键值
@@ -233,8 +241,8 @@ abstract class SimpleYAMLConfig(
         return true
     }
 
-    open val onLoaded: (FileConfiguration.() -> Unit)? = null
-    open val onSaved: (FileConfiguration.() -> Unit)? = null
+    open val onLoaded: (ConfigurationSection.() -> Unit)? = null
+    open val onSaved: (ConfigurationSection.() -> Unit)? = null
 
     /**
      * 转换配置文件的注释
@@ -290,7 +298,7 @@ abstract class SimpleYAMLConfig(
         var superClass: Class<*> = this::class.java
         while (true) {
             if (superClass == SimpleYAMLConfig::class.java) break
-            fields.addAll(superClass.declaredFields)
+            fields.addAll(0, superClass.declaredFields.toList())
             superClass = superClass.superclass
         }
         return fields

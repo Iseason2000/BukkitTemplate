@@ -8,7 +8,7 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.SimplePluginManager
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.utils.toColor
 import java.lang.reflect.Constructor
 import java.util.*
@@ -126,7 +126,7 @@ class CommandBuilder(private val commandNode: CommandNode) {
         fun register(commandNode: CommandNode) {
             require(commandNode.parent == null) { "只能为根命令注册!" }
             val pluginCommand =
-                pluginCommandConstructor.newInstance(commandNode.name, TemplatePlugin.getPlugin()) as PluginCommand
+                pluginCommandConstructor.newInstance(commandNode.name, BukkitTemplate.getPlugin()) as PluginCommand
             if (commandNode.alias != null) {
                 pluginCommand.aliases = Arrays.stream(commandNode.alias).collect(Collectors.toList())
             }
@@ -136,7 +136,7 @@ class CommandBuilder(private val commandNode: CommandNode) {
             pluginCommand.permissionMessage = commandNode.noPermissionMessage?.toColor()
             pluginCommand.setExecutor(commandNode)
             pluginCommand.tabCompleter = commandNode
-            simpleCommandMap.register(TemplatePlugin.getPlugin().name, pluginCommand)
+            simpleCommandMap.register(BukkitTemplate.getPlugin().name, pluginCommand)
             pluginPermissions.add(commandNode.permission)
             registeredCommands.add(pluginCommand)
         }

@@ -11,7 +11,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
@@ -39,7 +39,7 @@ object UIListener : Listener {
     }
 
     fun onEnable() {
-        Bukkit.getPluginManager().registerEvents(this, TemplatePlugin.getPlugin())
+        Bukkit.getPluginManager().registerEvents(this, BukkitTemplate.getPlugin())
     }
 
     @EventHandler

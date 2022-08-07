@@ -15,18 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarFile;
 
-public class TemplatePlugin extends JavaPlugin {
+public class BukkitTemplate extends JavaPlugin {
 
     private static List<Class<?>> classes;
     private static KotlinPlugin ktPlugin;
-    private static TemplatePlugin plugin = null;
+    private static BukkitTemplate plugin = null;
 
-    public TemplatePlugin() {
+    public BukkitTemplate() {
         if (plugin == null) plugin = this;
         //防止卡主线程
         new Thread(() -> {
             DependencyManager.parsePluginYml();
-//            DependencyLoader.loadLibs();
             classes = loadClass();
             ktPlugin = findInstance();
             ktPlugin.javaPlugin = this;
@@ -60,13 +59,14 @@ public class TemplatePlugin extends JavaPlugin {
      * 唤醒所有继承SimpleYAMLConfig 的 object类
      * 目的是为了让插件加载阶段就补全缺失的配置文件
      */
-//    private static void callConfigsInstance() {
+//    public static void loadConfigs() {
 //        for (Class<?> aClass : classes) {
 //            if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
 //                try {
 //                    Field instance = aClass.getDeclaredField("INSTANCE");
 //                    instance.setAccessible(true);
-//                    instance.get(null);
+//                    SimpleYAMLConfig config = (SimpleYAMLConfig) instance.get(null);
+//                    config.load(false);
 //                    instance.setAccessible(false);
 //                } catch (NoSuchFieldException | IllegalAccessException ignored) {
 //                }
@@ -80,7 +80,7 @@ public class TemplatePlugin extends JavaPlugin {
      * @return 需要的class的集合
      */
     private static List<Class<?>> loadClass() {
-        URL location = TemplatePlugin.class.getProtectionDomain().getCodeSource().getLocation();
+        URL location = BukkitTemplate.class.getProtectionDomain().getCodeSource().getLocation();
         ArrayList<Class<?>> classes = new ArrayList<>();
         File srcFile;
         try {
@@ -101,7 +101,7 @@ public class TemplatePlugin extends JavaPlugin {
                 }
                 Class<?> aClass;
                 try {
-                    aClass = Class.forName(name.replace('/', '.').substring(0, name.length() - 6), false, TemplatePlugin.class.getClassLoader());
+                    aClass = Class.forName(name.replace('/', '.').substring(0, name.length() - 6), false, BukkitTemplate.class.getClassLoader());
                 } catch (ClassNotFoundException e) {
                     return;
                 }
@@ -123,7 +123,7 @@ public class TemplatePlugin extends JavaPlugin {
      *
      * @return Bukkit插件主类
      */
-    public static TemplatePlugin getPlugin() {
+    public static BukkitTemplate getPlugin() {
         return plugin;
     }
 
@@ -138,7 +138,7 @@ public class TemplatePlugin extends JavaPlugin {
 
     // 比 onEnabled 先调用
     public void onAsyncLoad() {
-//        callConfigsInstance();
+
         ktPlugin.onAsyncLoad();
     }
 
@@ -150,10 +150,11 @@ public class TemplatePlugin extends JavaPlugin {
         ktPlugin.onAsyncEnable();
     }
 
-
     @Override
     public void onDisable() {
         ktPlugin.onDisable();
+        Bukkit.getScheduler().cancelTasks(this);
+
     }
 
 }

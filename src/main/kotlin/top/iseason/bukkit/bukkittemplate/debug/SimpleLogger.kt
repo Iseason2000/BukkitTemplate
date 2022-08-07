@@ -1,7 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.debug
 
 import org.bukkit.Bukkit
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 
 /**
@@ -23,10 +23,10 @@ fun debug(message: Any?) {
  * 输出警告日志
  */
 fun warn(message: Any?) {
-    TemplatePlugin.getPlugin().logger.warning(message.toString())
+    BukkitTemplate.getPlugin().logger.warning(message.toString())
 }
 
 object SimpleLogger {
-    var prefix = "[${TemplatePlugin.getPlugin().description.name}] "
+    var prefix = "[${BukkitTemplate.getPlugin().description.name}] "
     var isDebug = false
 }

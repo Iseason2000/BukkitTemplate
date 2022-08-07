@@ -8,7 +8,7 @@ open class KotlinPlugin {
     /**
      * 获取bukkit插件对象,在onLoad阶段才会被赋值
      */
-    lateinit var javaPlugin: TemplatePlugin
+    lateinit var javaPlugin: BukkitTemplate
 
     /**
      * 在其他线程加载，比onEnable先调用,结束了才调用onEnable

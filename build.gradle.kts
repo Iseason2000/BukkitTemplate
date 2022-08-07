@@ -59,6 +59,7 @@ dependencies {
 //    协程库
 //    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
 
+    // 数据库
     compileOnly("org.jetbrains.exposed:exposed-core:$exposedVersion")
     compileOnly("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     compileOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
@@ -71,7 +72,10 @@ dependencies {
 
 tasks {
     shadowJar {
-        relocate("top.iseason.bukkit.bukkittemplate", "$groupS.lib.core")
+        relocate("top.iseason.bukkit.bukkittemplate", "$groupS.libs.core")
+    }
+    build {
+        dependsOn("buildPlugin")
     }
     compileJava {
         options.encoding = "UTF-8"
@@ -82,7 +86,7 @@ tasks {
     processResources {
         filesMatching("plugin.yml") {
             expand(
-                "main" to "$groupS.lib.core.TemplatePlugin",
+                "main" to "$groupS.libs.core.BukkitTemplate",
                 "name" to pluginName,
                 "version" to project.version,
                 "author" to author,
@@ -94,7 +98,7 @@ tasks {
 }
 task<com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation>("relocateShadowJar") {
     target = tasks.shadowJar.get()
-    prefix = "$groupS.lib"
+    prefix = "$groupS.libs"
     shadowJar.minimize()
 }
 tasks.shadowJar.get().dependsOn(tasks.getByName("relocateShadowJar"))
@@ -128,11 +132,11 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     }
     val allowObf = mapOf("allowobfuscation" to true)
     libraryjars(configurations.compileClasspath.get().files)
-    keep("class $groupS.lib.core.TemplatePlugin {}")
-    keep(allowObf, "class * implements $groupS.lib.core.KotlinPlugin {*;}")
-    keepclassmembers("class * extends $groupS.lib.core.config.SimpleYAMLConfig {*;}")
+    keep("class $groupS.libs.core.BukkitTemplate {}")
+    keep(allowObf, "class * implements $groupS.libs.core.KotlinPlugin {*;}")
+    keepclassmembers("class * extends $groupS.libs.core.config.SimpleYAMLConfig {*;}")
     keepclassmembers(allowObf, "class * implements org.bukkit.event.Listener {*;}")
-    keep(allowObf, "class $groupS.lib.core.utils.MessageKt {*;}")
+    keep(allowObf, "class $groupS.libs.core.utils.MessageKt {*;}")
     keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
     keepkotlinmetadata()
     repackageclasses()

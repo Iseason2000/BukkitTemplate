@@ -2,7 +2,7 @@ package top.iseason.bukkit.bukkittemplate.dependency;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin;
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate;
 
 import java.io.File;
 import java.io.InputStreamReader;
@@ -16,7 +16,7 @@ public class DependencyManager {
      * 解析下载plugin.yml中的依赖
      */
     public static void parsePluginYml() {
-        YamlConfiguration yml = YamlConfiguration.loadConfiguration(new InputStreamReader(requireNonNull(TemplatePlugin.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
+        YamlConfiguration yml = YamlConfiguration.loadConfiguration(new InputStreamReader(requireNonNull(BukkitTemplate.class.getClassLoader().getResourceAsStream("plugin.yml"), "Jar does not contain plugin.yml")));
         ConfigurationSection libConfigs = yml.getConfigurationSection("runtime-libraries");
         if (libConfigs == null) return;
         DependencyDownloader dd = new DependencyDownloader();
@@ -24,7 +24,7 @@ public class DependencyManager {
         if (folder != null) {
             File parent;
             if (folder.startsWith("@Plugin:")) {
-                parent = new File(TemplatePlugin.getPlugin().getDataFolder(), folder.replace("@Plugin:", ""));
+                parent = new File(BukkitTemplate.getPlugin().getDataFolder(), folder.replace("@Plugin:", ""));
             } else {
                 parent = new File(".", folder);
             }

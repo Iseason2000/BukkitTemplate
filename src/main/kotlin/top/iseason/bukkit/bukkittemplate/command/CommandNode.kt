@@ -8,7 +8,7 @@ import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
@@ -52,7 +52,7 @@ open class CommandNode(
     var onExecute: (Params.(sender: CommandSender) -> Boolean)? = null
 ) : CommandExecutor, TabExecutor {
     var permission: Permission =
-        Permission("${TemplatePlugin.getPlugin().name.lowercase()}.$name", default)
+        Permission("${BukkitTemplate.getPlugin().name.lowercase()}.$name", default)
 
     /**
      * 获取父节点
@@ -293,7 +293,7 @@ open class CommandNode(
         var noPermissionMessage: String? = "${SimpleLogger.prefix}&c你没有该命令的权限: &7%permission%"
 
         // 使用提示消息头
-        var usageHeader: String? = "  &7======> &d${TemplatePlugin.getPlugin().name} &7<======"
+        var usageHeader: String? = "  &7======> &d${BukkitTemplate.getPlugin().name} &7<======"
         var usage: String = "&7 - &6%s &a%s &7%s"
 
         // 使用提示消息尾部

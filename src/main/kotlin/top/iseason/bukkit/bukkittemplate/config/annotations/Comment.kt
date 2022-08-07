@@ -5,5 +5,5 @@ package top.iseason.bukkit.bukkittemplate.config.annotations
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Repeatable
-@Target(AnnotationTarget.FIELD)
+@Target(AnnotationTarget.FIELD, AnnotationTarget.PROPERTY)
 annotation class Comment(vararg val value: String)

@@ -1,6 +1,6 @@
 package top.iseason.bukkit.templateplugin
 
-import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.ConfigurationSection
 import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig
 import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
 import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
@@ -22,10 +22,10 @@ object Config : SimpleYAMLConfig() {
     @Key
     var map = mutableMapOf("test" to mutableMapOf("1" to mutableMapOf('1' to 2), "2" to "2"), "test2" to 2)
 
-    override val onLoaded: FileConfiguration.() -> Unit = {
+    override val onLoaded: ConfigurationSection.() -> Unit = {
 //        println("loaded")
     }
-    override val onSaved: (FileConfiguration.() -> Unit) = {
+    override val onSaved: (ConfigurationSection.() -> Unit) = {
 //        println("saved")
     }
 

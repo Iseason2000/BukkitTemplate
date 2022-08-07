@@ -1,7 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.utils
 
 import org.bukkit.scheduler.BukkitRunnable
-import top.iseason.bukkit.bukkittemplate.TemplatePlugin
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 
 /**
  * 提交一个任务
@@ -21,15 +21,15 @@ fun submit(
     val submitter = Submitter(delay, period, async, task)
     if (submitter.async) {
         if (submitter.period > 0) {
-            submitter.runTaskTimerAsynchronously(TemplatePlugin.getPlugin(), submitter.delay, submitter.period)
+            submitter.runTaskTimerAsynchronously(BukkitTemplate.getPlugin(), submitter.delay, submitter.period)
         } else {
-            submitter.runTaskLaterAsynchronously(TemplatePlugin.getPlugin(), submitter.delay)
+            submitter.runTaskLaterAsynchronously(BukkitTemplate.getPlugin(), submitter.delay)
         }
     } else {
         if (submitter.period > 0) {
-            submitter.runTaskTimer(TemplatePlugin.getPlugin(), submitter.delay, submitter.period)
+            submitter.runTaskTimer(BukkitTemplate.getPlugin(), submitter.delay, submitter.period)
         } else {
-            submitter.runTaskLater(TemplatePlugin.getPlugin(), submitter.delay)
+            submitter.runTaskLater(BukkitTemplate.getPlugin(), submitter.delay)
         }
     }
 }
