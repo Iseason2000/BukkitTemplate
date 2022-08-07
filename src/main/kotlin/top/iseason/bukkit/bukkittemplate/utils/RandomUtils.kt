@@ -69,6 +69,21 @@ object RandomUtils {
         return odd * (end - half) + half
     }
 
+    /**
+     * 加权随机区间
+     * @return 选中的权重序号
+     */
+    fun getWeighted(weights: Iterable<Int>): Int {
+        val sum = weights.sum()
+        val random = getInteger(0, sum)
+        var temp = 0
+        weights.forEachIndexed { index, i ->
+            temp += i
+            if (random <= temp) return index
+        }
+        return 0
+    }
+
     //根据等级计算时运随机后的倍率
     fun calculateFortune(level: Int): Int {
         if (level <= 0) throw IllegalArgumentException("level can not <= 0")

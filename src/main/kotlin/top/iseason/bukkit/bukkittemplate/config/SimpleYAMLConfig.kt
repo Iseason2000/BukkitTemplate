@@ -196,9 +196,8 @@ open class SimpleYAMLConfig(
                 var value = loadConfiguration.get(key.key)
                 if (Map::class.java.isAssignableFrom(key.field.type) && value != null) {
                     value = (value as MemorySection).getValues(false)
-                } else if (SimpleYAMLConfig::class.java.isAssignableFrom(key.field.type) && value != null) {
-                    value = SimpleYAMLConfig(value as MemorySection, this.isAutoUpdate, false)
-                    value.load(false)
+                } else if (Set::class.java.isAssignableFrom(key.field.type) && value != null) {
+                    value = loadConfiguration.getList(key.key).toSet()
                 }
                 if (value != null) {
                     //获取修改的键值
@@ -226,7 +225,11 @@ open class SimpleYAMLConfig(
             }
             //将数据写入临时配置
             try {
-                temp.set(key.key, key.getValue(this))
+                var value = key.getValue(this)
+                if (value is Set<*>) {
+                    value = value.toList()
+                }
+                temp.set(key.key, value)
             } catch (e: Exception) {
                 debug("setting config $configPath error! key:${key.key}")
             }

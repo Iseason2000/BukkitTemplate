@@ -18,6 +18,10 @@ object Config : SimpleYAMLConfig() {
     @Comment("", "list 测试")
     var test2 = mutableListOf("12312", "asdfas46", "tew4q5t456wefg6s")
 
+    @Key
+    @Comment("", "set 测试")
+    var set = mutableSetOf("asdasd", "asdasdas", "asdas")
+
     @Comment("", "map 测试")
     @Key
     var map = mutableMapOf("test" to mutableMapOf("1" to mutableMapOf('1' to 2), "2" to "2"), "test2" to 2)

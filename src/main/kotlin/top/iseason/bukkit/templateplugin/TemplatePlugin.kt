@@ -26,7 +26,7 @@ object TemplatePlugin : KotlinPlugin() {
     override fun onAsyncEnable() {
 
 //        SimpleYAMLConfig.notifyMessage = "&7配置文件 &6%s &7已重载!"
-//        Config.load(false)
+        Config.load(false)
 //        LagCatcher.performanceCheck("test", 0) {
 //            DependencyDownloader().addRepositories("https://maven.aliyun.com/repository/public")
 //                .downloadDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
