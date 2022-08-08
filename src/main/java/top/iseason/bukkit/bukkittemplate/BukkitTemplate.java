@@ -1,6 +1,7 @@
 package top.iseason.bukkit.bukkittemplate;
 
 import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyManager;
 
@@ -154,7 +155,7 @@ public class BukkitTemplate extends JavaPlugin {
     public void onDisable() {
         ktPlugin.onDisable();
         Bukkit.getScheduler().cancelTasks(this);
-
+        HandlerList.unregisterAll(this);
     }
 
 }
