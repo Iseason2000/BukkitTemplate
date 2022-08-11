@@ -137,7 +137,7 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     keep(allowObf, "class * implements $groupS.libs.core.KotlinPlugin {*;}")
     keepclassmembers("class * extends $groupS.libs.core.config.SimpleYAMLConfig {*;}")
     keepclassmembers(allowObf, "class * implements org.bukkit.event.Listener {*;}")
-    keep(allowObf, "class $groupS.libs.core.utils.MessageKt {*;}")
+    keep(allowObf, "class $groupS.libs.core.utils.MessageUtilsKt {*;}")
     keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
     keepkotlinmetadata()
     repackageclasses()
