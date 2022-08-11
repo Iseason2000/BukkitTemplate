@@ -6,6 +6,7 @@ import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
 
 /**
  * 给予有物品栏的对象物品,如果是实体且放不下将会放置到实体脚下
@@ -36,6 +37,17 @@ fun InventoryHolder.giveItems(vararg itemStacks: ItemStack) {
     if (this !is Entity) return
     for (addItem in addItems) {
         if (addItem == null) continue
-        (world.spawnEntity(location, EntityType.DROPPED_ITEM) as Item).itemStack = addItem
+        val item = world.spawnEntity(location, EntityType.DROPPED_ITEM) as Item
+        item.setItemStack(addItem)
     }
+}
+
+/**
+ * 获取玩家手上拿着的物品,兼容低版本
+ * @return 没有或者是空气都返回null
+ */
+fun PlayerInventory.getHeldItem(): ItemStack? {
+    val item = getItem(heldItemSlot)
+    if (item == null || item.type.checkAir()) return null
+    return item
 }
