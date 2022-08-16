@@ -106,11 +106,7 @@ public class BukkitTemplate extends JavaPlugin {
                 } catch (ClassNotFoundException e) {
                     return;
                 }
-//                if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
-//                    classes.add(aClass);
-//                    return;
-//                }
-                if (KotlinPlugin.class.isAssignableFrom(aClass) && !KotlinPlugin.class.getName().equals(aClass.getName())) {
+                if (KotlinPlugin.class.isAssignableFrom(aClass) && KotlinPlugin.class != aClass) {
                     classes.add(aClass);
                 }
             });

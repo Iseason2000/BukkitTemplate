@@ -1,4 +1,4 @@
-package top.iseason.bukkit.templateplugin
+package com.example.bukkit.templateplugin
 
 
 import org.bukkit.Material

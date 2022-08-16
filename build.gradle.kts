@@ -29,7 +29,11 @@ val version: String by project
 // shadowJar 版本 ，请在gradle.properties 修改
 val shadowJar: ShadowJar by tasks
 // exposed 数据库框架版本，请在gradle.properties 修改
+
 val exposedVersion: String by project
+val obfuscated: String by project
+val shrink: String by project
+
 repositories {
 //    阿里的服务器速度快一点
     maven {
@@ -66,7 +70,7 @@ dependencies {
     compileOnly("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.13-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
 
 }
 
@@ -108,17 +112,15 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     group = "minecraft"
     verbose()
     injars(tasks.named("shadowJar"))
-    //是否混淆，注销掉启用混淆
-    val obfuscated = getProperties("obfuscated") == "true"
-    val shrink = getProperties("shrink") == "true"
-    if (!obfuscated) {
+    if (obfuscated != "true") {
         dontobfuscate()
     }
-    if (!shrink) {
+    if (shrink != "true") {
         dontshrink()
     }
     optimizationpasses(5)
     dontwarn()
+    //添加运行环境
     val javaHome = System.getProperty("java.home")
     if (JavaVersion.current() < JavaVersion.toVersion(9)) {
         libraryjars("$javaHome/lib/rt.jar")
@@ -131,8 +133,10 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
             "$javaHome/jmods/java.base.jmod"
         )
     }
-    val allowObf = mapOf("allowobfuscation" to true)
     libraryjars(configurations.compileClasspath.get().files)
+    //启用混淆的选项
+    val allowObf = mapOf("allowobfuscation" to true)
+    //class规则
     keep("class $groupS.libs.core.BukkitTemplate {}")
     keep(allowObf, "class * implements $groupS.libs.core.KotlinPlugin {*;}")
     keepclassmembers("class * extends $groupS.libs.core.config.SimpleYAMLConfig {*;}")
@@ -140,8 +144,9 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     keep(allowObf, "class $groupS.libs.core.utils.MessageUtilsKt {*;}")
     keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
     keepkotlinmetadata()
+
     repackageclasses()
-    if (obfuscated)
+    if (obfuscated == "true")
         outjars(File(jarOutputFile, "${project.name}-${project.version}-obfuscated.jar"))
     else
         outjars(File(jarOutputFile, "${project.name}-${project.version}.jar"))

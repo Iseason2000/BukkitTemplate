@@ -1,4 +1,4 @@
-package top.iseason.bukkit.templateplugin
+package com.example.bukkit.templateplugin
 
 import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionDefault
