@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.ui
+package top.iseason.bukkit.bukkittemplate.ui.container
 
 interface Pageable {
     var container: UIContainer?

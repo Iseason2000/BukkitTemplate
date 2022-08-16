@@ -1,5 +1,6 @@
-package top.iseason.bukkit.bukkittemplate.ui
+package top.iseason.bukkit.bukkittemplate.ui.container
 
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -7,6 +8,9 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.ui.slot.BaseSlot
+import top.iseason.bukkit.bukkittemplate.ui.slot.IOSlot
+import top.iseason.bukkit.bukkittemplate.ui.slot.merge
 import top.iseason.bukkit.bukkittemplate.utils.submit
 
 
@@ -17,7 +21,7 @@ abstract class BaseUI(
      */
     open var clickDelay: Long = 100L
 ) : InventoryHolder {
-    protected var baseInventory: Inventory? = null
+    private var baseInventory: Inventory? = null
 
     final override fun getInventory(): Inventory = baseInventory!!
 
@@ -41,22 +45,27 @@ abstract class BaseUI(
     /**
      * 点击时触发，可以取消
      */
-    open var onClick: InventoryClickEvent.() -> Unit = {}
+    open var onClick: (InventoryClickEvent.() -> Unit)? = null
 
     /**
      * 点击后触发，不可取消
      */
-    open var onClicked: InventoryClickEvent.() -> Unit = {}
+    open var onClicked: (InventoryClickEvent.() -> Unit)? = null
 
     /**
      * 关闭时触发
      */
-    open var onClose: InventoryCloseEvent?.() -> Unit = {}
+    open var onClose: (InventoryCloseEvent?.() -> Unit)? = null
 
     /**
      * 打开时触发
      */
-    open var onOpen: InventoryOpenEvent.() -> Unit = {}
+    open var onOpen: (InventoryOpenEvent.() -> Unit)? = null
+
+    /**
+     * 点击是否异步，只对 onClicked 有效
+     */
+    var async: Boolean = false
 
     /**
      * 获取正在看这个UI的实体
@@ -117,11 +126,12 @@ abstract class BaseUI(
         for (slot in slots) {
             if (slot == null) continue
             //清除原有的ItemStack
-            slot.baseInventory = baseInventory
+            slot.baseInventory = inventory
             if (slot is IOSlot) {
                 inventory.setItem(slot.index, slot.placeholder)
-            } else
+            } else {
                 inventory.setItem(slot.index, slot.itemStack)
+            }
         }
         return inventory
     }
@@ -212,6 +222,31 @@ abstract class BaseUI(
         return this
     }
 
+    /**
+     * 序列化为配置文件
+     */
+    open fun serialize(section: ConfigurationSection) {
+        section["row"] = size / 9
+        section["clickDelay"] = clickDelay
+        if (lockOnTop)
+            section["lockOnTop"] = true
+        if (lockOnBottom)
+            section["lockOnBottom"] = true
+        val slotSection = section.createSection("slots")
+        for (slot in slots) {
+            if (slot == null) continue
+            if (slotSection.contains(slot.serializeId)) {
+                slotSection.getConfigurationSection(slot.serializeId)?.apply {
+                    this["slot"] = this.getString("slot") + "," + slot.index
+                }
+            } else {
+                slot.serialize(slotSection.createSection(slot.serializeId))
+            }
+        }
+    }
+
+    abstract fun deserialize(section: ConfigurationSection): BaseUI?
+
     companion object {
         /**
          * 从 Inventory 获取 UI 对象
@@ -231,7 +266,8 @@ fun <T : BaseUI> T.onClick(action: InventoryClickEvent.() -> Unit): T {
 /**
  * 设置点击后的动作
  */
-fun <T : BaseUI> T.onClicked(action: InventoryClickEvent.() -> Unit): T {
+fun <T : BaseUI> T.onClicked(async: Boolean = false, action: InventoryClickEvent.() -> Unit): T {
+    this.async = async
     this.onClicked = action
     return this
 }

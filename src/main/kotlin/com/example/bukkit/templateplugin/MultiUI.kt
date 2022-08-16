@@ -3,7 +3,9 @@ package com.example.bukkit.templateplugin
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.ui.*
+import top.iseason.bukkit.bukkittemplate.ui.container.*
+import top.iseason.bukkit.bukkittemplate.ui.slot.Button
+import top.iseason.bukkit.bukkittemplate.ui.slot.onClicked
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.applyMeta
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.toColor

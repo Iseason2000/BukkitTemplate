@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryAction.*
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -12,8 +13,11 @@ import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.AutoDisable
-import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.debug.debug
+import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
+import top.iseason.bukkit.bukkittemplate.ui.slot.ClickSlot
+import top.iseason.bukkit.bukkittemplate.ui.slot.IOSlot
+import top.iseason.bukkit.bukkittemplate.ui.slot.merge
 import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
@@ -33,31 +37,40 @@ object UIListener : AutoDisable(), Listener {
     override fun onDisable() {
         Bukkit.getOnlinePlayers().forEach {
             val baseUI = BaseUI.fromInventory(it.openInventory.topInventory) ?: return
-            baseUI.onClose(null)
-            baseUI.ejectItems(it)
-            it.closeInventory()
+            runCatching {
+                baseUI.onClose?.invoke(null)
+                baseUI.ejectItems(it)
+                it.closeInventory()
+            }.getOrElse { e -> e.printStackTrace() }
         }
     }
 
-    fun onEnable() {
-        Bukkit.getPluginManager().registerEvents(this, BukkitTemplate.getPlugin())
-    }
-
+    /**
+     * 当ui被打开 时触发 onOpen 方法
+     */
     @EventHandler
     fun onInventoryOpenEvent(event: InventoryOpenEvent) {
         val baseUI = BaseUI.fromInventory(event.inventory) ?: return
-        baseUI.onOpen(event)
+        runCatching { baseUI.onOpen?.invoke(event) }.getOrElse { it.printStackTrace() }
     }
 
+    /**
+     * 当ui关闭时触发 onClose 方法
+     */
     @EventHandler
     fun onInventoryCloseEvent(event: InventoryCloseEvent) {
         val baseUI = BaseUI.fromInventory(event.inventory) ?: return
-        baseUI.onClose(event)
-        baseUI.ejectItems(event.player)
-        clickCoolDown.remove(event.player)
+        runCatching {
+            baseUI.onClose?.invoke(event)
+            baseUI.ejectItems(event.player)
+            clickCoolDown.remove(event.player)
+        }.getOrElse { it.printStackTrace() }
     }
 
-    @EventHandler
+    /**
+     * 处理ui的点击
+     */
+    @EventHandler(priority = EventPriority.LOW)
     fun onInventoryClickEvent(event: InventoryClickEvent) {
         val inventory = event.inventory
         val baseUI = BaseUI.fromInventory(inventory) ?: return
@@ -68,17 +81,10 @@ object UIListener : AutoDisable(), Listener {
         }
         var isCancelled = false
         val rawSlot = event.rawSlot
-        //点击上下锁，优先级大于slot
+
         val clickedClickSlot: ClickSlot? = baseUI.getSlot(rawSlot) as? ClickSlot
-        if (clickedClickSlot != null) {
-            clickedClickSlot.onClick?.let { it(clickedClickSlot, event) }
-            submit {
-                clickedClickSlot.onClicked?.let { it(clickedClickSlot, event) }
-            }
-        }
-        /**
-         * 上下锁
-         */
+
+        // 上下锁
         if (rawSlot in 0 until inventory.size && baseUI.lockOnTop) {
             if (clickedClickSlot !is IOSlot) isCancelled = true
             debug("ui ${baseUI::class.simpleName} lockup, slot $rawSlot")
@@ -86,18 +92,28 @@ object UIListener : AutoDisable(), Listener {
             isCancelled = true
             debug("ui ${baseUI::class.simpleName} lockdown, slot $rawSlot")
         }
-        event.isCancelled = isCancelled
-        event.ioEvent()
-        baseUI.onClick(event)
-        submit {
+        runCatching { baseUI.onClick?.invoke(event) }.getOrElse { it.printStackTrace() }
+        submit(async = baseUI.async) {
             if (whoClicked is Player) whoClicked.updateInventory()
-            baseUI.onClicked(event)
+            baseUI.onClicked?.invoke(event)
         }
+        // 处理点击事件
+        if (clickedClickSlot != null) {
+            runCatching {
+                clickedClickSlot.onClick?.invoke(clickedClickSlot, event)
+            }.getOrElse { it.printStackTrace() }
+            submit(async = clickedClickSlot.asyncClick) {
+                clickedClickSlot.onClicked?.invoke(clickedClickSlot, event)
+            }
+        }
+        event.isCancelled = isCancelled
+        kotlin.runCatching { event.ioEvent() }.getOrElse { it.printStackTrace() }
+
     }
 
     @EventHandler
     fun onInventoryDragEvent(event: InventoryDragEvent) {
-        event.ioEvent()
+        runCatching { event.ioEvent() }.getOrElse { it.printStackTrace() }
     }
 
 }

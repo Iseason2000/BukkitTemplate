@@ -1,6 +1,7 @@
-package top.iseason.bukkit.bukkittemplate.ui
+package top.iseason.bukkit.bukkittemplate.ui.slot
 
 import org.bukkit.Material
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
@@ -65,8 +66,25 @@ open class Icon(
         itemStack = rawItemStack
     }
 
+    override var serializeId: String = "icon"
+
+    override fun serialize(section: ConfigurationSection) {
+        section["serializeId"] = serializeId
+        section["slot"] = index
+        section["item"] = rawItemStack
+    }
+
+    override fun deserialize(section: ConfigurationSection): BaseSlot? {
+        if (serializeId != section["serializeId"]) return null
+        if (!section.contains("slot", true)) return null
+        if (!section.contains("item", true)) return null
+        val item = section.getItemStack("item") ?: return null
+        return Icon(item, section.getInt("slot")).also {
+            it.baseInventory = baseInventory
+        }
+    }
+
     override fun clone(index: Int): Icon = Icon(rawItemStack, index).also {
-        it.itemStack = itemStack
         it.baseInventory = baseInventory
     }
 }

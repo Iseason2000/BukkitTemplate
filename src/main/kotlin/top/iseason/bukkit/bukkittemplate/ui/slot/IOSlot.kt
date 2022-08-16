@@ -1,5 +1,6 @@
-package top.iseason.bukkit.bukkittemplate.ui
+package top.iseason.bukkit.bukkittemplate.ui.slot
 
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.HumanEntity
 import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
@@ -15,11 +16,6 @@ open class IOSlot(
     //没有物品时的占位符
     var placeholder: ItemStack? = null
 ) : ClickSlot(placeholder, index) {
-
-    init {
-        //默认开启输出输入
-        lockable(false)
-    }
 
     /**
      * 与Inventory的ItemStack同步,null时显示占位符
@@ -53,9 +49,19 @@ open class IOSlot(
     var onInput: IOSlot.(ItemStack) -> Unit = {}
 
     /**
+     * 输入时异步调用，只对 onInput 有效
+     */
+    var inputAsync = false
+
+    /**
      * 当输出物品时调用
      */
     var onOutput: IOSlot.(ItemStack) -> Unit = {}
+
+    /**
+     * 输出时异步调用，只对 onOutput 有效
+     */
+    var outputAsync = false
 
     /**
      * 将物品给某人
@@ -75,16 +81,30 @@ open class IOSlot(
         itemStack = null
     }
 
+    override var serializeId: String = "ioSlot"
+
+    override fun serialize(section: ConfigurationSection) {
+        section["serializeId"] = serializeId
+        section["slot"] = index
+        section["placeholder"] = placeholder
+    }
+
+    override fun deserialize(section: ConfigurationSection): BaseSlot? {
+        if (serializeId != section["serializeId"]) return null
+        if (!section.contains("slot", true)) return null
+        if (!section.contains("placeholder", true)) return null
+        val placeholder = section.getItemStack("placeholder") ?: return null
+        return clone(section.getInt("slot")).also { it.placeholder = placeholder }
+    }
+
     override fun clone(index: Int): IOSlot = IOSlot(index).also {
-        it.itemStack = itemStack
-        it.placeholder = placeholder
+        it.placeholder = placeholder?.clone()
         it.input = input
         it.output = output
         it.onClick = onClick
         it.onClicked = onClicked
         it.onInput = onInput
         it.onOutput = onOutput
-        it.baseInventory = baseInventory
     }
 }
 
@@ -134,7 +154,8 @@ fun <T : IOSlot> T.inputAble(inputAble: Boolean): T {
 /**
  * 输入物品后调用 onInput
  */
-fun <T : IOSlot> T.onInput(onInput: ClickSlot.(ItemStack) -> Unit): T {
+fun <T : IOSlot> T.onInput(async: Boolean = false, onInput: ClickSlot.(ItemStack) -> Unit): T {
+    this.inputAsync = async
     this.onInput = onInput
     return this
 }
@@ -142,7 +163,8 @@ fun <T : IOSlot> T.onInput(onInput: ClickSlot.(ItemStack) -> Unit): T {
 /**
  * 输出物品后调用 onOutput
  */
-fun <T : IOSlot> T.onOutput(onOutput: ClickSlot.(ItemStack) -> Unit): T {
+fun <T : IOSlot> T.onOutput(async: Boolean = false, onOutput: ClickSlot.(ItemStack) -> Unit): T {
+    this.outputAsync = async
     this.onOutput = onOutput
     return this
 }

@@ -32,7 +32,7 @@ open class SimpleYAMLConfig(
     /**
      * 是否自动重载
      */
-    var isAutoUpdate: Boolean = true,
+    open var isAutoUpdate: Boolean = true,
     /**
      * 重载是否提示,如果你要自定义提示请关闭
      */
@@ -54,7 +54,7 @@ open class SimpleYAMLConfig(
     /**
      * 配置文件路径
      */
-    private val configPath = getPath().apply {
+    val configPath = getPath().apply {
         if (!exists()) {
             parentFile.mkdirs()
             createNewFile()

@@ -1,7 +1,9 @@
-package top.iseason.bukkit.bukkittemplate.ui
+package top.iseason.bukkit.bukkittemplate.ui.slot
+
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
 
 /**
@@ -47,18 +49,23 @@ abstract class ClickSlot(
      */
     var onClicked: (ClickSlot.(InventoryClickEvent) -> Unit)? = null
 
+    /**
+     * 是否异步点击 只对 onClicked 有效
+     */
+    var asyncClick = false
 }
 
 /**
- * 点击之前
+ * 点击之后
  */
-fun <T : ClickSlot> T.onClicked(action: (ClickSlot.(InventoryClickEvent) -> Unit)? = null): T {
+fun <T : ClickSlot> T.onClicked(async: Boolean = false, action: (ClickSlot.(InventoryClickEvent) -> Unit)? = null): T {
+    this.asyncClick = async
     this.onClicked = action
     return this
 }
 
 /**
- * 点击之后
+ * 点击之前
  */
 fun <T : ClickSlot> T.onClick(action: (ClickSlot.(InventoryClickEvent) -> Unit)? = null): T {
     this.onClick = action

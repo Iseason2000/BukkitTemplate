@@ -1,5 +1,6 @@
 package com.example.bukkit.templateplugin
 
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.potion.PotionEffect
@@ -49,10 +50,12 @@ fun command1() {
                         if (potionEffect != null) time += potionEffect.duration
                         player.addPotionEffect(PotionEffect(type, time, level))
                     }
+
                     "set" -> {
                         player.removePotionEffect(type)
                         player.addPotionEffect(PotionEffect(type, time, level))
                     }
+
                     else -> {
                         player.removePotionEffect(type)
                     }
@@ -109,16 +112,28 @@ fun command4() {
 }
 
 fun openUICommand() {
-    commandRoot("openUI", isPlayerOnly = true).onExecute {
-        (it as Player).openUI<MyUI> {
-            title = it.displayName
+    commandRoot("openUI", isPlayerOnly = true, async = true) {
+        node("UI", isPlayerOnly = true).onExecute {
+            (it as Player).openUI<MyUI> {
+                title = it.displayName
+            }
+            true
         }
-        true
+        node("UISer", isPlayerOnly = true).onExecute {
+            (it as Player).openInventory(MyUIConfig.myUI?.build() ?: return@onExecute true)
+            true
+        }
+        node("saveUISer", isPlayerOnly = true, async = true).onExecute {
+            MyUISer.serialize(MyUIConfig.config)
+            (MyUIConfig.config as YamlConfiguration).save(MyUIConfig.configPath)
+            true
+        }
+        node("MultiUI", isPlayerOnly = true).onExecute {
+            (it as Player).openPageableUI<MultiUI>()
+            true
+        }
     }
-    commandRoot("openMultiUI", isPlayerOnly = true).onExecute {
-        (it as Player).openPageableUI<MultiUI>()
-        true
-    }
+
 }
 
 /**
