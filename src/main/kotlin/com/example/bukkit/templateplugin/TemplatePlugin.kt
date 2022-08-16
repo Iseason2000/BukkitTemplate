@@ -1,7 +1,6 @@
 package com.example.bukkit.templateplugin
 
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
-import top.iseason.bukkit.bukkittemplate.command.CommandBuilder
 import top.iseason.bukkit.bukkittemplate.debug.info
 
 object TemplatePlugin : KotlinPlugin() {
@@ -9,12 +8,12 @@ object TemplatePlugin : KotlinPlugin() {
     override fun onAsyncLoad() {
 //        command1()
 //        openUICommand()
+//        command1()
     }
 
     override fun onEnable() {
         //如果使用命令模块，取消注释
-        CommandBuilder.onEnable()
-        command1()
+//        CommandBuilder.updateCommands()
 //
 //        //如果使用UI模块,取消注释
 //        UIListener.onEnable()
@@ -34,15 +33,6 @@ object TemplatePlugin : KotlinPlugin() {
     }
 
     override fun onDisable() {
-
-        //如果使用命令模块，取消注释
-        CommandBuilder.onDisable()
-//
-//        //如果使用UI模块,取消注释
-//        UIListener.onDisable()
-//
-//        //如果使用配置模块，取消注销
-//        ConfigWatcher.onDisable()
         info("&6插件已卸载! ")
     }
 

@@ -152,6 +152,7 @@ public class BukkitTemplate extends JavaPlugin {
         ktPlugin.onDisable();
         Bukkit.getScheduler().cancelTasks(this);
         HandlerList.unregisterAll(this);
+        AutoDisable.disableAll();
     }
 
 }

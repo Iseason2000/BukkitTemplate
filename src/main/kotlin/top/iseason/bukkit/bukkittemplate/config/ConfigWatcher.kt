@@ -1,6 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.config
 
 import org.bukkit.scheduler.BukkitRunnable
+import top.iseason.bukkit.bukkittemplate.AutoDisable
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import java.io.File
 import java.lang.Thread.sleep
@@ -50,7 +51,7 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
         service.close()
     }
 
-    companion object {
+    companion object : AutoDisable() {
         private val folders = mutableMapOf<String, ConfigWatcher>()
 
         fun fromFile(file: File): ConfigWatcher {
@@ -64,7 +65,7 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
             return configWatcher
         }
 
-        fun onDisable() {
+        override fun onDisable() {
             for (v in folders.values) {
                 v.cancel()
             }

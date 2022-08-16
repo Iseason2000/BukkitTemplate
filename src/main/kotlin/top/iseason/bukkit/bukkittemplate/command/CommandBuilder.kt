@@ -8,6 +8,7 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.SimplePluginManager
+import top.iseason.bukkit.bukkittemplate.AutoDisable
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.utils.toColor
 import java.lang.reflect.Constructor
@@ -103,7 +104,7 @@ class CommandBuilder(private val commandNode: CommandNode) {
         return commandBuilder
     }
 
-    companion object {
+    companion object : AutoDisable() {
         private val pluginPermissions = mutableSetOf<Permission>()
         private val registeredCommands = mutableListOf<PluginCommand>()
         private val simpleCommandMap: SimpleCommandMap
@@ -165,16 +166,15 @@ class CommandBuilder(private val commandNode: CommandNode) {
         }
 
         @JvmStatic
-        fun onEnable() {
-            updateCommands()
-        }
-
-        @JvmStatic
-        fun onDisable() {
+        override fun onDisable() {
             clearPermissions()
             unregisterAll()
         }
 
+        /**
+         * 更新注册的命令以支持tab
+         */
+        @JvmStatic
         fun updateCommands() {
             try {
                 Bukkit.getServer().apply {

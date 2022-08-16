@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.AutoDisable
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
@@ -21,7 +22,7 @@ import top.iseason.bukkit.bukkittemplate.utils.submit
 /**
  * 负责所有UI的监听动作
  */
-object UIListener : Listener {
+object UIListener : AutoDisable(), Listener {
 
     //    private val playerClickTime = mutableMapOf<HumanEntity, Long>()
     private val clickCoolDown = WeakCoolDown<HumanEntity>()
@@ -29,7 +30,7 @@ object UIListener : Listener {
     /**
      * 在插件注销时关闭所有UI
      */
-    fun onDisable() {
+    override fun onDisable() {
         Bukkit.getOnlinePlayers().forEach {
             val baseUI = BaseUI.fromInventory(it.openInventory.topInventory) ?: return
             baseUI.onClose(null)
@@ -170,6 +171,7 @@ fun InventoryClickEvent.ioEvent() {
                         PICKUP_HALF -> {
                             amount - amount / 2
                         }
+
                         PICKUP_ONE -> 1
                         PICKUP_SOME -> maxStackSize
                         else -> amount
@@ -179,14 +181,17 @@ fun InventoryClickEvent.ioEvent() {
             } else outputItem = null
             inputItem = null
         }
+
         DROP_ALL_SLOT -> {
             outputItem = Pair(rawSlot, currentItem!!.clone())
             inputItem = null
         }
+
         DROP_ONE_SLOT -> {
             outputItem = Pair(rawSlot, currentItem!!.clone().apply { amount = 1 })
             inputItem = null
         }
+
         COLLECT_TO_CURSOR -> {
             //双击收集特殊处理
             val cursor = cursor!!.clone()
@@ -263,6 +268,7 @@ fun InventoryClickEvent.ioEvent() {
                 inputItem = null
             }
         }
+
         HOTBAR_SWAP, HOTBAR_MOVE_AND_READD -> {
             if (rawSlot in 0 until inventory.size) {
                 //处理占位符
@@ -277,6 +283,7 @@ fun InventoryClickEvent.ioEvent() {
                 outputItem = null
             }
         }
+
         else -> {
             inputItem = null
             outputItem = null
