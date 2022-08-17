@@ -15,6 +15,7 @@ buildscript {
         classpath("com.guardsquare:proguard-gradle:7.2.2")
     }
 }
+
 // 插件名称，请在gradle.properties 修改
 val pluginName: String by project
 //包名，请在gradle.properties 修改
@@ -74,7 +75,6 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
 
 }
-
 
 tasks {
     shadowJar {

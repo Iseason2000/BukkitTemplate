@@ -66,10 +66,16 @@ object DatabaseConfig : SimpleYAMLConfig() {
                 addRepository("https://repo.maven.apache.org/maven2/")
             }
             val config = when (database) {
-                "MySQL", "MariaDB" -> HikariConfig().apply {
-                    dd.downloadDependency("mysql:mysql-connector-java:8.0.29")
-                    jdbcUrl = "jdbc:mysql://$url?charactorEncoding=utf-8mb4"
+                "MySQL" -> HikariConfig().apply {
+                    dd.downloadDependency("mysql:mysql-connector-java:8.0.30")
+                    jdbcUrl = "jdbc:mysql://$url"
                     driverClassName = "com.mysql.cj.jdbc.Driver"
+                }
+
+                "MariaDB" -> HikariConfig().apply {
+                    dd.downloadDependency("org.mariadb.jdbc:mariadb-java-client:3.0.7")
+                    jdbcUrl = "jdbc:mariadb://$url"
+                    driverClassName = "org.mariadb.jdbc.Driver"
                 }
 
                 "SQLite" -> HikariConfig().apply {
