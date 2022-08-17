@@ -120,11 +120,11 @@ fun openUICommand() {
             true
         }
         node("UISer", isPlayerOnly = true).onExecute {
-            (it as Player).openInventory(MyUIConfig.myUI?.build() ?: return@onExecute true)
+            MyUIConfig.myUI?.clone()?.openFor((it as Player))
             true
         }
         node("saveUISer", isPlayerOnly = true, async = true).onExecute {
-            MyUISer.serialize(MyUIConfig.config)
+            MultiUI.serialize(MyUIConfig.config)
             (MyUIConfig.config as YamlConfiguration).save(MyUIConfig.configPath)
             true
         }

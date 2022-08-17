@@ -62,4 +62,27 @@ open class ChestUI(
         chestUI.onOpen = onOpen
         return chestUI
     }
+
+    override fun clone(): BaseUI {
+        val chestUI = ChestUI(this.title, this.size / 9, this.clickDelay)
+        slots.forEachIndexed { index, baseSlot ->
+            chestUI.slots[index] = baseSlot?.clone(index)
+        }
+        return chestUI.also {
+            it.lockOnBottom = lockOnBottom
+            it.lockOnTop = lockOnTop
+            it.serializeId = serializeId
+            it.async = async
+            it.onClick = onClick
+            it.onClicked = onClicked
+            it.onOpen = onOpen
+            it.onClose = onClose
+        }
+    }
+
+    override var container: UIContainer? = null
+
+    override fun getUI(): BaseUI = this
+
+    override var serializeId: String = "chestui"
 }

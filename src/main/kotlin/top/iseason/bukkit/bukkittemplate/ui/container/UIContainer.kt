@@ -1,5 +1,6 @@
 package top.iseason.bukkit.bukkittemplate.ui.container
 
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.HumanEntity
 
 /**
@@ -12,6 +13,7 @@ open class UIContainer(
      */
     protected val pages: Array<Pageable?>
 ) {
+
     // 页码
     val size = pages.size
     protected val viewers = mutableMapOf<HumanEntity, Int>()
@@ -30,7 +32,11 @@ open class UIContainer(
         val index = viewers[player] ?: 0
         val pageable = pages[index] ?: return null
         pageable.container = this
-        return pageable.getUI()
+        val ui = pageable.getUI()
+        if (!ui.hasBuilt) {
+            ui.build()
+        }
+        return ui
     }
 
     /**
@@ -69,4 +75,45 @@ open class UIContainer(
         player.openInventory(currentPage.inventory)
     }
 
+    /**
+     * 序列化
+     */
+    open fun serialize(section: ConfigurationSection) {
+        for (page in pages) {
+            if (page == null) continue
+            val sec = section.createSection(page.serializeId)
+            page.getUI().serialize(sec)
+        }
+    }
+
+
+    /**
+     * 反序列化
+     */
+    open fun deserialize(section: ConfigurationSection): UIContainer {
+        val listOf = mutableListOf<Pageable>()
+        for (serializeId in section.getKeys(false)) {
+            val find = pages.find { serializeId == it?.serializeId } ?: continue
+            val configurationSection = section.getConfigurationSection(serializeId) ?: continue
+            val deserialize = find.getUI().deserialize(configurationSection) ?: continue
+            deserialize.serializeId = serializeId
+            listOf.add(deserialize)
+        }
+        val uiContainer = UIContainer(listOf.toTypedArray())
+        uiContainer.onPageChanged = onPageChanged
+        return uiContainer
+    }
+
+    /**
+     * 复制
+     */
+    open fun clone(): UIContainer {
+        val copyOf = pages.copyOf()
+        copyOf.forEachIndexed { index, pageable ->
+            if (pageable == null) return@forEachIndexed
+            val clone = pageable.getUI().clone()
+            copyOf[index] = clone
+        }
+        return UIContainer(copyOf).also { it.onPageChanged = onPageChanged }
+    }
 }

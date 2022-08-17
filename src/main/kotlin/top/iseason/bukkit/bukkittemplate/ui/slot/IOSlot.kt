@@ -84,13 +84,11 @@ open class IOSlot(
     override var serializeId: String = "ioSlot"
 
     override fun serialize(section: ConfigurationSection) {
-        section["serializeId"] = serializeId
         section["slot"] = index
         section["placeholder"] = placeholder
     }
 
     override fun deserialize(section: ConfigurationSection): BaseSlot? {
-        if (serializeId != section["serializeId"]) return null
         if (!section.contains("slot", true)) return null
         if (!section.contains("placeholder", true)) return null
         val placeholder = section.getItemStack("placeholder") ?: return null

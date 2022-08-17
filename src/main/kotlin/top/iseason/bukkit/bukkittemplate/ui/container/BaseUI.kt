@@ -20,8 +20,11 @@ abstract class BaseUI(
      * 点击间隔，防止卡顿
      */
     open var clickDelay: Long = 100L
-) : InventoryHolder {
+) : InventoryHolder, Pageable {
     private var baseInventory: Inventory? = null
+
+    val hasBuilt: Boolean
+        get() = baseInventory != null
 
     final override fun getInventory(): Inventory = baseInventory!!
 
@@ -245,7 +248,12 @@ abstract class BaseUI(
         }
     }
 
+    /**
+     * 反序列化
+     */
     abstract fun deserialize(section: ConfigurationSection): BaseUI?
+
+    abstract fun clone(): BaseUI
 
     companion object {
         /**

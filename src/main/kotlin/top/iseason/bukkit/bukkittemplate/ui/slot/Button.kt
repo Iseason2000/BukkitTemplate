@@ -56,13 +56,11 @@ open class Button(
     override var serializeId: String = "button"
 
     override fun serialize(section: ConfigurationSection) {
-        section["serializeId"] = serializeId
         section["slot"] = index
         section["item"] = rawItemStack
     }
 
     override fun deserialize(section: ConfigurationSection): BaseSlot? {
-        if (serializeId != section["serializeId"]) return null
         if (!section.contains("slot", true)) return null
         if (!section.contains("item", true)) return null
         val item = section.getItemStack("item") ?: return null

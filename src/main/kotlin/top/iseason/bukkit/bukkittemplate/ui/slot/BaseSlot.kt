@@ -3,6 +3,8 @@ package top.iseason.bukkit.bukkittemplate.ui.slot
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
+import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 
 /**
  * 一个物品槽
@@ -55,4 +57,14 @@ fun <T : BaseSlot> T.serializeId(serializeId: String): T {
     this.serializeId = serializeId
     return this
 }
+
+/**
+ * 获取slot的ui
+ */
+fun <T : BaseSlot> T.getUI(): BaseUI = baseInventory!!.holder as BaseUI
+
+/**
+ * 获取slot的container
+ */
+fun <T : BaseSlot> T.getContainer(): UIContainer? = getUI().container
 
