@@ -1,5 +1,6 @@
 package com.example.bukkit.templateplugin
 
+import com.example.bukkit.templateplugin.ui.*
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionDefault
@@ -120,12 +121,21 @@ fun openUICommand() {
             true
         }
         node("UISer", isPlayerOnly = true).onExecute {
-            MyUIConfig.myUI?.clone()?.openFor((it as Player))
+            (it as Player).openInventory(MyUIConfig.myUI?.clone()?.build() ?: return@onExecute true)
+            true
+        }
+        node("multiUISer", isPlayerOnly = true).onExecute {
+            MyMultiUIConfig.myUI?.clone()?.openFor((it as Player))
             true
         }
         node("saveUISer", isPlayerOnly = true, async = true).onExecute {
-            MultiUI.serialize(MyUIConfig.config)
+            MyUISer.serialize(MyUIConfig.config)
             (MyUIConfig.config as YamlConfiguration).save(MyUIConfig.configPath)
+            true
+        }
+        node("saveMultiUISer", isPlayerOnly = true, async = true).onExecute {
+            MyMultiUIConfig.multiUI.serialize(MyMultiUIConfig.config)
+            (MyMultiUIConfig.config as YamlConfiguration).save(MyMultiUIConfig.configPath)
             true
         }
         node("MultiUI", isPlayerOnly = true).onExecute {

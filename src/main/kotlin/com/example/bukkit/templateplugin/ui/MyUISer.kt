@@ -1,4 +1,4 @@
-package com.example.bukkit.templateplugin
+package com.example.bukkit.templateplugin.ui
 
 import org.bukkit.ChatColor
 import org.bukkit.Material

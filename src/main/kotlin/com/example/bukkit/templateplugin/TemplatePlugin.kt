@@ -1,5 +1,6 @@
 package com.example.bukkit.templateplugin
 
+import com.example.bukkit.templateplugin.ui.MyUIConfig
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
 import top.iseason.bukkit.bukkittemplate.command.CommandBuilder
 import top.iseason.bukkit.bukkittemplate.debug.info

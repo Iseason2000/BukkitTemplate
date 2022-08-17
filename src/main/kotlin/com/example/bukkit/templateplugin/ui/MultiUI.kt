@@ -1,4 +1,4 @@
-package com.example.bukkit.templateplugin
+package com.example.bukkit.templateplugin.ui
 
 
 import org.bukkit.Material
@@ -14,7 +14,7 @@ import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.toColor
 
 
-object MultiUI : UIContainer(arrayOf(Page1(), Page2(), Page3())) {
+class MultiUI : UIContainer(arrayOf(Page1(), Page2(), Page3())) {
     override var onPageChanged: ((from: Int, to: Int) -> Unit)? = { from, to ->
 //        info("from $from to $to")
     }
