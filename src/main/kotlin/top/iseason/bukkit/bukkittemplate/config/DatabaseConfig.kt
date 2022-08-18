@@ -18,32 +18,29 @@ import java.io.File
 
 @FilePath("database.yml")
 object DatabaseConfig : SimpleYAMLConfig() {
-    @Key
-    @Comment("是否自动重载配置链接数据库")
-    override var isAutoUpdate: Boolean = true
 
+    @Comment("数据库类型: 支持 MySQL、MariaDB、SQLite、H2、Oracle、PostgreSQL、SQLServer")
     @Key
-    @Comment("数据库类型:支持 MySQL、MariaDB、SQLite、H2、Oracle、PostgreSQL、SQLServer")
     var database = "H2"
 
-    @Key
     @Comment("数据库地址")
+    @Key
     var url = File(BukkitTemplate.getPlugin().dataFolder, "database").absoluteFile.toString()
 
-    @Key
     @Comment("", "数据库名")
+    @Key
     var dbName = "database-${BukkitTemplate.getPlugin().name}"
 
-    @Key
     @Comment("", "数据库用户名，如果有的话")
+    @Key
     var user = "user"
 
-    @Key
     @Comment("", "数据库密码，如果有的话")
+    @Key
     var password = "password"
 
     var isConnected = false
-    private var connection: Database? = null
+    private lateinit var connection: Database
     private var ds: HikariDataSource? = null
 
     override val onLoaded: (ConfigurationSection.() -> Unit) = {
@@ -54,12 +51,10 @@ object DatabaseConfig : SimpleYAMLConfig() {
      * 链接数据库
      */
     fun reConnected() {
-        isConnected = false
         info("&6数据库链接中...")
-        if (isConnected) {
-            closeDB()
-        }
-        kotlin.runCatching {
+        AutoClose
+        closeDB()
+        runCatching {
             val dd = DependencyDownloader().apply {
                 repositories.clear()
                 addRepository("https://maven.aliyun.com/repository/public")
@@ -124,6 +119,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
             isConnected = true
             info("&a数据库链接成功!")
         }.getOrElse {
+            isConnected = false
             it.printStackTrace()
             info("&c数据库链接失败!")
         }
@@ -133,12 +129,12 @@ object DatabaseConfig : SimpleYAMLConfig() {
      * 关闭数据库
      */
     fun closeDB() {
-        try {
+        if (!isConnected) return
+        runCatching {
             ds?.close()
-            if (connection != null)
-                TransactionManager.closeAndUnregister(connection!!)
-        } catch (_: Exception) {
-        }
+            TransactionManager.closeAndUnregister(connection)
+            isConnected = false
+        }.getOrElse { it.printStackTrace() }
     }
 
     /**
@@ -146,8 +142,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
      */
     fun initTables(vararg tables: Table) {
         if (!isConnected) return
-        AutoClose
-        kotlin.runCatching {
+        runCatching {
             transaction {
                 if (SimpleLogger.isDebug) addLogger(StdOutSqlLogger)
                 if (!database.equals("sqlite", true)) {

@@ -32,19 +32,12 @@ open class SimpleYAMLConfig(
     /**
      * 是否自动重载
      */
-    open var isAutoUpdate: Boolean = true,
+    var isAutoUpdate: Boolean = true,
     /**
      * 重载是否提示,如果你要自定义提示请关闭
      */
     var updateNotify: Boolean = true
 ) {
-    constructor(
-        config: ConfigurationSection,
-        isAutoUpdate: Boolean = true,
-        updateNotify: Boolean = true
-    ) : this(null, isAutoUpdate, updateNotify) {
-        this.config = config
-    }
 
     /**
      * 更新时间

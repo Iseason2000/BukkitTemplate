@@ -14,6 +14,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.jar.JarFile;
 
 public class BukkitTemplate extends JavaPlugin {
@@ -25,7 +26,7 @@ public class BukkitTemplate extends JavaPlugin {
     public BukkitTemplate() {
         if (plugin == null) plugin = this;
         //防止卡主线程
-        new Thread(() -> {
+        CompletableFuture.runAsync(() -> {
             DependencyManager.parsePluginYml();
             classes = loadClass();
             ktPlugin = findInstance();
@@ -34,7 +35,7 @@ public class BukkitTemplate extends JavaPlugin {
             plugin.setEnabled(true);
             Bukkit.getScheduler().runTask(plugin, () -> plugin.onEnabled());
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.onAsyncEnabled());
-        }).start();
+        });
     }
 
 

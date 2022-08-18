@@ -27,6 +27,6 @@ fun warn(message: Any?) {
 }
 
 object SimpleLogger {
-    var prefix = "[${BukkitTemplate.getPlugin().description.name}] "
+    var prefix = "&a[&6${BukkitTemplate.getPlugin().description.name}&a] &f"
     var isDebug = false
 }

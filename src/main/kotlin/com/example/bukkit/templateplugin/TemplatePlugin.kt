@@ -1,6 +1,7 @@
 package com.example.bukkit.templateplugin
 
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
+import top.iseason.bukkit.bukkittemplate.config.DatabaseConfig
 import top.iseason.bukkit.bukkittemplate.debug.info
 
 object TemplatePlugin : KotlinPlugin() {
@@ -22,13 +23,12 @@ object TemplatePlugin : KotlinPlugin() {
 
         //如果使用命令模块，取消注释
 //        CommandBuilder.updateCommands()
-
         //如果使用UI模块,取消注释
 //        registerListeners(UIListener)
 
         //使用数据库请取消注释以下2行
-//        DatabaseConfig.reConnected()
-//        DatabaseConfig.initTables()
+        DatabaseConfig.load(false)
+        DatabaseConfig.initTables()
 
 //        SimpleYAMLConfig.notifyMessage = "&7配置文件 &6%s &7已重载!"
 //        Config.load(false)
@@ -39,9 +39,7 @@ object TemplatePlugin : KotlinPlugin() {
     }
 
     override fun onDisable() {
-        info("&6插件已卸载!")
-        val numbers = listOf("one", "two", "three", "four", "five")
-
+        info("&6插件已卸载! ")
     }
 
 }

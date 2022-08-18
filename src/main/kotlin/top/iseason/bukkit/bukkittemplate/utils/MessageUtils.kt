@@ -3,6 +3,7 @@ package top.iseason.bukkit.bukkittemplate.utils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import java.lang.reflect.Method
 import java.util.regex.Pattern
 
@@ -56,7 +57,7 @@ fun sendConsole(messages: Array<String>?, prefix: String = MessageUtils.defaultP
     messages?.forEach { sendConsole(it, prefix) }
 
 object MessageUtils {
-    var defaultPrefix = ""
+    var defaultPrefix = "&a[&6${BukkitTemplate.getPlugin().description.name}&a] &f"
     val colorPattern: Pattern = Pattern.compile("#[A-F|\\d]{6}", Pattern.CASE_INSENSITIVE)
     var rgbColorMethod: Method? = null
         private set

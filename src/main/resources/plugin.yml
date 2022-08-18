@@ -13,10 +13,10 @@ runtime-libraries:
 
   libraries:
     - org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}
+    - org.jetbrains.exposed:exposed-core:${exposedVersion}
+    - org.jetbrains.exposed:exposed-dao:${exposedVersion}
+    - org.jetbrains.exposed:exposed-jdbc:${exposedVersion}
+    - org.jetbrains.exposed:exposed-java-time:${exposedVersion}
+    - com.zaxxer:HikariCP:4.0.3
 #    - org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}
-# database lib
-#    - org.jetbrains.exposed:exposed-core:${exposedVersion}
-#    - org.jetbrains.exposed:exposed-dao:${exposedVersion}
-#    - org.jetbrains.exposed:exposed-jdbc:${exposedVersion}
-#    - org.jetbrains.exposed:exposed-java-time:${exposedVersion}
-#    - com.zaxxer:HikariCP:4.0.3
+
