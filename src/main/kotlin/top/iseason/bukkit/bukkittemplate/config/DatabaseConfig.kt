@@ -18,12 +18,15 @@ import java.io.File
 
 @FilePath("database.yml")
 object DatabaseConfig : SimpleYAMLConfig() {
+    @Key
+    @Comment("", "是否自动重连数据库")
+    var autoReload = true
 
-    @Comment("数据库类型: 支持 MySQL、MariaDB、SQLite、H2、Oracle、PostgreSQL、SQLServer")
+    @Comment("", "数据库类型: 支持 MySQL、MariaDB、SQLite、H2、Oracle、PostgreSQL、SQLServer")
     @Key
     var database = "H2"
 
-    @Comment("数据库地址")
+    @Comment("", "数据库地址")
     @Key
     var url = File(BukkitTemplate.getPlugin().dataFolder, "database").absoluteFile.toString()
 
@@ -44,6 +47,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
     private var ds: HikariDataSource? = null
 
     override val onLoaded: (ConfigurationSection.() -> Unit) = {
+        isAutoUpdate = autoReload
         reConnected()
     }
 
