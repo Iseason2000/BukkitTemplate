@@ -3,6 +3,10 @@ package top.iseason.bukkit.bukkittemplate.config
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.bukkit.configuration.ConfigurationSection
+import org.jetbrains.exposed.dao.Entity
+import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -165,3 +169,19 @@ object DatabaseConfig : SimpleYAMLConfig() {
         }
     }
 }
+
+/**
+ * varchar(255) 作为主键的table
+ */
+open class StringIdTable(name: String = "", columnName: String = "id") : IdTable<String>(name) {
+    final override val id: Column<EntityID<String>> = varchar(columnName, 255).entityId()
+    final override val primaryKey = PrimaryKey(id)
+}
+
+abstract class StringEntity(id: EntityID<String>) : Entity<String>(id)
+
+abstract class StringEntityClass<out E : Entity<String>> constructor(
+    table: IdTable<String>,
+    entityType: Class<E>? = null,
+    entityCtor: ((EntityID<String>) -> E)? = null
+) : EntityClass<String, E>(table, entityType, entityCtor)
