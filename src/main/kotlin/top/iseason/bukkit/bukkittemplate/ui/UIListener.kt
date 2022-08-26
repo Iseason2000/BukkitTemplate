@@ -125,8 +125,8 @@ fun InventoryDragEvent.ioEvent() {
     val baseUI = BaseUI.fromInventory(inventory) ?: return
     var tempItem: ItemStack? = null
     for ((index, newItem) in newItems) {
-        val ioSlot = baseUI.getSlot(index) ?: continue
-        if (ioSlot is IOSlot && ioSlot.input(ioSlot, newItem)) {
+        val ioSlot = baseUI.getSlot(index)
+        if (ioSlot != null && ioSlot is IOSlot && ioSlot.input(ioSlot, newItem)) {
             val itemStack = ioSlot.itemStack
             if (itemStack != null) {
                 ioSlot.itemStack = newItem.apply {
@@ -135,10 +135,18 @@ fun InventoryDragEvent.ioEvent() {
             } else {
                 ioSlot.itemStack = newItem
             }
-            submit {
+            submit(async = ioSlot.inputAsync) {
                 ioSlot.onInput(ioSlot, newItem)
             }
         } else {
+            if (ioSlot == null) {
+                if (index in 0 until inventory.size && baseUI.lockOnTop) {
+                    debug("ui ${baseUI::class.simpleName} lockup, slot $index")
+                } else if (index > 0 && baseUI.lockOnBottom) {
+                    isCancelled = true
+                    debug("ui ${baseUI::class.simpleName} lockdown, slot $index")
+                } else continue
+            }
             if (tempItem == null) tempItem = newItem.clone()
             else tempItem.merge(newItem)
             val item = view.getItem(index)?.clone()

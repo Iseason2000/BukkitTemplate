@@ -13,7 +13,7 @@ abstract class ClickSlot(
     /**
      * 按钮对应的默认图标
      */
-    open val rawItemStack: ItemStack? = null,
+    open var rawItemStack: ItemStack? = null,
     /**
      * 位于容器中的位置
      */

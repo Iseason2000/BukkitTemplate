@@ -1,6 +1,5 @@
 package top.iseason.bukkit.bukkittemplate.ui.container
 
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.HumanEntity
 
 /**
@@ -73,35 +72,6 @@ open class UIContainer(
         require(pages.isNotEmpty()) { "Your pageable ui must possess at lease 1 page" }
         val currentPage = getCurrentPage(player) ?: return
         player.openInventory(currentPage.inventory)
-    }
-
-    /**
-     * 序列化
-     */
-    open fun serialize(section: ConfigurationSection) {
-        for (page in pages) {
-            if (page == null) continue
-            val sec = section.createSection(page.serializeId)
-            page.getUI().serialize(sec)
-        }
-    }
-
-
-    /**
-     * 反序列化
-     */
-    open fun deserialize(section: ConfigurationSection): UIContainer {
-        val listOf = mutableListOf<Pageable>()
-        for (serializeId in section.getKeys(false)) {
-            val find = pages.find { serializeId == it?.serializeId } ?: continue
-            val configurationSection = section.getConfigurationSection(serializeId) ?: continue
-            val deserialize = find.getUI().deserialize(configurationSection) ?: continue
-            deserialize.serializeId = serializeId
-            listOf.add(deserialize)
-        }
-        val uiContainer = UIContainer(listOf.toTypedArray())
-        uiContainer.onPageChanged = onPageChanged
-        return uiContainer
     }
 
     /**

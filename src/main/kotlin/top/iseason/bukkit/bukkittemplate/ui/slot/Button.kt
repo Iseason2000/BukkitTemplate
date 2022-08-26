@@ -1,7 +1,6 @@
 package top.iseason.bukkit.bukkittemplate.ui.slot
 
 import org.bukkit.Material
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
@@ -53,28 +52,11 @@ open class Button(
         itemStack = rawItemStack
     }
 
-    override var serializeId: String = "button"
-
-    override fun serialize(section: ConfigurationSection) {
-        section["slot"] = index
-        section["item"] = rawItemStack
-    }
-
-    override fun deserialize(section: ConfigurationSection): BaseSlot? {
-        if (!section.contains("slot", true)) return null
-        if (!section.contains("item", true)) return null
-        val item = section.getItemStack("item") ?: return null
-        return Button(item, section.getInt("slot")).also {
-            it.baseInventory = baseInventory
-            it.onClick = onClick
-            it.onClicked = onClicked
-        }
-    }
-
     override fun clone(index: Int): Button = Button(rawItemStack, index).also {
         it.baseInventory = baseInventory
         it.onClick = onClick
         it.onClicked = onClicked
+        it.asyncClick = asyncClick
     }
 
 }

@@ -1,6 +1,5 @@
 package top.iseason.bukkit.bukkittemplate.ui.slot
 
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.HumanEntity
 import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
@@ -14,8 +13,14 @@ import top.iseason.bukkit.bukkittemplate.utils.submit
 open class IOSlot(
     index: Int,
     //没有物品时的占位符
-    var placeholder: ItemStack? = null
+    placeholder: ItemStack?
 ) : ClickSlot(placeholder, index) {
+
+    var placeholder: ItemStack?
+        get() = rawItemStack
+        set(value) {
+            rawItemStack = value
+        }
 
     /**
      * 与Inventory的ItemStack同步,null时显示占位符
@@ -81,28 +86,15 @@ open class IOSlot(
         itemStack = null
     }
 
-    override var serializeId: String = "ioSlot"
 
-    override fun serialize(section: ConfigurationSection) {
-        section["slot"] = index
-        section["placeholder"] = placeholder
-    }
-
-    override fun deserialize(section: ConfigurationSection): BaseSlot? {
-        if (!section.contains("slot", true)) return null
-        if (!section.contains("placeholder", true)) return null
-        val placeholder = section.getItemStack("placeholder") ?: return null
-        return clone(section.getInt("slot")).also { it.placeholder = placeholder }
-    }
-
-    override fun clone(index: Int): IOSlot = IOSlot(index).also {
-        it.placeholder = placeholder?.clone()
+    override fun clone(index: Int): IOSlot = IOSlot(index, placeholder).also {
         it.input = input
         it.output = output
         it.onClick = onClick
         it.onClicked = onClicked
         it.onInput = onInput
         it.onOutput = onOutput
+        it.asyncClick = asyncClick
     }
 }
 

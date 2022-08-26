@@ -1,6 +1,5 @@
 package top.iseason.bukkit.bukkittemplate.ui.container
 
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.entity.HumanEntity
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -224,34 +223,6 @@ abstract class BaseUI(
         this@BaseUI.addSlot(this)
         return this
     }
-
-    /**
-     * 序列化为配置文件
-     */
-    open fun serialize(section: ConfigurationSection) {
-        section["row"] = size / 9
-        section["clickDelay"] = clickDelay
-        if (lockOnTop)
-            section["lockOnTop"] = true
-        if (lockOnBottom)
-            section["lockOnBottom"] = true
-        val slotSection = section.createSection("slots")
-        for (slot in slots) {
-            if (slot == null) continue
-            if (slotSection.contains(slot.serializeId)) {
-                slotSection.getConfigurationSection(slot.serializeId)?.apply {
-                    this["slot"] = this.getString("slot") + "," + slot.index
-                }
-            } else {
-                slot.serialize(slotSection.createSection(slot.serializeId))
-            }
-        }
-    }
-
-    /**
-     * 反序列化
-     */
-    abstract fun deserialize(section: ConfigurationSection): BaseUI?
 
     abstract fun clone(): BaseUI
 

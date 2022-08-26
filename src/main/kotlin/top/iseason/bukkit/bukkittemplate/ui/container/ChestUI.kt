@@ -1,7 +1,6 @@
 package top.iseason.bukkit.bukkittemplate.ui.container
 
 import org.bukkit.Bukkit
-import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.inventory.Inventory
 
 /**
@@ -19,49 +18,8 @@ open class ChestUI(
         resetSlots()
     }
 
-    override fun serialize(section: ConfigurationSection) {
-        section["title"] = title
-        super.serialize(section)
-    }
 
     override fun buildInventory(): Inventory = Bukkit.createInventory(this, super.size, title)
-
-
-    override fun deserialize(section: ConfigurationSection): ChestUI? {
-        if (!section.contains("row", true)) {
-            return null
-        }
-        val chestUI = ChestUI(section.getString("title") ?: "", section.getInt("row"))
-        with(chestUI) {
-            clickDelay = section.getLong("clickDelay", 200L)
-            lockOnTop = section.getBoolean("lockOnTop")
-            lockOnBottom = section.getBoolean("lockOnBottom")
-            val slotSection = section.getConfigurationSection("slots") ?: return@with
-            for (serializeId in slotSection.getKeys(false)) {
-                val find = this@ChestUI.slots.find {
-                    serializeId == it?.serializeId
-                } ?: continue
-                val slot = slotSection.getConfigurationSection(serializeId) ?: continue
-                val string = slot.getString("slot") ?: continue
-                val ints = string.split(',').mapNotNull {
-                    try {
-                        it.toInt()
-                    } catch (e: Throwable) {
-                        null
-                    }
-                }
-                inner@ for (int in ints) {
-                    slot["slot"] = int
-                    chestUI.addSlots(find.deserialize(slot) ?: continue@inner)
-                }
-            }
-        }
-        chestUI.onClick = onClick
-        chestUI.onClicked = onClicked
-        chestUI.onClose = onClose
-        chestUI.onOpen = onOpen
-        return chestUI
-    }
 
     override fun clone(): BaseUI {
         val chestUI = ChestUI(this.title, this.size / 9, this.clickDelay)

@@ -49,10 +49,10 @@ open class CommandNode(
     /**
      * 命令执行
      */
-    var onExecute: (Params.(sender: CommandSender) -> Boolean)? = null
+    open var onExecute: (Params.(sender: CommandSender) -> Boolean)? = null
 ) : CommandExecutor, TabExecutor {
     var permission: Permission =
-        Permission("${BukkitTemplate.getPlugin().name.lowercase()}.$name", default)
+        Permission("${BukkitTemplate.getPlugin().name.lowercase()}.$name.", default)
 
     /**
      * 获取父节点
@@ -96,6 +96,7 @@ open class CommandNode(
         }
         subNodes[node.name] = node
         node.parent = this
+        CommandBuilder.addPermissions(node.permission)
         node.alias?.forEach {
             subNodes[it] = node
         }
@@ -177,7 +178,6 @@ open class CommandNode(
             }
             node = subNode
         }
-//        println(node.name)
         val keys = node.getKeys(sender)
         if (keys.isEmpty() && node.params.isNotEmpty()) {
             val last = args.last()
