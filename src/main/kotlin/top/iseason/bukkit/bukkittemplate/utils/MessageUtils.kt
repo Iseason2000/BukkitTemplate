@@ -97,3 +97,7 @@ fun String.formatBy(vararg values: Any?): String {
     }
     return temp
 }
+
+fun String.format(vararg values: Any?) = this.replace(Regex("\\{([0-9]+?)}")) {
+    values[it.groupValues[1].toInt()].toString()
+}
