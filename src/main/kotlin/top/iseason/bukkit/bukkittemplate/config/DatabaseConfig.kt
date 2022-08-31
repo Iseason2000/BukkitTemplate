@@ -18,7 +18,6 @@ import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
 import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
 import top.iseason.bukkit.bukkittemplate.config.annotations.Key
-import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.debug.info
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyDownloader
@@ -40,7 +39,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
 
     @Comment("", "数据库名")
     @Key
-    var dbName = "database-${BukkitTemplate.getPlugin().name}"
+    var dbName = "database_${BukkitTemplate.getPlugin().name}"
 
     @Comment("", "数据库用户名，如果有的话")
     @Key
@@ -84,13 +83,13 @@ object DatabaseConfig : SimpleYAMLConfig() {
             val config = when (database) {
                 "MySQL" -> HikariConfig().apply {
                     dd.downloadDependency("mysql:mysql-connector-java:8.0.30")
-                    jdbcUrl = "jdbc:mysql://$url"
+                    jdbcUrl = "jdbc:mysql://$url/$dbName?createDatabaseIfNotExist=true"
                     driverClassName = "com.mysql.cj.jdbc.Driver"
                 }
 
                 "MariaDB" -> HikariConfig().apply {
                     dd.downloadDependency("org.mariadb.jdbc:mariadb-java-client:3.0.7")
-                    jdbcUrl = "jdbc:mariadb://$url"
+                    jdbcUrl = "jdbc:mariadb://$url/$dbName?createDatabaseIfNotExist=true"
                     driverClassName = "org.mariadb.jdbc.Driver"
                 }
 
@@ -102,25 +101,25 @@ object DatabaseConfig : SimpleYAMLConfig() {
 
                 "H2" -> HikariConfig().apply {
                     dd.downloadDependency("com.h2database:h2:2.1.214")
-                    jdbcUrl = "jdbc:h2:$url;TRACE_LEVEL_FILE=0;TRACE_LEVEL_SYSTEM_OUT=0"
+                    jdbcUrl = "jdbc:h2:$url/$dbName;TRACE_LEVEL_FILE=0;TRACE_LEVEL_SYSTEM_OUT=0"
                     driverClassName = "org.h2.Driver"
                 }
 
                 "PostgreSQL" -> HikariConfig().apply {
                     dd.downloadDependency("com.impossibl.pgjdbc-ng:pgjdbc-ng:0.8.9")
-                    jdbcUrl = "jdbc:postgresql://$url"
+                    jdbcUrl = "jdbc:postgresql://$url/$dbName"
                     driverClassName = "com.impossibl.postgres.jdbc.PGDriver"
                 }
 
                 "Oracle" -> HikariConfig().apply {
                     dd.downloadDependency("com.oracle.database.jdbc:ojdbc8:21.6.0.0.1")
-                    jdbcUrl = "dbc:oracle:thin:@//$url"
+                    jdbcUrl = "dbc:oracle:thin:@//$url/$dbName"
                     driverClassName = "oracle.jdbc.OracleDriver"
                 }
 
                 "SQLServer" -> HikariConfig().apply {
                     dd.downloadDependency("com.microsoft.sqlserver:mssql-jdbc:10.2.1.jre8")
-                    jdbcUrl = "jdbc:sqlserver://$url"
+                    jdbcUrl = "jdbc:sqlserver://$url/$dbName"
                     driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
                 }
 
@@ -169,12 +168,6 @@ object DatabaseConfig : SimpleYAMLConfig() {
         this.tables = tables
         runCatching {
             transaction {
-                if (SimpleLogger.isDebug) addLogger(StdOutSqlLogger)
-                if (!database.equals("sqlite", true)) {
-                    val schema = Schema(dbName)
-                    SchemaUtils.createSchema(schema)
-                    SchemaUtils.setSchema(schema)
-                }
                 SchemaUtils.create(*tables)
             }
         }.getOrElse { it.printStackTrace() }
