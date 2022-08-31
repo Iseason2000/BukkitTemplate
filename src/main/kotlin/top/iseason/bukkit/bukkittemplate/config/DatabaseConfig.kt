@@ -107,7 +107,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
 
                 "PostgreSQL" -> HikariConfig().apply {
                     dd.downloadDependency("com.impossibl.pgjdbc-ng:pgjdbc-ng:0.8.9")
-                    jdbcUrl = "jdbc:postgresql://$url/$dbName"
+                    jdbcUrl = "jdbc:pgsql://$url/$dbName"
                     driverClassName = "com.impossibl.postgres.jdbc.PGDriver"
                 }
 
