@@ -1,8 +1,14 @@
 package com.example.bukkit.templateplugin
 
+import org.bukkit.entity.Player
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
-import top.iseason.bukkit.bukkittemplate.config.DatabaseConfig
+import top.iseason.bukkit.bukkittemplate.command.CommandBuilder
+import top.iseason.bukkit.bukkittemplate.command.commandRoot
 import top.iseason.bukkit.bukkittemplate.debug.info
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.toSection
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.getHeldItem
+import java.io.File
+import java.util.*
 
 object TemplatePlugin : KotlinPlugin() {
 
@@ -27,9 +33,16 @@ object TemplatePlugin : KotlinPlugin() {
 //        registerListeners(UIListener)
 
         //使用数据库请取消注释以下2行
-        DatabaseConfig.load(false)
-        DatabaseConfig.initTables()
-
+//        DatabaseConfig.load(false)
+//        DatabaseConfig.initTables()
+        commandRoot("serTest", isPlayerOnly = true) {
+            onExecute {
+                (it as Player).inventory.getHeldItem().toSection()
+                    .save(File(javaPlugin.dataFolder, "${UUID.randomUUID()}.yml"))
+                true
+            }
+        }
+        CommandBuilder.updateCommands()
 //        SimpleYAMLConfig.notifyMessage = "&7配置文件 &6%s &7已重载!"
 //        Config.load(false)
 //        LagCatcher.performanceCheck("test", 0) {

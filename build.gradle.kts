@@ -51,7 +51,10 @@ repositories {
         name = "jitpack"
         url = uri("https://jitpack.io")
     }
-
+    maven {
+        name = "CodeMC"
+        url = uri("https://repo.codemc.org/repository/maven-public")
+    }
     mavenLocal()
 }
 
@@ -72,13 +75,16 @@ dependencies {
     compileOnly("com.zaxxer:HikariCP:4.0.3")
 
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT")
+    implementation("io.github.bananapuncher714:nbteditor:7.18.3")
+    compileOnly("org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT")
 
 }
 
 tasks {
     shadowJar {
         relocate("top.iseason.bukkit.bukkittemplate", "$groupS.libs.core")
+        relocate("org.bstats", "$groupS.libs.bstats")
+        relocate("io.github.bananapuncher714.nbteditor", "$groupS.libs.nbteditor")
     }
     build {
         dependsOn("buildPlugin")

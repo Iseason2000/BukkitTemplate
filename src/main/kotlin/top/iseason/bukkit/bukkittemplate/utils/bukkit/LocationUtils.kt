@@ -19,21 +19,16 @@ fun Location.getNormalX(): Vector {
 }
 
 /**
+ * 根据坐标yaw和pith值获取Y方向的单位向量
+ * @return Y方向的单位向量
+ */
+fun Location.getNormalY(): Vector = direction.getCrossProduct(getNormalX())
+
+/**
  * 根据坐标yaw和pith值获取Z方向的单位向量
  * @return Z方向的单位向量,与 getDirection() 方法一致
- *
  */
-fun Location.getNormalZ(): Vector {
-    val vector = Vector()
-    val rotX = yaw.toDouble()
-    val rotY = pitch.toDouble()
-    // row = 0
-    vector.y = -sin(Math.toRadians(rotY))
-    val xz = cos(Math.toRadians(rotY))
-    vector.x = -xz * sin(Math.toRadians(rotX))
-    vector.z = xz * cos(Math.toRadians(rotX))
-    return vector
-}
+fun Location.getNormalZ(): Vector = direction
 
 // 以自身为原点和相对坐标系获取世界坐标
 fun Location.getRelativeByCoordinate(

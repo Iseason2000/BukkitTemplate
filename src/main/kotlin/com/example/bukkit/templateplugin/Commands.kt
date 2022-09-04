@@ -1,7 +1,7 @@
 package com.example.bukkit.templateplugin
 
-import com.example.bukkit.templateplugin.ui.*
-import org.bukkit.configuration.file.YamlConfiguration
+import com.example.bukkit.templateplugin.ui.MultiUI
+import com.example.bukkit.templateplugin.ui.MyUI
 import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.potion.PotionEffect
@@ -118,24 +118,6 @@ fun openUICommand() {
             (it as Player).openUI<MyUI> {
                 title = it.displayName
             }
-            true
-        }
-        node("UISer", isPlayerOnly = true).onExecute {
-            (it as Player).openInventory(MyUIConfig.myUI?.clone()?.build() ?: return@onExecute true)
-            true
-        }
-        node("multiUISer", isPlayerOnly = true).onExecute {
-            MyMultiUIConfig.myUI?.clone()?.openFor((it as Player))
-            true
-        }
-        node("saveUISer", isPlayerOnly = true, async = true).onExecute {
-            MyUISer.serialize(MyUIConfig.config)
-            (MyUIConfig.config as YamlConfiguration).save(MyUIConfig.configPath)
-            true
-        }
-        node("saveMultiUISer", isPlayerOnly = true, async = true).onExecute {
-            MyMultiUIConfig.multiUI.serialize(MyMultiUIConfig.config)
-            (MyMultiUIConfig.config as YamlConfiguration).save(MyMultiUIConfig.configPath)
             true
         }
         node("MultiUI", isPlayerOnly = true).onExecute {

@@ -8,7 +8,7 @@ import top.iseason.bukkit.bukkittemplate.ui.container.ChestUI
 import top.iseason.bukkit.bukkittemplate.ui.container.Pageable
 import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.*
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.applyMeta
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
 import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.toColor
 
@@ -22,13 +22,11 @@ object MyUISer : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 50
         ItemStack(Material.ANVIL).applyMeta {
             setDisplayName("${ChatColor.GREEN}按钮示例")
         },
-    ).serializeId("message")
-        .onClicked {
-            it.whoClicked.sendColorMessage("&a 你点击了按钮")
-        }.setup()
+    ).onClicked {
+        it.whoClicked.sendColorMessage("&a 你点击了按钮")
+    }.setup()
 
     val inputSlot = IOSlot(4, placeholder = ItemStack(Material.HOPPER))
-        .serializeId("input")
         .inputFilter {
             it.type == Material.APPLE
         }.onInput {

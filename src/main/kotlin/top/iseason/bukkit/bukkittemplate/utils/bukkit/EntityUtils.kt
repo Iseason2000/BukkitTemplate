@@ -7,6 +7,7 @@ import org.bukkit.entity.Item
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.checkAir
 
 /**
  * 给予有物品栏的对象物品,如果是实体且放不下将会放置到实体脚下

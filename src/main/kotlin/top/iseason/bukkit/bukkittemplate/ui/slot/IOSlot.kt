@@ -2,7 +2,7 @@ package top.iseason.bukkit.bukkittemplate.ui.slot
 
 import org.bukkit.entity.HumanEntity
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.giveItems
 import top.iseason.bukkit.bukkittemplate.utils.submit
 
@@ -32,7 +32,7 @@ open class IOSlot(
         }
         get() {
             val item = baseInventory?.getItem(index)
-            return if (item != null && !item.type.checkAir() && !item.isSimilar(placeholder)) item
+            return if (item != null && !item.checkAir() && !item.isSimilar(placeholder)) item
             else null
         }
 

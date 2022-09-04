@@ -19,8 +19,8 @@ import top.iseason.bukkit.bukkittemplate.ui.slot.ClickSlot
 import top.iseason.bukkit.bukkittemplate.ui.slot.IOSlot
 import top.iseason.bukkit.bukkittemplate.ui.slot.merge
 import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.checkAir
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.subtract
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.checkAir
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.subtract
 import top.iseason.bukkit.bukkittemplate.utils.submit
 
 /**
@@ -173,7 +173,7 @@ fun InventoryClickEvent.ioEvent() {
         PLACE_SOME -> {
             if (rawSlot in 0 until inventory.size) {
                 //处理占位符
-                inputItem = if (cursor?.type?.checkAir() == true) null
+                inputItem = if (cursor.checkAir()) null
                 else Pair(rawSlot, cursor!!.clone()).apply {
                     if (action == PLACE_ONE) second.amount = 1
                     val currentItem = currentItem
