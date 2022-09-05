@@ -15,7 +15,7 @@ fun submit(
     period: Long = 0,
     async: Boolean = false,
     task: Submitter.() -> Unit
-) {
+): Submitter {
     check(delay >= 0) { "delay must grater than 0" }
     check(period >= 0) { "period must grater than 0" }
     val submitter = Submitter(delay, period, async, task)
@@ -32,6 +32,7 @@ fun submit(
             submitter.runTaskLater(BukkitTemplate.getPlugin(), submitter.delay)
         }
     }
+    return submitter
 }
 
 class Submitter(

@@ -29,7 +29,9 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import kotlin.math.abs
 
-
+/**
+ * 物品通用工具
+ */
 object ItemUtils {
 
     private val UNUSED_NBT = listOf(
@@ -571,6 +573,8 @@ object ItemUtils {
 //        println(NBTEditor.getNBTCompound(item, "tag").toJson())
         return item
     }
+
+    fun Collection<ItemStack>.toSection(allowNested: Boolean = true) = map { it.toSection(allowNested) }
 
     /**
      * 字节转换为ItemStack

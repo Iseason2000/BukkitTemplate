@@ -37,10 +37,4 @@ open class KotlinPlugin {
         Bukkit.getPluginManager().registerEvents(listener, javaPlugin)
     }
 
-    /**
-     * 快速注册监听器
-     */
-    fun Listener.register() {
-        Bukkit.getPluginManager().registerEvents(this, javaPlugin)
-    }
 }
