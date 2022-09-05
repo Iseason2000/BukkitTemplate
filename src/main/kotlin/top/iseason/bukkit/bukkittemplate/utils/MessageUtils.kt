@@ -1,3 +1,5 @@
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
+
 package top.iseason.bukkit.bukkittemplate.utils
 
 import org.bukkit.Bukkit
@@ -86,6 +88,8 @@ fun String.toColor(): String {
     }
     return ChatColor.translateAlternateColorCodes('&', temp)
 }
+
+fun Collection<String>.toColor() = map { it.toColor() }
 
 fun String.noColor(): String? = ChatColor.stripColor(this)
 

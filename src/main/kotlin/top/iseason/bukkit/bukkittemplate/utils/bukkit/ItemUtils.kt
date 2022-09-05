@@ -2,29 +2,32 @@
 
 package top.iseason.bukkit.bukkittemplate.utils.bukkit
 
+
 import com.google.gson.Gson
 import io.github.bananapuncher714.nbteditor.NBTEditor
-import org.bukkit.Color
-import org.bukkit.Material
+import io.github.bananapuncher714.nbteditor.NBTEditor.NBTCompound
+import org.bukkit.*
 import org.bukkit.block.CreatureSpawner
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.EntityType
 import org.bukkit.inventory.BlockInventoryHolder
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.*
 import org.bukkit.map.MapView
 import org.bukkit.material.SpawnEgg
-import org.bukkit.potion.Potion
-import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.*
 import org.bukkit.util.io.BukkitObjectInputStream
 import org.bukkit.util.io.BukkitObjectOutputStream
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.StringUtils.toEffectString
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.StringUtils.toRGBString
+import top.iseason.bukkit.bukkittemplate.utils.toColor
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+import kotlin.math.abs
 
 
 object ItemUtils {
@@ -185,9 +188,8 @@ object ItemUtils {
      * 序列化为bukkit支持的配置
      * @param allowNested 是否允许嵌套解析(比如潜影盒)，只对容器有效，为false时将容器内容转为base64储存
      */
-    fun ItemStack?.toSection(allowNested: Boolean = true): YamlConfiguration {
+    fun ItemStack.toSection(allowNested: Boolean = true): YamlConfiguration {
         val yaml = YamlConfiguration()
-        if (this == null) return yaml
         yaml["material"] = type.toString()
         if (amount != 1) yaml["amount"] = amount
         if (!hasItemMeta()) return yaml
@@ -199,7 +201,10 @@ object ItemUtils {
             // 耐久
             if (this is Damageable) if (damage != 0) yaml["damage"] = damage
             // 附魔
-            if (hasEnchants()) yaml.createSection("enchants", enchants.mapKeys { it.key.key })
+            if (hasEnchants()) yaml.createSection("enchants", enchants.mapKeys {
+                val namespacedKey = it.key.key
+                if (namespacedKey.namespace == NamespacedKey.MINECRAFT) namespacedKey.key else namespacedKey.toString()
+            })
             // flags
             val itemFlags = itemFlags
             if (itemFlags.isNotEmpty()) yaml["flags"] = itemFlags.map { it.name }
@@ -226,7 +231,6 @@ object ItemUtils {
                     } else if (durability != 0.toShort()) {
                         val potion = Potion.fromItemStack(this@toSection)
                         yaml["base-effect"] = "${potion.type.name},${potion.hasExtendedDuration()},${potion.isSplash}"
-                        yaml["level"] = potion.level
                     }
                 }
 
@@ -355,15 +359,217 @@ object ItemUtils {
             }
         }
         // 额外的NBt
-        val json = Gson().fromJson(NBTEditor.getNBTCompound(this, "tag").toJson(), Map::class.java).toMutableMap()
+        val toJson = NBTEditor.getNBTCompound(this, "tag").toJson()
+//        println(toJson)
+        val json = Gson().fromJson(toJson, Map::class.java).toMutableMap()
         for (s in UNUSED_NBT) {
             json.remove(s)
         }
         if (json.isNotEmpty()) {
-            yaml["nbt"] = json
+            fun deepFor(map: Map<*, *>, config: ConfigurationSection) {
+                for ((k, v) in map) {
+                    if (v is Map<*, *>) {
+                        deepFor(v, config.createSection(k.toString()))
+                    } else {
+                        if ((v is Double) && (abs(v - Math.round(v)) < Double.MIN_VALUE)) {
+                            config.set(k.toString(), v.toInt())
+                        } else if (v is String && v.endsWith('d')) {
+                            val double = runCatching {
+                                v.substring(0, v.length - 1).toDouble()
+                            }.getOrNull()
+                            if (double == null) config.set(k.toString(), v)
+                            else
+                                config.set(k.toString(), double)
+                        } else {
+                            config.set(k.toString(), v)
+                        }
+                    }
+                }
+            }
+            deepFor(json, yaml.createSection("nbt"))
+//            yaml["nbt"] = json
         }
-
         return yaml
+    }
+
+    /**
+     * 从配置反序列化ItemStack
+     */
+    fun fromSection(section: ConfigurationSection, allowNested: Boolean = true): ItemStack? {
+        val material = Material.getMaterial(section.getString("material")!!.uppercase()) ?: return null
+        var item = ItemStack(material)
+        //处理头颅
+        val url = section.getString("skull")
+        if (url != null) item = NBTEditor.getHead(url)
+        item.amount = section.getInt("amount", 1)
+        item.applyMeta {
+            section.getString("name")?.also { setDisplayName(it.toColor()) }
+            section.getStringList("lore").also { if (it.isNotEmpty()) lore = it.toColor() }
+            if (this is Damageable) damage = section.getInt("damage", 0)
+            section.getConfigurationSection("enchants")?.getValues(false)?.forEach { (t, u) ->
+                val enchant = matchEnchant(t) ?: return@forEach
+                val level = u as? Int ?: return@forEach
+                addEnchant(enchant, level, true)
+            }
+            section.getStringList("flags").forEach {
+                addItemFlags(runCatching { ItemFlag.valueOf(it.uppercase()) }.getOrElse { return@forEach })
+            }
+            // 解析meta
+            when (this) {
+                // 附魔书附魔
+                is EnchantmentStorageMeta -> section.getConfigurationSection("stored-enchants")?.getValues(false)
+                    ?.forEach { (t, u) ->
+                        val enchant = matchEnchant(t) ?: return@forEach
+                        val level = u as? Int ?: return@forEach
+                        addStoredEnchant(enchant, level, true)
+                    }
+                // 皮革
+                is LeatherArmorMeta -> section.getString("color")?.also { setColor(fromColorStr(it)) }
+                // 药水
+                is PotionMeta -> {
+                    if (NBTEditor.getMinecraftVersion().greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_9)) {
+                        section.getString("base-effect")?.also {
+                            val split = it.trim().split(',')
+                            val type =
+                                runCatching { PotionType.valueOf(split[0].uppercase()) }.getOrElse { return@also }
+                            basePotionData = PotionData(
+                                type,
+                                split.getOrNull(1)?.toBoolean() ?: false,
+                                split.getOrNull(2)?.toBoolean() ?: false
+                            )
+                        }
+                        section.getStringList("effects").forEach { ef ->
+                            val effect = fromEffectString(ef) ?: return@forEach
+                            addCustomEffect(effect, true)
+                        }
+                        section.getString("color")?.also { color = fromColorStr(it) }
+                    } else if (item.durability != 0.toShort()) {
+                        section.getString("base-effect")?.also {
+                            val split = it.split(',')
+                            val type = runCatching { PotionType.valueOf(split[0]) }.getOrElse { return@also }
+                            val extended = runCatching { split[1].toBoolean() }.getOrElse { return@also }
+                            val upgraded = runCatching { split[2].toBoolean() }.getOrElse { return@also }
+                            basePotionData = PotionData(type, extended, upgraded)
+                        }
+                    }
+                }
+
+                is BlockStateMeta -> {
+                    val blockState = blockState
+                    if (blockState is CreatureSpawner) {
+                        val type =
+                            section.getString("spawner")?.let { runCatching { EntityType.valueOf(it) }.getOrNull() }
+                        if (type != null) blockState.spawnedType = type
+                    } else if (blockState is BlockInventoryHolder) {
+                        if (allowNested) {
+                            val configurationSection = section.getConfigurationSection("inventory")
+                            configurationSection?.getKeys(false)?.forEach {
+                                val itemSection = configurationSection.getConfigurationSection(it) ?: return@forEach
+                                val toInt = it.toInt()
+                                val fromSection = fromSection(itemSection, true) ?: return@forEach
+                                blockState.inventory.setItem(toInt, fromSection)
+                            }
+                        } else {
+                            section.getString("inventory")?.also {
+                                for ((index, i) in fromBase64ToMap(it)) {
+                                    blockState.inventory.setItem(index, i)
+                                }
+                            }
+                        }
+                    }
+                    this.blockState = blockState
+                }
+
+                is FireworkMeta -> {
+                    power = section.getInt("power", 1)
+                    val effectSection = section.getConfigurationSection("effects")
+                    effectSection?.getKeys(false)?.forEach { key ->
+                        val effects = section.getConfigurationSection(key)!!
+                        val type =
+                            runCatching { FireworkEffect.Type.valueOf(effects.getString("type")!!) }.getOrElse { return@forEach }
+                        addEffect(
+                            FireworkEffect.builder()
+                                .with(type)
+                                .flicker(effects.getBoolean("flicker"))
+                                .trail(effects.getBoolean("trail"))
+                                .withColor(effects.getStringList("colors.base").map { fromColorStr(it) })
+                                .withFade(effects.getStringList("colors.fade").map { fromColorStr(it) })
+                                .build()
+                        )
+                    }
+                }
+
+                is BookMeta -> {
+                    val book = section.getConfigurationSection("book")
+                    if (book != null) {
+                        book.getString("title")?.also { title = it.toColor() }
+                        book.getString("author")?.also { author = it.toColor() }
+                        pages = book.getStringList("pages").toColor()
+                    }
+                    if (book != null && NBTEditor.getMinecraftVersion()
+                            .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_9)
+                    ) {
+                        book.getString("generation")?.also {
+                            generation = kotlin.runCatching { BookMeta.Generation.valueOf(it.uppercase()) }.getOrNull()
+                        }
+                    }
+                }
+
+                is MapMeta -> {
+                    val mapSection = section.getConfigurationSection("map")
+                    isScaling = mapSection?.getBoolean("scaling") ?: false
+                    if (mapSection != null && NBTEditor.getMinecraftVersion()
+                            .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_11)
+                    ) {
+                        mapSection.getString("location")?.also { locationName = it.toColor() }
+                        mapSection.getString("color")?.also { color = fromColorStr(it) }
+                    }
+                    if (mapSection != null && NBTEditor.getMinecraftVersion()
+                            .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_14)
+                    ) {
+                        mapSection.getConfigurationSection("view")?.also {
+                            runCatching {
+                                val mapView = Bukkit.createMap(Bukkit.getWorld(it.getString("world")!!)!!)
+                                mapView.scale = MapView.Scale.valueOf(it.getString("scale")!!)
+                                mapView.centerX = it.getString("center")!!.split(',')[0].toInt()
+                                mapView.centerZ = it.getString("center")!!.split(',')[1].toInt()
+                                mapView.isLocked = it.getBoolean("locked")
+                                mapView.isTrackingPosition = it.getBoolean("tracking-position")
+                                mapView.isUnlimitedTracking = it.getBoolean("unlimited-tracking")
+                                setMapView(mapView)
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        // 处理nbt
+        val nbtSection = section.getConfigurationSection("nbt") ?: return item
+        val map = mutableMapOf<String, Any>()
+        fun deepFor(config: ConfigurationSection, map: MutableMap<String, Any>) {
+            for ((key, value) in config.getValues(false)) {
+                if (value is ConfigurationSection) {
+                    val newMap = mutableMapOf<String, Any>()
+                    map[key] = newMap
+                    deepFor(value, newMap)
+                    continue
+                }
+                map[key] = value
+            }
+        }
+        deepFor(nbtSection, map)
+        val nbtCompound = NBTEditor.getNBTCompound(item, "tag")
+        map.forEach { (k, v) ->
+            if (v is Map<*, *>) {
+                val toJson = NBTCompound.fromJson(Gson().toJson(v))
+                nbtCompound.set(toJson, k)
+            } else
+                nbtCompound.set(v, k)
+        }
+        item = NBTEditor.set(item, nbtCompound)
+//        println(NBTEditor.getNBTCompound(item, "tag").toJson())
+        return item
     }
 
     /**
@@ -428,9 +634,35 @@ object ItemUtils {
      */
     fun fromJson(json: String): ItemStack = NBTEditor.getItemFromTag(NBTEditor.getNBTCompound(json))
 
-}
-
-object StringUtils {
     fun Color.toRGBString(): String = "${red},${green},${blue}"
+    fun fromColorStr(str: String): Color {
+        val split = str.trim().split(',')
+        return Color.fromRGB(
+            split.getOrNull(0)?.toInt() ?: 0,
+            split.getOrNull(0)?.toInt() ?: 0,
+            split.getOrNull(0)?.toInt() ?: 0
+        )
+    }
+
     fun PotionEffect.toEffectString(): String = "${type.name},${duration},${amplifier}"
+
+    fun fromEffectString(str: String): PotionEffect? {
+        val split = str.trim().split(',')
+        val type = runCatching { PotionEffectType.getByName(split[0]) }.getOrNull() ?: return null
+        val duration = runCatching { split[1].toInt() }.getOrElse { return null }
+        val amplifier = runCatching { split[2].toInt() }.getOrElse { return null }
+        return PotionEffect(type, duration, amplifier)
+    }
+
+    /**
+     * 由namespacekey 获取对应的附魔
+     */
+    fun matchEnchant(key: String): Enchantment? {
+        val split = key.split(':')
+        val k = if (split.size == 1) NamespacedKey.minecraft(key)
+        else if (split.size == 2) NamespacedKey(
+            split[0], split[1]
+        ) else return null
+        return Enchantment.getByKey(k)
+    }
 }

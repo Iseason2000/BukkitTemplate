@@ -2,8 +2,8 @@ package top.iseason.bukkit.bukkittemplate.ui.slot
 
 import org.bukkit.entity.HumanEntity
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.EntityUtils.giveItems
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.checkAir
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.giveItems
 import top.iseason.bukkit.bukkittemplate.utils.submit
 
 /**
