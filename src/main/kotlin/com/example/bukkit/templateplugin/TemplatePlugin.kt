@@ -3,6 +3,7 @@ package com.example.bukkit.templateplugin
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
 import top.iseason.bukkit.bukkittemplate.debug.info
 
+@Suppress("UNUSED")
 object TemplatePlugin : KotlinPlugin() {
 
     override fun onAsyncLoad() {
@@ -38,7 +39,7 @@ object TemplatePlugin : KotlinPlugin() {
     }
 
     override fun onDisable() {
-        info("&6插件已卸载! ")
+        info("&6插件已卸载!")
     }
 
 }

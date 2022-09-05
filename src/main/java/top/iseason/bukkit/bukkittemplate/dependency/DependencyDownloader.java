@@ -15,6 +15,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 /**
  * 依赖下载器
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class DependencyDownloader {
 
     public static File parent = new File(".", "libraries");

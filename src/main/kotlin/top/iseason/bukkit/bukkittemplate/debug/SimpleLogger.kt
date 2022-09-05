@@ -2,7 +2,7 @@ package top.iseason.bukkit.bukkittemplate.debug
 
 import org.bukkit.Bukkit
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
-import top.iseason.bukkit.bukkittemplate.utils.toColor
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
 
 /**
  * 输出日志

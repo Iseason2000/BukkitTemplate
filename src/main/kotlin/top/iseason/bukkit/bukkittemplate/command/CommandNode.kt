@@ -10,9 +10,9 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessages
 import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
-import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
-import top.iseason.bukkit.bukkittemplate.utils.sendColorMessages
 import top.iseason.bukkit.bukkittemplate.utils.submit
 import java.util.*
 

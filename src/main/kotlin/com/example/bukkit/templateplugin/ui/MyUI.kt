@@ -8,9 +8,9 @@ import top.iseason.bukkit.bukkittemplate.ui.container.ChestUI
 import top.iseason.bukkit.bukkittemplate.ui.container.Pageable
 import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.*
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
-import top.iseason.bukkit.bukkittemplate.utils.sendColorMessage
-import top.iseason.bukkit.bukkittemplate.utils.toColor
 
 class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L), Pageable {
 

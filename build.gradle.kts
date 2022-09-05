@@ -76,7 +76,7 @@ dependencies {
 
     implementation("org.bstats:bstats-bukkit:3.0.0")
     implementation("io.github.bananapuncher714:nbteditor:7.18.3")
-    compileOnly("org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.1-R0.1-SNAPSHOT")
 
 }
 
@@ -145,7 +145,7 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     val allowObf = mapOf("allowobfuscation" to true)
     //class规则
     keep("class $groupS.libs.core.BukkitTemplate {}")
-    keep(allowObf, "class $groupS.libs.core.utils.MessageUtilsKt {*;}")
+//    keep(allowObf, "class $groupS.libs.core.utils.MessageUtilsKt {*;}")
     keep(allowObf, "class * implements $groupS.libs.core.KotlinPlugin {*;}")
     keepclassmembers("class * extends $groupS.libs.core.config.SimpleYAMLConfig {*;}")
     keepclassmembers("class * implements $groupS.libs.core.ui.container.BaseUI {*;}")

@@ -82,8 +82,20 @@ public class BukkitTemplate extends JavaPlugin {
      * @return 需要的class的集合
      */
     private static List<Class<?>> loadClass() {
-        URL location = BukkitTemplate.class.getProtectionDomain().getCodeSource().getLocation();
         ArrayList<Class<?>> classes = new ArrayList<>();
+        //猜測程序入口以减少遍历的消耗
+        String canonicalName = BukkitTemplate.class.getCanonicalName();
+        String guessName = canonicalName.replace(".libs.core.BukkitTemplate", "") + "." + plugin.getName();
+        try {
+            Class<?> aClass = Class.forName(guessName, false, BukkitTemplate.class.getClassLoader());
+            if (KotlinPlugin.class.isAssignableFrom(aClass)) {
+                classes.add(aClass);
+                return classes;
+            }
+        } catch (ClassNotFoundException ignored) {
+        }
+        URL location = BukkitTemplate.class.getProtectionDomain().getCodeSource().getLocation();
+
         File srcFile;
         try {
             srcFile = new File(location.toURI());
@@ -153,7 +165,7 @@ public class BukkitTemplate extends JavaPlugin {
         ktPlugin.onDisable();
         Bukkit.getScheduler().cancelTasks(this);
         HandlerList.unregisterAll(this);
-        AutoDisable.disableAll();
+        DisableHook.disableAll();
     }
 
 }

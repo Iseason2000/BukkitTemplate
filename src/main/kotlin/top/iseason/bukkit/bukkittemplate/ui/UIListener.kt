@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.AutoDisable
+import top.iseason.bukkit.bukkittemplate.DisableHook
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
 import top.iseason.bukkit.bukkittemplate.ui.slot.ClickSlot
@@ -26,15 +26,19 @@ import top.iseason.bukkit.bukkittemplate.utils.submit
 /**
  * 负责所有UI的监听动作
  */
-object UIListener : AutoDisable(), Listener {
+object UIListener : Listener {
 
     //    private val playerClickTime = mutableMapOf<HumanEntity, Long>()
     private val clickCoolDown = WeakCoolDown<HumanEntity>()
 
+    init {
+        DisableHook.addTask { onDisable() }
+    }
+
     /**
      * 在插件注销时关闭所有UI
      */
-    override fun onDisable() {
+    fun onDisable() {
         Bukkit.getOnlinePlayers().forEach {
             val baseUI = BaseUI.fromInventory(it.openInventory.topInventory) ?: return
             runCatching {

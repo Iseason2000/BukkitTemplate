@@ -8,9 +8,9 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.SimplePluginManager
-import top.iseason.bukkit.bukkittemplate.AutoDisable
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
-import top.iseason.bukkit.bukkittemplate.utils.toColor
+import top.iseason.bukkit.bukkittemplate.DisableHook
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
 import java.lang.reflect.Constructor
 import java.util.*
 import java.util.stream.Collectors
@@ -115,7 +115,7 @@ class CommandBuilder(private val commandNode: CommandNode) {
         return commandBuilder
     }
 
-    companion object : AutoDisable() {
+    companion object {
         private val pluginPermissions = mutableSetOf<Permission>()
         private val registeredCommands = mutableListOf<PluginCommand>()
         private val simpleCommandMap: SimpleCommandMap
@@ -126,6 +126,7 @@ class CommandBuilder(private val commandNode: CommandNode) {
             val commandMapField = SimplePluginManager::class.java.getDeclaredField("commandMap")
             commandMapField.isAccessible = true
             simpleCommandMap = commandMapField.get(simplePluginManager) as SimpleCommandMap
+            DisableHook.addTask { onDisable() }
         }
 
         private fun getPluginCommandConstructor(): Constructor<PluginCommand> {
@@ -177,7 +178,7 @@ class CommandBuilder(private val commandNode: CommandNode) {
         }
 
         @JvmStatic
-        override fun onDisable() {
+        fun onDisable() {
             clearPermissions()
             unregisterAll()
         }

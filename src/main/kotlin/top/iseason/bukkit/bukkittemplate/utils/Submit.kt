@@ -1,6 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.utils
 
-import org.bukkit.scheduler.BukkitRunnable
+import org.bukkit.Bukkit
+import org.bukkit.scheduler.BukkitTask
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 
 /**
@@ -14,34 +15,21 @@ fun submit(
     delay: Long = 0,
     period: Long = 0,
     async: Boolean = false,
-    task: Submitter.() -> Unit
-): Submitter {
+    task: Runnable
+): BukkitTask {
     check(delay >= 0) { "delay must grater than 0" }
     check(period >= 0) { "period must grater than 0" }
-    val submitter = Submitter(delay, period, async, task)
-    if (submitter.async) {
-        if (submitter.period > 0) {
-            submitter.runTaskTimerAsynchronously(BukkitTemplate.getPlugin(), submitter.delay, submitter.period)
+    return if (async) {
+        if (period > 0) {
+            Bukkit.getScheduler().runTaskTimerAsynchronously(BukkitTemplate.getPlugin(), task, delay, period)
         } else {
-            submitter.runTaskLaterAsynchronously(BukkitTemplate.getPlugin(), submitter.delay)
+            Bukkit.getScheduler().runTaskLaterAsynchronously(BukkitTemplate.getPlugin(), task, delay)
         }
     } else {
-        if (submitter.period > 0) {
-            submitter.runTaskTimer(BukkitTemplate.getPlugin(), submitter.delay, submitter.period)
+        if (period > 0) {
+            Bukkit.getScheduler().runTaskTimer(BukkitTemplate.getPlugin(), task, delay, period)
         } else {
-            submitter.runTaskLater(BukkitTemplate.getPlugin(), submitter.delay)
+            Bukkit.getScheduler().runTaskLater(BukkitTemplate.getPlugin(), task, delay)
         }
-    }
-    return submitter
-}
-
-class Submitter(
-    val delay: Long,
-    val period: Long,
-    val async: Boolean,
-    val task: Submitter.() -> Unit
-) : BukkitRunnable() {
-    override fun run() {
-        task()
     }
 }

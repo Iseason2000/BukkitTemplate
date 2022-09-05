@@ -13,8 +13,8 @@ import org.jetbrains.exposed.sql.statements.StatementContext
 import org.jetbrains.exposed.sql.statements.expandArgs
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
-import top.iseason.bukkit.bukkittemplate.AutoDisable
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
+import top.iseason.bukkit.bukkittemplate.DisableHook
 import top.iseason.bukkit.bukkittemplate.config.annotations.Comment
 import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
 import top.iseason.bukkit.bukkittemplate.config.annotations.Key
@@ -57,6 +57,10 @@ object DatabaseConfig : SimpleYAMLConfig() {
     private lateinit var connection: Database
     private var ds: HikariDataSource? = null
 
+    init {
+        DisableHook.addTask { closeDB() }
+    }
+
     override val onLoaded: (ConfigurationSection.() -> Unit) = {
         isAutoUpdate = autoReload
         reConnected()
@@ -72,7 +76,6 @@ object DatabaseConfig : SimpleYAMLConfig() {
         if (isConnecting) return
         info("&6数据库链接中...")
         isConnecting = true
-        AutoClose
         closeDB()
         runCatching {
             val dd = DependencyDownloader().apply {
@@ -173,11 +176,6 @@ object DatabaseConfig : SimpleYAMLConfig() {
         }.getOrElse { it.printStackTrace() }
     }
 
-    object AutoClose : AutoDisable() {
-        override fun onDisable() {
-            closeDB()
-        }
-    }
 }
 
 /**

@@ -7,10 +7,10 @@ import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
+import org.bukkit.scheduler.BukkitTask
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
-import top.iseason.bukkit.bukkittemplate.utils.Submitter
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
 import top.iseason.bukkit.bukkittemplate.utils.submit
-import top.iseason.bukkit.bukkittemplate.utils.toColor
 
 object IOUtils {
     /**
@@ -24,7 +24,7 @@ object IOUtils {
         submit {
             openInventory(inv)
         }
-        var submit: Submitter? = null
+        var task: BukkitTask? = null
         val listener = object : Listener {
             @EventHandler
             fun onClose(event: InventoryCloseEvent) {
@@ -32,13 +32,13 @@ object IOUtils {
                     submit(async = async) {
                         onFinish(inv)
                     }
-                    submit?.cancel()
+                    task?.cancel()
                     HandlerList.unregisterAll(this)
                 }
             }
         }
         listener.register()
-        submit = submit(delay = 12000) {
+        task = submit(delay = 12000) {
             if (openInventory.topInventory == inv) {
                 closeInventory()
             } else {

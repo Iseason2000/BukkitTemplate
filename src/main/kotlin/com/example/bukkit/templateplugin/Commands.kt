@@ -10,7 +10,7 @@ import top.iseason.bukkit.bukkittemplate.command.*
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.ui.openPageableUI
 import top.iseason.bukkit.bukkittemplate.ui.openUI
-import top.iseason.bukkit.bukkittemplate.utils.sendMessage
+import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
 
 fun command1() {
     commandRoot("playerutil", alias = arrayOf("test1", "test2"), description = "测试命令1") {
@@ -90,8 +90,8 @@ fun command2() {
     ).onExecute {
         val param1 = getParam<Int>(0)
         val param2 = getOptionalParam<Double>(1)
-        it.sendMessage(param1)
-        it.sendMessage(param2)
+        it.sendColorMessage(param1)
+        it.sendColorMessage(param2)
         true
     }
 }
