@@ -33,17 +33,18 @@ object LocationUtils {
      */
     fun Location.getNormalZ(): Vector = direction
 
-    // 以自身为原点和相对坐标系获取世界坐标
+    /**
+     *   由相对坐标获取世界坐标
+     */
     fun Location.getRelativeByCoordinate(
-        coordinate: Array<Vector>, //坐标轴的单位向量
         x: Double,
         y: Double,
         z: Double
     ): Location {
         return clone().apply {
-            add(coordinate[0].clone().multiply(x))
-            add(coordinate[1].clone().multiply(y))
-            add(coordinate[2].clone().multiply(z))
+            add(getNormalX().multiply(x))
+            add(getNormalY().multiply(y))
+            add(getNormalZ().multiply(z))
         }
     }
 }

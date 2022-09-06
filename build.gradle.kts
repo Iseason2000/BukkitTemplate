@@ -76,8 +76,8 @@ dependencies {
 
     implementation("org.bstats:bstats-bukkit:3.0.0")
     implementation("io.github.bananapuncher714:nbteditor:7.18.3")
-    compileOnly("org.spigotmc:spigot-api:1.19.1-R0.1-SNAPSHOT")
 
+    compileOnly("org.spigotmc:spigot-api:1.19.1-R0.1-SNAPSHOT")
 }
 
 tasks {

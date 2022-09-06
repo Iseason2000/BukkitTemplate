@@ -396,6 +396,7 @@ object ItemUtils {
 
     /**
      * 从配置反序列化ItemStack
+     * @param allowNested 是否允许嵌套解析(比如潜影盒)，只对容器有效，为false时将容器内容转为base64储存
      */
     fun fromSection(section: ConfigurationSection, allowNested: Boolean = true): ItemStack? {
         val material = Material.getMaterial(section.getString("material")!!.uppercase()) ?: return null
@@ -574,7 +575,47 @@ object ItemUtils {
         return item
     }
 
+    /**
+     * 物品集合转为配置
+     * @param allowNested 是否允许嵌套解析(比如潜影盒)，只对容器有效，为false时将容器内容转为base64储存
+     */
     fun Collection<ItemStack>.toSection(allowNested: Boolean = true) = map { it.toSection(allowNested) }
+
+    /**
+     * 配置list转为物品集合，配合 ConfigurationSection::getList 方法使用
+     * @param allowNested 是否允许嵌套解析(比如潜影盒)，只对容器有效，为false时将容器内容转为base64储存
+     */
+    fun fromSections(sections: List<*>, allowNested: Boolean = true): List<ItemStack> {
+        if (sections.isEmpty()) return emptyList()
+        return sections.mapNotNull { if (it is ConfigurationSection) fromSection(it, allowNested) else null }
+    }
+
+    /**
+     * 带有序号的物品集合转为ConfigurationSection
+     * @param allowNested 是否允许嵌套解析(比如潜影盒)，只对容器有效，为false时将容器内容转为base64储存
+     */
+    fun Map<Int, ItemStack>.toSection(allowNested: Boolean = true): ConfigurationSection {
+        val yamlConfiguration = YamlConfiguration()
+        forEach { (index, item) ->
+            yamlConfiguration[index.toString()] = item.toSection(allowNested)
+        }
+        return yamlConfiguration
+    }
+
+    /**
+     * ConfigurationSection转为带有序号的物品集合
+     * @param allowNested 是否允许嵌套解析(比如潜影盒)，只对容器有效，为false时将容器内容转为base64储存
+     */
+    fun fromSectionToMap(section: ConfigurationSection, allowNested: Boolean = true): Map<Int, ItemStack> {
+        val mutableMapOf = mutableMapOf<Int, ItemStack>()
+        section.getKeys(false).forEach {
+            kotlin.runCatching {
+                mutableMapOf[it.toInt()] =
+                    fromSection(section.getConfigurationSection(it)!!, allowNested) ?: return@forEach
+            }
+        }
+        return mutableMapOf
+    }
 
     /**
      * 字节转换为ItemStack
@@ -638,8 +679,8 @@ object ItemUtils {
      */
     fun fromJson(json: String): ItemStack = NBTEditor.getItemFromTag(NBTEditor.getNBTCompound(json))
 
-    fun Color.toRGBString(): String = "${red},${green},${blue}"
-    fun fromColorStr(str: String): Color {
+    private fun Color.toRGBString(): String = "${red},${green},${blue}"
+    private fun fromColorStr(str: String): Color {
         val split = str.trim().split(',')
         return Color.fromRGB(
             split.getOrNull(0)?.toInt() ?: 0,
@@ -648,9 +689,9 @@ object ItemUtils {
         )
     }
 
-    fun PotionEffect.toEffectString(): String = "${type.name},${duration},${amplifier}"
+    private fun PotionEffect.toEffectString(): String = "${type.name},${duration},${amplifier}"
 
-    fun fromEffectString(str: String): PotionEffect? {
+    private fun fromEffectString(str: String): PotionEffect? {
         val split = str.trim().split(',')
         val type = runCatching { PotionEffectType.getByName(split[0]) }.getOrNull() ?: return null
         val duration = runCatching { split[1].toInt() }.getOrElse { return null }
@@ -661,7 +702,7 @@ object ItemUtils {
     /**
      * 由namespacekey 获取对应的附魔
      */
-    fun matchEnchant(key: String): Enchantment? {
+    private fun matchEnchant(key: String): Enchantment? {
         val split = key.split(':')
         val k = if (split.size == 1) NamespacedKey.minecraft(key)
         else if (split.size == 2) NamespacedKey(

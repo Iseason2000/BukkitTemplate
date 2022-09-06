@@ -5,9 +5,10 @@ package top.iseason.bukkit.bukkittemplate.utils
 import kotlin.math.abs
 
 /**
- * 整数转罗马数字
+ * 整数转罗马数字,最大到3999
  */
 fun Int.toRoman(): String {
+    if (this > 3999) return toString()
     val num = abs(this)
     val m = arrayOf("", "M", "MM", "MMM")
     val c = arrayOf("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM")

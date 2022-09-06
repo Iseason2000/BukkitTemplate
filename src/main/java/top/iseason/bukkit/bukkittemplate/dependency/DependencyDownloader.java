@@ -25,6 +25,7 @@ public class DependencyDownloader {
 
     /**
      * 下载依赖
+     * 比如 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10
      *
      * @param dependency   依赖地址
      * @param recursiveSub 是否下载子依赖
@@ -69,6 +70,7 @@ public class DependencyDownloader {
                 }
             }
         }
+        if (!recursiveSub) return;
         for (String repository : repositories) {
             try {
                 URL pomUrl = new URL(repository + suffix + pomName);
@@ -77,8 +79,7 @@ public class DependencyDownloader {
                     continue;
                 }
                 for (String subDependency : new XmlDependency(pomFile).getDependency()) {
-                    if (recursiveSub)
-                        downloadDependency(subDependency, false, repositories);
+                    downloadDependency(subDependency, false, repositories);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -117,6 +118,13 @@ public class DependencyDownloader {
         }
     }
 
+    /**
+     * 下載文件，超时5秒
+     *
+     * @param url  文件链接
+     * @param file 保存路径
+     * @return
+     */
     private static boolean download(URL url, File file) {
         HttpURLConnection connection;
         try {

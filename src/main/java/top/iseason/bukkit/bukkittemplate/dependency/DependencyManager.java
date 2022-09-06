@@ -23,26 +23,21 @@ public class DependencyManager {
         String folder = libConfigs.getString("libraries-folder");
         if (folder != null) {
             File parent;
-            if (folder.startsWith("@Plugin:")) {
-                parent = new File(BukkitTemplate.getPlugin().getDataFolder(), folder.replace("@Plugin:", ""));
+            if (folder.toLowerCase().startsWith("@plugin:")) {
+                parent = new File(BukkitTemplate.getPlugin().getDataFolder(), folder.substring(8));
             } else {
                 parent = new File(".", folder);
             }
             DependencyDownloader.parent = parent;
         }
         List<String> repositories = libConfigs.getStringList("repositories");
-        if (repositories != null) {
+        if (!repositories.isEmpty()) {
             dd.repositories.clear();
             for (String repository : repositories) {
                 dd.addRepository(repository);
             }
-        } else {
-            dd.repositories.add("https://repo.maven.apache.org/maven2/");
         }
-        List<String> libraries = libConfigs.getStringList("libraries");
-        if (libraries != null) {
-            dd.dependencies = libraries;
-        }
+        dd.dependencies = libConfigs.getStringList("libraries");
         dd.setup();
     }
 }

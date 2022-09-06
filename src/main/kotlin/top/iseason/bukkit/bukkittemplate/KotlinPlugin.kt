@@ -1,8 +1,5 @@
 package top.iseason.bukkit.bukkittemplate
 
-import org.bukkit.Bukkit
-import org.bukkit.event.Listener
-
 open class KotlinPlugin {
 
     /**
@@ -30,11 +27,5 @@ open class KotlinPlugin {
      */
     open fun onDisable() {}
 
-    /**
-     * 快速注册监听器
-     */
-    fun registerListeners(listener: Listener) {
-        Bukkit.getPluginManager().registerEvents(listener, javaPlugin)
-    }
 
 }

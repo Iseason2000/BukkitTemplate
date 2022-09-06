@@ -75,10 +75,10 @@ object RandomUtils {
      * 加权随机区间
      * @return 选中的权重序号
      */
-    fun getWeighted(weights: Iterable<Int>): Int {
+    fun getWeighted(weights: Iterable<Double>): Int {
         val sum = weights.sum()
-        val random = getInteger(0, sum)
-        var temp = 0
+        val random = getDouble(0.0, sum)
+        var temp = 0.0
         weights.forEachIndexed { index, i ->
             temp += i
             if (random <= temp) return index

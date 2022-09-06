@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * XML文件依赖解析器
+ */
 public class XmlDependency {
     private static final Pattern placeHolder = Pattern.compile("\\$\\{(.*)}");
     Document doc;
@@ -26,6 +29,9 @@ public class XmlDependency {
         doc = builder.parse(file);
     }
 
+    /**
+     * 解析XML文件依赖,返回格式化的依赖
+     */
     public List<String> getDependency() {
         List<String> list = new ArrayList<>();
         NodeList dependencies = doc.getElementsByTagName("dependencies");
