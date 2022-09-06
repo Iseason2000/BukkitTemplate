@@ -7,7 +7,6 @@ import org.bukkit.permissions.PermissionDefault
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import top.iseason.bukkit.bukkittemplate.command.*
-import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkit.bukkittemplate.ui.openPageableUI
 import top.iseason.bukkit.bukkittemplate.ui.openUI
 import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
@@ -63,7 +62,6 @@ fun command1() {
                 }
                 true
             }
-            onSuccess("${SimpleLogger.prefix}&a命令已执行!")
         }
 
         node("other", default = PermissionDefault.OP, description = "测试节点2") {

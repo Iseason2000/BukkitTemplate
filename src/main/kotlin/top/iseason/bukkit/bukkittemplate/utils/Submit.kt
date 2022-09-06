@@ -3,9 +3,10 @@ package top.iseason.bukkit.bukkittemplate.utils
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitTask
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
+import java.util.concurrent.CompletableFuture
 
 /**
- * 提交一个任务
+ * 提交一个 bukkit runnable任务
  * @param delay 延迟 单位tick
  * @param period 循环周期 单位tick
  * @param async 是否异步
@@ -32,4 +33,16 @@ fun submit(
             Bukkit.getScheduler().runTaskLater(BukkitTemplate.getPlugin(), task, delay)
         }
     }
+}
+
+/**
+ * 在主线程运行任务(使用BukkitRunnable)
+ */
+fun runSync(task: Runnable) = Bukkit.getScheduler().runTask(BukkitTemplate.getPlugin(), task)
+
+/**
+ * 在异步线程运行任务
+ */
+fun runAsync(task: Runnable) {
+    CompletableFuture.runAsync(task)
 }

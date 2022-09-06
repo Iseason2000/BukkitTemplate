@@ -5,6 +5,7 @@ import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
+import org.bukkit.plugin.EventExecutor
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 
 object EventUtils {
@@ -29,14 +30,22 @@ object EventUtils {
         priority: EventPriority = EventPriority.NORMAL,
         ignoreCancelled: Boolean = true,
         crossinline action: T.(Listener) -> Unit
-    ): Listener {
-        val listener = object : Listener {}
+    ): TempListener {
+        val tempListener = TempListener()
+        tempListener.executor = EventExecutor { _, event ->
+            runCatching {
+                action.invoke(event as T, tempListener)
+            }.getOrElse { it.printStackTrace() }
+        }
         Bukkit.getPluginManager()
-            .registerEvent(T::class.java, listener, priority, { _, event ->
-                runCatching {
-                    action.invoke(event as T, listener)
-                }.getOrElse { it.printStackTrace() }
-            }, BukkitTemplate.getPlugin(), ignoreCancelled)
-        return listener
+            .registerEvent(
+                T::class.java, tempListener, priority,
+                tempListener.executor!!, BukkitTemplate.getPlugin(), ignoreCancelled
+            )
+        return tempListener
+    }
+
+    class TempListener : Listener {
+        lateinit var executor: EventExecutor
     }
 }

@@ -49,7 +49,7 @@ open class CommandNode(
     /**
      * 命令执行
      */
-    open var onExecute: (Params.(sender: CommandSender) -> Boolean)? = null
+    open var onExecute: (Params.(sender: CommandSender) -> Unit)? = null
 ) : CommandExecutor, TabExecutor {
     var permission: Permission =
         Permission("${BukkitTemplate.getPlugin().name.lowercase()}.$name.", default)
@@ -83,8 +83,6 @@ open class CommandNode(
     /**
      * 参数类型和建议参数
      */
-    var successMessage: String? = CommandNode.successMessage
-    var failureMessage: String? = CommandNode.failureMessage
     var noPermissionMessage: String? = CommandNode.noPermissionMessage
 
     /**
@@ -221,13 +219,7 @@ open class CommandNode(
         }
         submit(async = node.async) {
             try {
-                if (node.onExecute!!.invoke((Params(params, node)), sender)) {
-                    if (node.successMessage != null)
-                        sender.sendColorMessage(node.successMessage)
-                } else if (node.failureMessage != null) sender.sendColorMessage(
-                    node.failureMessage,
-                    SimpleLogger.prefix
-                )
+                node.onExecute!!.invoke((Params(params, node)), sender)
             } catch (e: ParmaException) {
                 //参数错误的提示
                 if (e.typeParam != null) sender.sendColorMessage(e.typeParam.errorMessage(e.arg))

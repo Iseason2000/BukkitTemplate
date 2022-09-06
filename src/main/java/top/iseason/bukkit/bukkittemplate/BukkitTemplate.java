@@ -3,6 +3,7 @@ package top.iseason.bukkit.bukkittemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
+import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyManager;
 
 import java.io.File;
@@ -24,13 +25,12 @@ public class BukkitTemplate extends JavaPlugin {
     private static BukkitTemplate plugin = null;
 
     public BukkitTemplate() {
-        if (plugin == null) plugin = this;
+        plugin = this;
         //防止卡主线程
         CompletableFuture.runAsync(() -> {
             DependencyManager.parsePluginYml();
             classes = loadClass();
             ktPlugin = findInstance();
-            ktPlugin.javaPlugin = this;
             plugin.onAsyncLoad();
             plugin.setEnabled(true);
             Bukkit.getScheduler().runTask(plugin, () -> plugin.onEnabled());
@@ -59,22 +59,21 @@ public class BukkitTemplate extends JavaPlugin {
 
     /**
      * 唤醒所有继承SimpleYAMLConfig 的 object类
-     * 目的是为了让插件加载阶段就补全缺失的配置文件
      */
-//    public static void loadConfigs() {
-//        for (Class<?> aClass : classes) {
-//            if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
-//                try {
-//                    Field instance = aClass.getDeclaredField("INSTANCE");
-//                    instance.setAccessible(true);
-//                    SimpleYAMLConfig config = (SimpleYAMLConfig) instance.get(null);
-//                    config.load(false);
-//                    instance.setAccessible(false);
-//                } catch (NoSuchFieldException | IllegalAccessException ignored) {
-//                }
-//            }
-//        }
-//    }
+    public static void loadConfigs() {
+        for (Class<?> aClass : classes) {
+            if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
+                try {
+                    Field instance = aClass.getDeclaredField("INSTANCE");
+                    instance.setAccessible(true);
+                    SimpleYAMLConfig config = (SimpleYAMLConfig) instance.get(null);
+                    config.load(false);
+                    instance.setAccessible(false);
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                }
+            }
+        }
+    }
 
     /**
      * 加载需要的class

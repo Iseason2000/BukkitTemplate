@@ -7,6 +7,7 @@ import top.iseason.bukkit.bukkittemplate.debug.info
 object TemplatePlugin : KotlinPlugin() {
 
     override fun onEnable() {
+
 //        SimpleLogger.prefix = "&a[&6${javaPlugin.description.name}&a]&r ".toColor()
     }
 
@@ -31,6 +32,7 @@ object TemplatePlugin : KotlinPlugin() {
 //            DependencyDownloader().addRepositories("https://maven.aliyun.com/repository/public")
 //                .downloadDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 //        }
+
         info("&a插件已启用!")
     }
 

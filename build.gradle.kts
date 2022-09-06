@@ -33,6 +33,7 @@ val shadowJar: ShadowJar by tasks
 
 val exposedVersion: String by project
 val obfuscated: String by project
+val isObfuscated = obfuscated == "true"
 val shrink: String by project
 
 repositories {
@@ -82,6 +83,9 @@ dependencies {
 
 tasks {
     shadowJar {
+        if (isObfuscated) {
+            relocate("top.iseason.bukkit.bukkittemplate.BukkitTemplate", "a")
+        }
         relocate("top.iseason.bukkit.bukkittemplate", "$groupS.libs.core")
         relocate("org.bstats", "$groupS.libs.bstats")
         relocate("io.github.bananapuncher714.nbteditor", "$groupS.libs.nbteditor")
@@ -98,7 +102,7 @@ tasks {
     processResources {
         filesMatching("plugin.yml") {
             expand(
-                "main" to "$groupS.libs.core.BukkitTemplate",
+                "main" to if (isObfuscated) "a" else "$groupS.libs.core.BukkitTemplate",
                 "name" to pluginName,
                 "version" to project.version,
                 "author" to author,
@@ -119,7 +123,7 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     group = "minecraft"
     verbose()
     injars(tasks.named("shadowJar"))
-    if (obfuscated != "true") {
+    if (!isObfuscated) {
         dontobfuscate()
     }
     if (shrink != "true") {
@@ -144,7 +148,8 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     //启用混淆的选项
     val allowObf = mapOf("allowobfuscation" to true)
     //class规则
-    keep("class $groupS.libs.core.BukkitTemplate {}")
+    if (isObfuscated) keep(allowObf, "class a {}")
+    else keep("class $groupS.libs.core.BukkitTemplate {}")
 //    keep(allowObf, "class $groupS.libs.core.utils.MessageUtilsKt {*;}")
     keep(allowObf, "class * implements $groupS.libs.core.KotlinPlugin {*;}")
     keepclassmembers("class * extends $groupS.libs.core.config.SimpleYAMLConfig {*;}")
@@ -158,7 +163,7 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
     keepkotlinmetadata()
     repackageclasses()
-    if (obfuscated == "true")
+    if (isObfuscated)
         outjars(File(jarOutputFile, "${project.name}-${project.version}-obfuscated.jar"))
     else
         outjars(File(jarOutputFile, "${project.name}-${project.version}.jar"))

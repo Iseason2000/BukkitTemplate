@@ -21,24 +21,8 @@ class CommandBuilder(private val commandNode: CommandNode) {
     /**
      * 节点执行代码
      */
-    fun onExecute(onExecute: Params.(sender: CommandSender) -> Boolean): CommandBuilder {
+    fun onExecute(onExecute: Params.(sender: CommandSender) -> Unit): CommandBuilder {
         commandNode.onExecute = onExecute
-        return this
-    }
-
-    /**
-     * 执行失败的提示信息
-     */
-    fun onFailure(onFailure: String): CommandBuilder {
-        commandNode.failureMessage = onFailure
-        return this
-    }
-
-    /**
-     * 执行成功的提示信息
-     */
-    fun onSuccess(onSuccess: String): CommandBuilder {
-        commandNode.successMessage = onSuccess
         return this
     }
 
