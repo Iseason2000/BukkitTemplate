@@ -130,7 +130,7 @@ object MessageUtils {
      *
      * 结果: 你好啊 Iseason,欢迎来到 我的世界
      */
-    fun String.format(vararg values: Any?): String {
+    fun String.formatBy(vararg values: Any?): String {
         var temp = this
         values.forEachIndexed { index, any ->
             if (any == null) return@forEachIndexed

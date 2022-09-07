@@ -68,7 +68,7 @@ open class UIContainer(
     /**
      * 为某个玩家打开UI
      */
-    fun openFor(player: HumanEntity) {
+    open fun openFor(player: HumanEntity) {
         require(pages.isNotEmpty()) { "Your pageable ui must possess at lease 1 page" }
         val currentPage = getCurrentPage(player) ?: return
         player.openInventory(currentPage.inventory)

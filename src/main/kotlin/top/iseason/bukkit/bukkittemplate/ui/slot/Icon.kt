@@ -7,7 +7,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.checkAir
 
 open class Icon(
-    val rawItemStack: ItemStack,
+    var rawItemStack: ItemStack,
     override val index: Int
 
 ) : BaseSlot {

@@ -12,7 +12,9 @@ import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
 import org.bukkit.inventory.BlockInventoryHolder
+import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.*
@@ -710,4 +712,45 @@ object ItemUtils {
         ) else return null
         return Enchantment.getByKey(k)
     }
+
+    /**
+     * 模拟玩家背包检查是否能添加物品
+     * @return 溢出的物品数量
+     */
+    fun Player.canAddItem(vararg itemStacks: ItemStack): Int {
+        val createInventory = Bukkit.createInventory(this, 36)
+        //将需要输入的物品合并
+        val addItem = createInventory.addItem(*itemStacks)
+        val sortedItems = createInventory.mapNotNull { it }
+        createInventory.contents = inventory.storageContents
+        val addItems = createInventory.addItem(*sortedItems.toTypedArray())
+        return addItems.size + addItem.size
+    }
+
+    /**
+     * 模拟玩家背包检查是否能添加物品
+     * @return 溢出的物品数量
+     */
+    fun Player.canAddItem(itemStacks: Collection<ItemStack>): Int = canAddItem(*itemStacks.toTypedArray())
+
+    /**
+     * 模拟背包检查是否能添加物品
+     * @return 溢出的物品数量
+     */
+    fun Inventory.canAddItem(vararg itemStacks: ItemStack): Int {
+        val createInventory = Bukkit.createInventory(null, this.contents.size)
+        val addItem = createInventory.addItem(*itemStacks)
+        val sortedItems = createInventory.mapNotNull { it }
+        createInventory.contents = this.contents
+        val addItems = createInventory.addItem(*sortedItems.toTypedArray())
+        return addItems.size + addItem.size
+    }
+
+    /**
+     * 模拟背包检查是否能添加物品
+     * @return 溢出的物品数量
+     */
+    fun Inventory.canAddItem(itemStacks: Collection<ItemStack>): Int = canAddItem(*itemStacks.toTypedArray())
+
+
 }

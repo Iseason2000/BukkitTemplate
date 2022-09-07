@@ -10,7 +10,7 @@ open class LazyUIContainer(
     /**
      * 是否启用缓存，如果为false则每人的每个UI都是新对象
      */
-    private val allowCache: Boolean = true
+    val allowCache: Boolean = true
 ) : UIContainer(arrayOfNulls(pageTypes.size)) {
 
     /**
