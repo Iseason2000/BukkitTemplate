@@ -4,9 +4,6 @@ import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.debug.info
-import top.iseason.bukkit.bukkittemplate.ui.container.ChestUI
-import top.iseason.bukkit.bukkittemplate.ui.container.Pageable
-import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.*
 import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor

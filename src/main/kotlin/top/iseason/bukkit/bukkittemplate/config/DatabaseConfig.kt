@@ -54,7 +54,8 @@ object DatabaseConfig : SimpleYAMLConfig() {
     var isConnected = false
         private set
     private var isConnecting = false
-    private lateinit var connection: Database
+    public lateinit var connection: Database
+        private set
     private var ds: HikariDataSource? = null
 
     init {
@@ -199,3 +200,9 @@ object MySqlLogger : SqlLogger {
         debug("&6DEBUG SQL: &7${context.expandArgs(transaction)}")
     }
 }
+
+/**
+ * 使用本插件数据库的事务
+ */
+fun <T> dbTransaction(statement: Transaction.() -> T) =
+    transaction(top.iseason.bukkit.bukkittemplate.config.DatabaseConfig.connection, statement)

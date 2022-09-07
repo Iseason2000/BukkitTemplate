@@ -3,8 +3,6 @@ package com.example.bukkit.templateplugin.ui
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.ui.container.ChestUI
-import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.Button
 import top.iseason.bukkit.bukkittemplate.ui.slot.getContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.onClicked

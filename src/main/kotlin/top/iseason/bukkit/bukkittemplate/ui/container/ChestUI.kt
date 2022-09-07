@@ -29,7 +29,6 @@ open class ChestUI(
         return chestUI.also {
             it.lockOnBottom = lockOnBottom
             it.lockOnTop = lockOnTop
-            it.serializeId = serializeId
             it.async = async
             it.onClick = onClick
             it.onClicked = onClicked
@@ -41,6 +40,4 @@ open class ChestUI(
     override var container: UIContainer? = null
 
     override fun getUI(): BaseUI = this
-
-    override var serializeId: String = "chestui"
 }

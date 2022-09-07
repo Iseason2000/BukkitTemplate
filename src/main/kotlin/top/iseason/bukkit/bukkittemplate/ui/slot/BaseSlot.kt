@@ -3,7 +3,6 @@ package top.iseason.bukkit.bukkittemplate.ui.slot
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
-import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 
 /**
  * 一个物品槽
