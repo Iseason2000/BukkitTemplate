@@ -12,12 +12,13 @@ import top.iseason.bukkit.bukkittemplate.ui.openUI
 import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
 
 fun command1() {
-    commandRoot("playerutil", alias = arrayOf("test1", "test2"), description = "测试命令1") {
-        node(
-            "potion",
-            description = "玩家药水控制",
-            default = PermissionDefault.OP,
-            isPlayerOnly = true,
+    command("playerutil") {
+        description = "测试命令1"
+        alias = arrayOf("test1", "test2")
+        node("potion") {
+            description = "玩家药水控制"
+            default = PermissionDefault.OP
+            isPlayerOnly = true
             params = arrayOf(
                 Param("<操作>", listOf("add", "set", "remove")),
                 Param("<药水类型>", ParamSuggestCache.potionTypes),
@@ -25,8 +26,7 @@ fun command1() {
                 Param("[等级]", listOf("0", "1", "2", "3", "4")),
                 Param("[秒]", listOf("1", "5", "10"))
             )
-        ) {
-            onExecute {
+            onExecute = {
                 val operation = getParam<String>(0)
                 if (operation !in setOf("add", "set", "remove"))
                     throw ParmaException("&7参数 &c${operation}&7 不是一个有效的操作,支持的有: add、set、remove")
@@ -62,11 +62,18 @@ fun command1() {
                 }
             }
         }
-
-        node("other", default = PermissionDefault.OP, description = "测试节点2") {
-            node("test3", alias = arrayOf("test1", "test2"), description = "测试命令") {
-                onExecute {
-
+    }
+    command("testcommand") {
+        description = "测试命令1"
+        alias = arrayOf("test1", "test2")
+        node("other") {
+            default = PermissionDefault.OP
+            description = "测试节点2"
+            node("test3") {
+                alias = arrayOf("test1", "test2")
+                description = "测试命令"
+                onExecute = {
+                    it.sendColorMessage("#66ccff 这是一个测试命令")
                 }
             }
         }
@@ -74,23 +81,25 @@ fun command1() {
 }
 
 fun command2() {
-    commandRoot(
+    val node = command(
         "2node",
-        alias = arrayOf("node2", "node3"),
-        default = PermissionDefault.OP,
-        async = true,
-        description = "测试命令2",
-        params = arrayOf(
-            Param("<玩家>", suggestRuntime = ParamSuggestCache.playerParam),
-            Param("[数字]", listOf("1", "5", "10", "-5", "-1"))
-        )
-    ).onExecute {
+    )
+    node.alias = arrayOf("node2", "node3")
+    node.default = PermissionDefault.OP
+    node.async = true
+    node.description = "测试命令2"
+    node.params = arrayOf(
+        Param("<玩家>", suggestRuntime = ParamSuggestCache.playerParam),
+        Param("[数字]", listOf("1", "5", "10", "-5", "-1"))
+    )
+    node.onExecute = {
         val param1 = getParam<Int>(0)
         val param2 = getOptionalParam<Double>(1)
         it.sendColorMessage(param1)
         it.sendColorMessage(param2)
         true
     }
+
 }
 
 fun command3() {
@@ -98,10 +107,10 @@ fun command3() {
 }
 
 fun command4() {
-    commandRoot("testcommand") {
+    command("testcommand") {
         node("node1") {
             node("node2") {
-                testNode()
+                node(testNode())
             }
         }
         node("node4")
@@ -110,16 +119,21 @@ fun command4() {
 }
 
 fun openUICommand() {
-    commandRoot("openUI", isPlayerOnly = true, async = true) {
-        node("UI", isPlayerOnly = true).onExecute {
+    command("openUI") {
+        isPlayerOnly = true
+        async = true
+        node("UI") {
+            isPlayerOnly = true
+        }.onExecute = {
             (it as Player).openUI<MyUI> {
                 title = it.displayName
             }
             true
         }
-        node("MultiUI", isPlayerOnly = true).onExecute {
+        val node = node("MultiUI")
+        node.isPlayerOnly = true
+        node.onExecute = {
             (it as Player).openPageableUI<MultiUI>()
-            true
         }
     }
 
@@ -128,10 +142,9 @@ fun openUICommand() {
 /**
  * 结构命令
  */
-fun CommandBuilder.testNode() = node("node3") {
-    onExecute {
+fun testNode() = node("node3") {
+    onExecute = {
         it.sendMessage("hello")
-        true
     }
 }
 

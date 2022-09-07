@@ -3,6 +3,8 @@ package com.example.bukkit.templateplugin.ui
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import top.iseason.bukkit.bukkittemplate.ui.container.ChestUI
+import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.Button
 import top.iseason.bukkit.bukkittemplate.ui.slot.getContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.onClicked
@@ -27,7 +29,6 @@ class Page1 : ChestUI("page1" + System.currentTimeMillis()) {
     val next = Button(ItemStack(Material.MELON).applyMeta { setDisplayName("&a下一页".toColor()) }, 8).onClicked {
         getContainer()?.nextPage(it.whoClicked)
     }.setup()
-    override var serializeId: String = "page1"
 }
 
 class Page2 : ChestUI("page2" + System.currentTimeMillis()) {
@@ -40,7 +41,6 @@ class Page2 : ChestUI("page2" + System.currentTimeMillis()) {
     val next = Button(ItemStack(Material.MELON).applyMeta { setDisplayName("&a下一页".toColor()) }, 8).onClicked {
         getContainer()?.nextPage(it.whoClicked)
     }.setup()
-    override var serializeId: String = "page2"
 }
 
 class Page3 : ChestUI("page3" + System.currentTimeMillis()) {
@@ -53,5 +53,4 @@ class Page3 : ChestUI("page3" + System.currentTimeMillis()) {
     val next = Button(ItemStack(Material.MELON).applyMeta { setDisplayName("&a下一页".toColor()) }, 8).onClicked {
         getContainer()?.nextPage(it.whoClicked)
     }.setup()
-    override var serializeId: String = "page3"
 }

@@ -3,6 +3,7 @@ package top.iseason.bukkit.bukkittemplate.ui
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
+import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 
 
 /**
