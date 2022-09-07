@@ -98,4 +98,5 @@ private fun setDefaultParams() {
     TypeParam(Material::class) {
         Material.getMaterial(it.uppercase())
     }
+
 }

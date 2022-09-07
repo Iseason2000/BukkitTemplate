@@ -60,14 +60,13 @@ fun command1() {
                         player.removePotionEffect(type)
                     }
                 }
-                true
             }
         }
 
         node("other", default = PermissionDefault.OP, description = "测试节点2") {
             node("test3", alias = arrayOf("test1", "test2"), description = "测试命令") {
                 onExecute {
-                    true
+
                 }
             }
         }

@@ -28,7 +28,7 @@ object MessageUtils {
     val colorPattern: Pattern = Pattern.compile("#[A-F|\\d]{6}", Pattern.CASE_INSENSITIVE)
 
     /**
-     * 将String转为bukkit支持的颜色消息,从bentobox 抄来的
+     * 将String转为bukkit支持的颜色消息,从 bentobox 抄来的
      * 例子: &a你好、#66ccff 你好、#6cf 你好
      */
     fun String.toColor(): String {
@@ -75,13 +75,13 @@ object MessageUtils {
     /**
      * 发送带颜色转换的消息
      */
-    fun CommandSender.sendColorMessages(vararg messages: String, prefix: String = defaultPrefix) =
+    fun CommandSender.sendColorMessages(vararg messages: Any?, prefix: String = defaultPrefix) =
         messages.forEach { sendColorMessage(it, prefix) }
 
     /**
      * 发送带颜色转换的消息
      */
-    fun CommandSender.sendColorMessages(messages: Collection<String>?, prefix: String = defaultPrefix) =
+    fun CommandSender.sendColorMessages(messages: Collection<Any?>?, prefix: String = defaultPrefix) =
         messages?.forEach { sendColorMessage(it, prefix) }
 
     /**
@@ -107,13 +107,13 @@ object MessageUtils {
     /**
      * 进行颜色转换并发送给控制台
      */
-    fun sendConsole(messages: Collection<String>?, prefix: String = defaultPrefix) =
+    fun sendConsole(messages: Collection<Any?>?, prefix: String = defaultPrefix) =
         messages?.forEach { sendConsole(it, prefix) }
 
     /**
      * 进行颜色转换并发送给控制台
      */
-    fun sendConsole(messages: Array<String>?, prefix: String = defaultPrefix) =
+    fun sendConsole(messages: Array<Any?>?, prefix: String = defaultPrefix) =
         messages?.forEach { sendConsole(it, prefix) }
 
     /**

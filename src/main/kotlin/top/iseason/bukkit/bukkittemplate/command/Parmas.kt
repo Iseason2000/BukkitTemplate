@@ -7,7 +7,7 @@ import org.bukkit.potion.PotionEffectType
 
 class Params(val params: Array<String>, val node: CommandNode) {
     /**
-     * 获取指定参数类型的参数
+     * 获取指定参数类型的参数,不存在返回null
      * @param index 参数的位置
      */
     inline fun <reified T> getOptionalParam(index: Int): T? {

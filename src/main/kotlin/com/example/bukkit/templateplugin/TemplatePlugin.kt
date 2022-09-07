@@ -1,6 +1,7 @@
 package com.example.bukkit.templateplugin
 
 import top.iseason.bukkit.bukkittemplate.KotlinPlugin
+import top.iseason.bukkit.bukkittemplate.command.CommandBuilder
 import top.iseason.bukkit.bukkittemplate.debug.info
 
 @Suppress("UNUSED")
@@ -13,12 +14,12 @@ object TemplatePlugin : KotlinPlugin() {
 
     override fun onAsyncEnable() {
         //命令
-//        command1()
+
 //        openUICommand()
 //        command1()
 
         //如果使用命令模块，取消注释
-//        CommandBuilder.updateCommands()
+        CommandBuilder.updateCommands()
         //如果使用UI模块,取消注释
 //        registerListeners(UIListener)
 
