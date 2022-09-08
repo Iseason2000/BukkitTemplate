@@ -3,6 +3,7 @@
 package top.iseason.bukkit.bukkittemplate.utils.bukkit
 
 
+import com.google.common.base.Enums
 import com.google.gson.Gson
 import io.github.bananapuncher714.nbteditor.NBTEditor
 import io.github.bananapuncher714.nbteditor.NBTEditor.NBTCompound
@@ -11,14 +12,17 @@ import org.bukkit.block.CreatureSpawner
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Axolotl
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.entity.TropicalFish
 import org.bukkit.inventory.BlockInventoryHolder
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.*
 import org.bukkit.map.MapView
+import org.bukkit.material.MaterialData
 import org.bukkit.material.SpawnEgg
 import org.bukkit.potion.*
 import org.bukkit.util.io.BukkitObjectInputStream
@@ -31,6 +35,7 @@ import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import kotlin.math.abs
 
+
 /**
  * 物品通用工具
  */
@@ -41,6 +46,7 @@ object ItemUtils {
         "Enchantments",
         "StoredEnchantments",
         "CustomPotionEffects",
+        "Decorations",
         "AttributeModifiers",
 //        "CanPlaceOn",
 //        "CanDestroy",
@@ -48,6 +54,7 @@ object ItemUtils {
         "SkullOwner",
         "Unbreakable",
         "Damage",
+        "Effects",
         "generation",
         "BlockEntityTag",
         "Fireworks",
@@ -60,6 +67,10 @@ object ItemUtils {
         "BucketVariantTag",
         "Charged",
         "ChargedProjectiles",
+        "Variant",
+        "LodestoneTracked",
+        "LodestoneDimension",
+        "LodestonePos",
 
         )
 
@@ -311,9 +322,9 @@ object ItemUtils {
             //老版本刷怪蛋 1.13 以下
             if (NBTEditor.getMinecraftVersion().lessThanOrEqualTo(NBTEditor.MinecraftVersion.v1_13)) {
                 if (NBTEditor.getMinecraftVersion().lessThanOrEqualTo(NBTEditor.MinecraftVersion.v1_11)) {
-                    if (data is SpawnEgg) yaml["spawn-egg"] = (data as SpawnEgg).spawnedType.getName()
+                    if (data is SpawnEgg) yaml["creature"] = (data as SpawnEgg).spawnedType.getName()
                 } else if (this is SpawnEggMeta) {
-                    yaml["spawn-egg"] = spawnedType.getName()
+                    yaml["creature"] = spawnedType.getName()
                 }
             }
             // 1.9以上的属性
@@ -355,12 +366,27 @@ object ItemUtils {
                         yaml["color"] = bodyColor.name
                         yaml["pattern-color"] = patternColor.name
                     }
-                    // 谜之炖菜
+                    // 迷之炖菜
                     is SuspiciousStewMeta -> {
                         yaml["effects"] = customEffects.map { it.toEffectString() }
                     }
                 }
             }
+        }
+        if (NBTEditor.getMinecraftVersion()
+                .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_16) && this is CompassMeta
+        ) {
+            val subSection: ConfigurationSection = yaml.createSection("lodestone")
+            subSection["tracked"] = isLodestoneTracked
+            if (hasLodestone()) {
+                val location = lodestone
+                subSection["location"] = location!!.toLocationString()
+            }
+        }
+        if (NBTEditor.getMinecraftVersion()
+                .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_17) && this is AxolotlBucketMeta
+        ) {
+            if (hasVariant()) yaml["color"] = variant.toString()
         }
         // 额外的NBt
         val toJson = NBTEditor.getNBTCompound(this, "tag").toJson()
@@ -546,6 +572,87 @@ object ItemUtils {
                         }
                     }
                 }
+            }
+            if (NBTEditor.getMinecraftVersion().lessThanOrEqualTo(NBTEditor.MinecraftVersion.v1_13)) {
+                if (NBTEditor.getMinecraftVersion().greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_11)) {
+                    if (this is SpawnEggMeta) {
+                        val creatureName = section.getString("creature")
+                        if (creatureName != null) {
+                            val creature = Enums.getIfPresent(
+                                EntityType::class.java, creatureName.uppercase()
+                            )
+                            if (creature.isPresent) spawnedType = creature.get()
+                        }
+                    }
+                } else {
+                    val data: MaterialData? = item.data
+                    if (data is SpawnEgg) {
+                        val creatureName = section.getString("creature")
+                        if (creatureName != null) {
+                            val creature = Enums.getIfPresent(
+                                EntityType::class.java, creatureName.uppercase()
+                            )
+                            if (creature.isPresent) data.spawnedType = creature.get()
+                            item.data = data
+                        }
+                    }
+                }
+            }
+            if (NBTEditor.getMinecraftVersion().lessThanOrEqualTo(NBTEditor.MinecraftVersion.v1_14)) {
+                if (this is CrossbowMeta) {
+                    val section1 = section.getConfigurationSection("projectiles")
+                    if (section1 != null) {
+                        for (projectiles in section1.getKeys(false)) {
+                            val projectile = fromSection(section1.getConfigurationSection(projectiles)!!)
+                            if (projectile != null) {
+                                addChargedProjectile(projectile)
+                            }
+                        }
+                    }
+                } else if (this is TropicalFishBucketMeta) {
+                    val color =
+                        Enums.getIfPresent(DyeColor::class.java, section.getString("color") ?: "").or(DyeColor.WHITE)
+                    val patternColor =
+                        Enums.getIfPresent(DyeColor::class.java, section.getString("pattern-color") ?: "")
+                            .or(DyeColor.WHITE)
+                    val pattern =
+                        Enums.getIfPresent(TropicalFish.Pattern::class.java, section.getString("pattern") ?: "")
+                            .or(TropicalFish.Pattern.BETTY)
+                    bodyColor = color
+                    setPatternColor(patternColor)
+                    setPattern(pattern)
+                }
+            }
+            if (NBTEditor.getMinecraftVersion()
+                    .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_15) && this is SuspiciousStewMeta
+            ) {
+                for (effects in section.getStringList("effects")) {
+                    val fromEffectString = fromEffectString(effects)
+                    if (fromEffectString != null)
+                        addCustomEffect(fromEffectString, true)
+                }
+            }
+            if (NBTEditor.getMinecraftVersion()
+                    .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_16) && this is CompassMeta
+            ) {
+
+                val lodestoneSection = section.getConfigurationSection("lodestone")
+                if (lodestoneSection != null) {
+                    isLodestoneTracked = lodestoneSection.getBoolean("tracked")
+                    lodestoneSection.getString("lodestone")?.let { lodestone = fromLocationString(it) }
+                }
+
+            }
+            if (NBTEditor.getMinecraftVersion()
+                    .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_17) && this is AxolotlBucketMeta
+            ) {
+                val variantStr = section.getString("color")
+                if (variantStr != null) {
+                    val variantE: Axolotl.Variant =
+                        Enums.getIfPresent(Axolotl.Variant::class.java, variantStr.uppercase())
+                            .or(Axolotl.Variant.BLUE)
+                    variant = variantE
+                }
 
             }
         }
@@ -688,6 +795,18 @@ object ItemUtils {
             split.getOrNull(0)?.toInt() ?: 0,
             split.getOrNull(0)?.toInt() ?: 0,
             split.getOrNull(0)?.toInt() ?: 0
+        )
+    }
+
+    private fun Location.toLocationString() = "${world},$x,$y,$z"
+    private fun fromLocationString(str: String): Location {
+        val split = str.trim().split(',')
+        val world = Bukkit.getWorld(split[0])
+        return Location(
+            world,
+            str.getOrNull(1)?.toDouble() ?: 0.0,
+            str.getOrNull(2)?.toDouble() ?: 0.0,
+            str.getOrNull(3)?.toDouble() ?: 0.0
         )
     }
 
