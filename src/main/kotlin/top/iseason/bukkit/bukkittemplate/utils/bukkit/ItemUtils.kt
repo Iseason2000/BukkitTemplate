@@ -8,6 +8,8 @@ import com.google.gson.Gson
 import io.github.bananapuncher714.nbteditor.NBTEditor
 import io.github.bananapuncher714.nbteditor.NBTEditor.NBTCompound
 import org.bukkit.*
+import org.bukkit.attribute.Attribute
+import org.bukkit.attribute.AttributeModifier
 import org.bukkit.block.CreatureSpawner
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -16,10 +18,7 @@ import org.bukkit.entity.Axolotl
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.TropicalFish
-import org.bukkit.inventory.BlockInventoryHolder
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.*
 import org.bukkit.inventory.meta.*
 import org.bukkit.map.MapView
 import org.bukkit.material.MaterialData
@@ -40,39 +39,6 @@ import kotlin.math.abs
  * 物品通用工具
  */
 object ItemUtils {
-
-    private val UNUSED_NBT = listOf(
-        "display",
-        "Enchantments",
-        "StoredEnchantments",
-        "CustomPotionEffects",
-        "Decorations",
-        "AttributeModifiers",
-//        "CanPlaceOn",
-//        "CanDestroy",
-        "HideFlags",
-        "SkullOwner",
-        "Unbreakable",
-        "Damage",
-        "Effects",
-        "generation",
-        "BlockEntityTag",
-        "Fireworks",
-        "Potion",
-        "map",
-        "author",
-        "pages",
-        "title",
-        "generation",
-        "BucketVariantTag",
-        "Charged",
-        "ChargedProjectiles",
-        "Variant",
-        "LodestoneTracked",
-        "LodestoneDimension",
-        "LodestonePos",
-
-        )
 
     /**
      * 修改ItemMeta
@@ -208,30 +174,50 @@ object ItemUtils {
         yaml["material"] = type.toString()
         if (amount != 1) yaml["amount"] = amount
         if (!hasItemMeta()) return yaml
+        // 额外的NBt
+        val toJson = NBTEditor.getNBTCompound(this, "tag").toJson()
+//        println(toJson)
+        val json = Gson().fromJson(toJson, Map::class.java).toMutableMap()
         with(itemMeta!!) {
             // 名字
             if (hasDisplayName()) yaml["name"] = displayName
             // lore
             if (hasLore()) yaml["lore"] = lore
             // 耐久
-            if (this is Damageable) if (damage != 0) yaml["damage"] = damage
+            if (this is Damageable) if (damage != 0) {
+                yaml["damage"] = damage
+                json.remove("Damage")
+            }
             // 附魔
-            if (hasEnchants()) yaml.createSection("enchants", enchants.mapKeys {
-                val namespacedKey = it.key.key
-                if (namespacedKey.namespace == NamespacedKey.MINECRAFT) namespacedKey.key else namespacedKey.toString()
-            })
+            if (hasEnchants()) {
+                yaml.createSection("enchants", enchants.mapKeys {
+                    val namespacedKey = it.key.key
+                    if (namespacedKey.namespace == NamespacedKey.MINECRAFT) namespacedKey.key else namespacedKey.toString()
+                })
+                json.remove("Enchantments")
+            }
             // flags
             val itemFlags = itemFlags
-            if (itemFlags.isNotEmpty()) yaml["flags"] = itemFlags.map { it.name }
+            if (itemFlags.isNotEmpty()) {
+                yaml["flags"] = itemFlags.map { it.name }
+                json.remove("HideFlags")
+            }
             when (this) {
                 // 附魔书附魔
-                is EnchantmentStorageMeta -> if (hasStoredEnchants()) yaml.createSection("stored-enchants",
-                    storedEnchants.mapKeys { it.key.key })
+                is EnchantmentStorageMeta ->
+                    if (hasStoredEnchants()) {
+                        yaml.createSection("stored-enchants",
+                            storedEnchants.mapKeys { it.key.key })
+                        json.remove("StoredEnchantments")
+                    }
+
+
                 // 头颅
                 is SkullMeta -> {
                     val texture = NBTEditor.getTexture(this@toSection)
                     if (texture != null) yaml["skull"] = texture
                     else if (hasOwner()) yaml["skull-owner"] = owner
+                    json.remove("SkullOwner")
                 }
                 // 皮革
                 is LeatherArmorMeta -> yaml["color"] = color.toRGBString()
@@ -247,6 +233,9 @@ object ItemUtils {
                         val potion = Potion.fromItemStack(this@toSection)
                         yaml["base-effect"] = "${potion.type.name},${potion.hasExtendedDuration()},${potion.isSplash}"
                     }
+                    json.remove("Potion")
+                    json.remove("CustomPotionEffects")
+                    json.remove("CustomPotionColor")
                 }
 
                 is BlockStateMeta -> {
@@ -268,8 +257,8 @@ object ItemUtils {
                                 }
                             }.toBase64()
                         }
-
                     }
+                    json.remove("BlockEntityTag")
                 }
 
                 is FireworkMeta -> {
@@ -283,6 +272,7 @@ object ItemUtils {
                         colors["base"] = effect.colors.map { it.toRGBString() }
                         colors["fade"] = effect.fadeColors.map { it.toRGBString() }
                     }
+                    json.remove("Fireworks")
                 }
 
                 is BookMeta -> {
@@ -293,6 +283,10 @@ object ItemUtils {
                         bookInfo["generation"] = generation?.name
                     }
                     bookInfo["pages"] = pages
+                    json.remove("generation")
+                    json.remove("author")
+                    json.remove("title")
+                    json.remove("pages")
                 }
 
                 is MapMeta -> {
@@ -316,6 +310,8 @@ object ItemUtils {
                             view["unlimited-tracking"] = mapView.isUnlimitedTracking
                         }
                     }
+                    json.remove("map")
+                    json.remove("Decorations")
                 }
 
             }
@@ -326,6 +322,7 @@ object ItemUtils {
                 } else if (this is SpawnEggMeta) {
                     yaml["creature"] = spawnedType.getName()
                 }
+                json.remove("EntityTag")
             }
             // 1.9以上的属性
             if (NBTEditor.getMinecraftVersion()
@@ -333,42 +330,64 @@ object ItemUtils {
             ) {
                 val mutableMapOf = mutableMapOf<String, Any>()
                 attributeModifiers!!.forEach { t, u ->
-                    val serialize = u.serialize()
+                    val serialize = mutableMapOf<String, String>()
+                    serialize["attribute"] = t.name
+                    serialize["uuid"] = u.uniqueId.toString()
                     serialize["operation"] = u.operation.name
-                    mutableMapOf[t.name] = serialize
+                    serialize["amount"] = u.amount.toString()
+                    if (u.slot != null) serialize["slot"] = u.slot!!.name
+                    mutableMapOf[u.name] = serialize
                 }
-                yaml.createSection("enchants", mutableMapOf)
+                yaml.createSection("attributes", mutableMapOf)
+                json.remove("AttributeModifiers")
             }
             // 1.11以上
             if (NBTEditor.getMinecraftVersion().greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_11)) {
                 // 无法破坏
-                if (isUnbreakable) yaml["unbreakable"] = true
+                if (isUnbreakable) {
+                    yaml["unbreakable"] = true
+                    json.remove("Unbreakable")
+                }
                 // 旗帜
-                if (this is BannerMeta) yaml.createSection(
-                    "banner",
-                    patterns.associate { it.pattern.name to it.color.name })
+                if (this is BannerMeta) {
+                    yaml.createSection(
+                        "banner",
+                        patterns.associate { it.pattern.name to it.color.name })
+                    json.remove("Patterns")
+
+                }
+
             }
             // 1.14 以上
             if (NBTEditor.getMinecraftVersion().greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_14)) {
                 // 模型
-                if (hasCustomModelData()) yaml["custom-model-data"] = customModelData
+                if (hasCustomModelData()) {
+                    yaml["custom-model-data"] = customModelData
+                    json.remove("custom_model_data")
+                }
                 when (this) {
                     //弩
                     is CrossbowMeta -> {
-                        if (chargedProjectiles.isNotEmpty())
+                        if (chargedProjectiles.isNotEmpty()) {
                             for ((i, projectiles) in chargedProjectiles.withIndex()) {
                                 yaml["projectiles.$i"] = projectiles.toSection()
                             }
+                            json.remove("ChargedProjectiles")
+                            json.remove("Charged")
+                        }
                     }
                     // 热带鱼桶
                     is TropicalFishBucketMeta -> {
                         yaml["pattern"] = pattern.name
                         yaml["color"] = bodyColor.name
                         yaml["pattern-color"] = patternColor.name
+                        json.remove("BucketVariantTag")
+                        json.remove("EntityTag")
                     }
                     // 迷之炖菜
                     is SuspiciousStewMeta -> {
                         yaml["effects"] = customEffects.map { it.toEffectString() }
+                        json.remove("Effects")
                     }
                 }
             }
@@ -378,23 +397,22 @@ object ItemUtils {
         ) {
             val subSection: ConfigurationSection = yaml.createSection("lodestone")
             subSection["tracked"] = isLodestoneTracked
+            json.remove("LodestoneTracked")
             if (hasLodestone()) {
                 val location = lodestone
                 subSection["location"] = location!!.toLocationString()
             }
+            json.remove("LodestoneDimension")
+            json.remove("LodestonePos")
         }
         if (NBTEditor.getMinecraftVersion()
                 .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_17) && this is AxolotlBucketMeta
         ) {
             if (hasVariant()) yaml["color"] = variant.toString()
+            json.remove("Variant")
         }
-        // 额外的NBt
-        val toJson = NBTEditor.getNBTCompound(this, "tag").toJson()
-//        println(toJson)
-        val json = Gson().fromJson(toJson, Map::class.java).toMutableMap()
-        for (s in UNUSED_NBT) {
-            json.remove(s)
-        }
+        json.remove("display")
+        //写入数据
         if (json.isNotEmpty()) {
             fun deepFor(map: Map<*, *>, config: ConfigurationSection) {
                 for ((k, v) in map) {
@@ -596,6 +614,28 @@ object ItemUtils {
                             item.data = data
                         }
                     }
+                }
+            }
+            if (NBTEditor.getMinecraftVersion().greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_9)
+            ) {
+                val section2 = section.getConfigurationSection("attributes")
+                section2?.getKeys(false)?.forEach { name ->
+                    val section3 = section2.getConfigurationSection(name)!!
+                    val attribute = runCatching {
+                        Attribute.valueOf(
+                            section3.getString("attribute")!!.uppercase()
+                        )
+                    }.getOrElse { return@forEach }
+                    val operation = runCatching {
+                        AttributeModifier.Operation.valueOf(section3.getString("operation")!!.uppercase())
+                    }.getOrElse { return@forEach }
+                    val amount = section3.getDouble("amount")
+                    val slot =
+                        kotlin.runCatching { EquipmentSlot.valueOf(section3.getString("slot")!!.uppercase()) }
+                            .getOrNull()
+                    val uuid =
+                        runCatching { UUID.fromString(section3.getString("uuid")!!) }.getOrElse { UUID.randomUUID() }
+                    addAttributeModifier(attribute, AttributeModifier(uuid, name, amount, operation, slot))
                 }
             }
             if (NBTEditor.getMinecraftVersion().lessThanOrEqualTo(NBTEditor.MinecraftVersion.v1_14)) {
