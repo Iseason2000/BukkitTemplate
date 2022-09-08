@@ -161,7 +161,7 @@ object TestNode : CommandNode(
         onExecute = {
             val player = getParam<Player>(0)
             val money = getOptionalParam<Double>(1)
-            player.sendMessage(money.toString())
+            player.sendColorMessage(money.toString())
         }
     }
 }
