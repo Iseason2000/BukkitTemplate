@@ -159,10 +159,6 @@ open class CommandNode(
         args: Array<String>
     ): List<String>? {
         require(parent == null) { "只有根节点才能使用" }
-        //200毫秒冷却，防止
-        if (coolDown.check(sender, 200)) {
-            return emptyList()
-        }
         var node: CommandNode = this
         // 不完整参数
         var incomplete = ""

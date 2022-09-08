@@ -40,7 +40,7 @@ object EventUtils {
         Bukkit.getPluginManager()
             .registerEvent(
                 T::class.java, tempListener, priority,
-                tempListener.executor!!, BukkitTemplate.getPlugin(), ignoreCancelled
+                tempListener.executor, BukkitTemplate.getPlugin(), ignoreCancelled
             )
         return tempListener
     }

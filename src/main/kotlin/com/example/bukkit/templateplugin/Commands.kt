@@ -97,7 +97,6 @@ fun command2() {
         val param2 = getOptionalParam<Double>(1)
         it.sendColorMessage(param1)
         it.sendColorMessage(param2)
-        true
     }
 
 }
@@ -128,7 +127,6 @@ fun openUICommand() {
             (it as Player).openUI<MyUI> {
                 title = it.displayName
             }
-            true
         }
         val node = node("MultiUI")
         node.isPlayerOnly = true
@@ -164,7 +162,6 @@ object TestNode : CommandNode(
             val player = getParam<Player>(0)
             val money = getOptionalParam<Double>(1)
             player.sendMessage(money.toString())
-            true
         }
     }
 }
