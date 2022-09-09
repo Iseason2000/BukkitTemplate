@@ -3,7 +3,6 @@ plugins {
 }
 
 group = "top.iseason.bukkit.bukkittemplate"
-version = "1.0"
 
 val exposedVersion: String by rootProject
 
@@ -24,5 +23,8 @@ tasks {
         options.isDeprecation = true
         options.isWarnings = false
         options.isVerbose = false
+    }
+    build {
+        dependsOn(named("shadowJar"))
     }
 }

@@ -30,7 +30,6 @@ object TemplatePlugin : KotlinPlugin() {
 //            DependencyDownloader().addRepositories("https://maven.aliyun.com/repository/public")
 //                .downloadDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 //        }
-
         info("&a插件已启用! v${javaPlugin.description.version}")
     }
 
