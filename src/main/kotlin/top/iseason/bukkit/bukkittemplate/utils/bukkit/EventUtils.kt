@@ -29,23 +29,35 @@ object EventUtils {
     inline fun <reified T : Event> listen(
         priority: EventPriority = EventPriority.NORMAL,
         ignoreCancelled: Boolean = true,
-        crossinline action: T.(Listener) -> Unit
+        noinline action: T.(Listener) -> Unit
     ): TempListener {
-        val tempListener = TempListener()
-        tempListener.executor = EventExecutor { _, event ->
-            runCatching {
-                action.invoke(event as T, tempListener)
-            }.getOrElse { it.printStackTrace() }
-        }
-        Bukkit.getPluginManager()
-            .registerEvent(
-                T::class.java, tempListener, priority,
-                tempListener.executor, BukkitTemplate.getPlugin(), ignoreCancelled
-            )
-        return tempListener
+        return createListener(T::class.java, priority, ignoreCancelled, action)
     }
 
     class TempListener : Listener {
         lateinit var executor: EventExecutor
+    }
+
+    /**
+     * 根据class创建事件监听器
+     */
+    fun <E : Event> createListener(
+        clazz: Class<E>,
+        priority: EventPriority = EventPriority.NORMAL,
+        ignoreCancelled: Boolean = true,
+        action: E.(Listener) -> Unit
+    ): TempListener {
+        val tempListener = TempListener()
+        tempListener.executor = EventExecutor { _, event ->
+            runCatching {
+                action.invoke(event as E, tempListener)
+            }.getOrElse { it.printStackTrace() }
+        }
+        Bukkit.getPluginManager()
+            .registerEvent(
+                clazz, tempListener, priority,
+                tempListener.executor, BukkitTemplate.getPlugin(), ignoreCancelled
+            )
+        return tempListener
     }
 }

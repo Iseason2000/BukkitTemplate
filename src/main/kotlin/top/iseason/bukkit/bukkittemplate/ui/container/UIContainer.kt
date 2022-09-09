@@ -11,7 +11,7 @@ open class UIContainer(
     /**
      * 储存多页数组
      */
-    protected val pages: Array<Pageable?>
+    protected val pages: Array<BaseUI?>
 ) {
 
     // 页码
@@ -30,9 +30,8 @@ open class UIContainer(
      */
     open fun getCurrentPage(player: HumanEntity): BaseUI? {
         val index = viewers[player] ?: 0
-        val pageable = pages[index] ?: return null
-        pageable.container = this
-        val ui = pageable.getUI()
+        val ui = pages[index] ?: return null
+        ui.container = this
         if (!ui.hasBuilt) {
             ui.build()
         }
@@ -88,10 +87,9 @@ open class UIContainer(
      */
     open fun clone(): UIContainer {
         val copyOf = pages.copyOf()
-        copyOf.forEachIndexed { index, pageable ->
-            if (pageable == null) return@forEachIndexed
-            val clone = pageable.getUI().clone()
-            copyOf[index] = clone
+        copyOf.forEachIndexed { index, ui ->
+            if (ui == null) return@forEachIndexed
+            copyOf[index] = ui.clone()
         }
         return UIContainer(copyOf).also { it.onPageChanged = onPageChanged }
     }

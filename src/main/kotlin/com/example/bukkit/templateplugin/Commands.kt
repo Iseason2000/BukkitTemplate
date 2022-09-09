@@ -19,14 +19,14 @@ fun command1() {
             description = "玩家药水控制"
             default = PermissionDefault.OP
             isPlayerOnly = true
-            params = arrayOf(
-                Param("<操作>", listOf("add", "set", "remove")),
-                Param("<药水类型>", ParamSuggestCache.potionTypes),
-                Param("[玩家]", suggestRuntime = ParamSuggestCache.playerParam),
-                Param("[等级]", listOf("0", "1", "2", "3", "4")),
-                Param("[秒]", listOf("1", "5", "10"))
-            )
-            onExecute = {
+
+            param("<操作>", suggest = listOf("add", "set", "remove"))
+            param("<药水类型>", suggest = ParamSuggestCache.potionTypes)
+            param("[玩家]", suggestRuntime = ParamSuggestCache.playerParam)
+            param("[等级]", suggest = listOf("0", "1", "2", "3", "4"))
+            param("[秒]", suggest = listOf("1", "5", "10"))
+
+            executor {
                 val operation = getParam<String>(0)
                 if (operation !in setOf("add", "set", "remove"))
                     throw ParmaException("&7参数 &c${operation}&7 不是一个有效的操作,支持的有: add、set、remove")
@@ -88,7 +88,7 @@ fun command2() {
     node.default = PermissionDefault.OP
     node.async = true
     node.description = "测试命令2"
-    node.params = arrayOf(
+    node.params = listOf(
         Param("<玩家>", suggestRuntime = ParamSuggestCache.playerParam),
         Param("[数字]", listOf("1", "5", "10", "-5", "-1"))
     )
@@ -152,7 +152,7 @@ object TestNode : CommandNode(
     default = PermissionDefault.OP,
     async = true,
     description = "测试命令-单独类",
-    params = arrayOf(
+    params = listOf(
         Param("<玩家>", suggestRuntime = ParamSuggestCache.playerParam),
         Param("[金钱]", listOf("1", "5", "10", "-5", "-1"))
     )

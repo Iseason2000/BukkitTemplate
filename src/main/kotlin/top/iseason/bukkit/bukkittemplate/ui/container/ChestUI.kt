@@ -39,5 +39,4 @@ open class ChestUI(
 
     override var container: UIContainer? = null
 
-    override fun getUI(): BaseUI = this
 }

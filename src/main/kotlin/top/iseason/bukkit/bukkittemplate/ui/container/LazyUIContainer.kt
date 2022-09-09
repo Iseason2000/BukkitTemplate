@@ -3,10 +3,10 @@ package top.iseason.bukkit.bukkittemplate.ui.container
 import org.bukkit.entity.HumanEntity
 
 /**
- * 多页UI，采用懒加载模式，当UI显示时才初始化,UI应该具有空构造函数
+ * 多页UI，采用懒加载模式，当UI显示时才初始化
  */
 open class LazyUIContainer(
-    protected val pageTypes: List<Class<out Pageable>>,
+    protected val pageTypes: List<Class<out BaseUI>>,
     /**
      * 是否启用缓存，如果为false则每人的每个UI都是新对象
      */
@@ -14,9 +14,18 @@ open class LazyUIContainer(
 ) : UIContainer(arrayOfNulls(pageTypes.size)) {
 
     /**
-     * 当新的UI被构建时，可以对UI进行修改的回调函数
+     * 当页面被第一次加载时，将由class生成对象的方法
      */
-    open var onUIBuild: (BaseUI.(HumanEntity) -> Unit)? = null
+    open fun onInit(clazz: Class<out BaseUI>): BaseUI {
+        return clazz.newInstance()
+    }
+
+    /**
+     * 当新的UI被构建前，可以对UI进行修改的回调函数
+     */
+    open fun onUIBuild(ui: BaseUI, player: HumanEntity) {
+
+    }
 
     /**
      * 获取当前的UI，如果不存在则创建一个
@@ -24,10 +33,11 @@ open class LazyUIContainer(
     override fun getCurrentPage(player: HumanEntity): BaseUI {
         val index = viewers[player] ?: 0
         if (!allowCache || pages[index] == null) {
-            val pageable = pageTypes[index].newInstance() as Pageable
-            pageable.getUI().apply { onUIBuild?.invoke(this, player) }.build()
-            pageable.container = this
-            pages[index] = pageable
+            val ui = onInit(pageTypes[index])
+            onUIBuild(ui, player)
+            ui.build()
+            ui.container = this
+            pages[index] = ui
         }
         return super.getCurrentPage(player)!!
     }

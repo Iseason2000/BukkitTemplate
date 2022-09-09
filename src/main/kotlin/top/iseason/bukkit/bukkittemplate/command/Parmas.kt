@@ -12,7 +12,7 @@ class Params(val params: Array<String>, val node: CommandNode) {
      */
     inline fun <reified T> getOptionalParam(index: Int): T? {
         val param = params.getOrNull(index) ?: return null
-        return TypeParam.getOptionalParam<T>(param)
+        return TypeParam.getOptionalTypedParam<T>(T::class.java, param)
     }
 
     /**
@@ -20,12 +20,9 @@ class Params(val params: Array<String>, val node: CommandNode) {
      * @param index 参数的位置
      */
     inline fun <reified T> getParam(index: Int): T {
-        val param = params.getOrNull(index) ?: throw ParmaException(
-            "&c参数 &6${
-                node.params.getOrNull(index)?.placeholder ?: "位置 $index"
-            } &c不存在!"
-        )
-        return TypeParam.getParam(param)
+        val param = params.getOrNull(index)
+            ?: throw ParmaException("&c参数 &6${node.params.getOrNull(index)?.placeholder ?: "位置 $index"} &c不存在!")
+        return TypeParam.getTypedParam(T::class.java, param)
     }
 }
 
@@ -40,11 +37,11 @@ open class Param(
     /**
      * 建议，存在运行时建议时不会使用
      */
-    val suggest: Collection<String>? = null,
+    var suggest: Collection<String>? = null,
     /**
      * 运行时建议
      */
-    val suggestRuntime: (CommandSender.() -> Collection<String>)? = null
+    var suggestRuntime: (CommandSender.() -> Collection<String>)? = null
 )
 
 /**

@@ -67,5 +67,5 @@ object EntityUtils {
     /**
      * 序列化为json
      */
-    fun Entity.toJson() = NBTEditor.getNBTCompound(this).toJson()
+    fun Entity.toJson(): String = NBTEditor.getNBTCompound(this).toJson()
 }

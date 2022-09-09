@@ -1,25 +1,24 @@
 package top.iseason.bukkit.bukkittemplate.command
 
+import com.google.common.base.Enums
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
 import java.util.*
-import kotlin.reflect.KClass
 
 @Suppress("unused")
 open class TypeParam<T : Any>(
-    val type: KClass<T>,
+    val type: Class<T>,
     var errorMessage: (String) -> String = { "Param ${it}is not exist" },
-    val onCast: TypeParam<*>.(String) -> T?
+    val onCast: (String) -> T?
 ) {
     init {
         addTypeParam(this)
     }
 
     companion object {
-        val typeParams = mutableMapOf<KClass<*>, TypeParam<*>>()
+        val typeParams = mutableMapOf<Class<*>, TypeParam<*>>()
 
         init {
             setDefaultParams()
@@ -29,20 +28,24 @@ open class TypeParam<T : Any>(
             typeParams[typeParam.type] = typeParam
         }
 
-        fun getTypeParam(clazz: KClass<*>) = typeParams[clazz]
+        fun getTypeParam(clazz: Class<*>) = typeParams[clazz]
 
-        fun removeType(type: KClass<*>) = typeParams.remove(type)
+        fun removeType(type: Class<*>) = typeParams.remove(type)
 
         // 可选参数
-        inline fun <reified T> getOptionalParam(paramStr: String): T? {
-            val typeParam = typeParams[T::class] ?: throw ParmaException("Param Type is not exist!")
-            return typeParam.onCast(typeParam, paramStr) as? T
+        fun <T> getOptionalTypedParam(clazz: Class<*>, paramStr: String): T? {
+            val typeParam = typeParams[clazz]
+            //匹配所有枚举
+            if (typeParam == null && clazz.isEnum) {
+                return Enums.getIfPresent(clazz as Class<out Enum<*>>, paramStr.uppercase()).orNull() as? T
+            }
+            if (typeParam == null) throw ParmaException("Param Type is not exist!")
+            return typeParam.onCast(paramStr) as? T
         }
 
         //必须的参数
-        inline fun <reified T> getParam(paramStr: String): T {
-            val typeParam = typeParams[T::class] ?: throw ParmaException("Param Type is not exist!")
-            return typeParam.onCast(typeParam, paramStr) as? T ?: throw ParmaException(paramStr, typeParam)
+        fun <T> getTypedParam(clazz: Class<*>, paramStr: String): T {
+            return getOptionalTypedParam(clazz, paramStr) ?: throw ParmaException(paramStr, typeParams[clazz])
         }
     }
 }
@@ -51,52 +54,33 @@ open class TypeParam<T : Any>(
  * 默认提供的参数
  */
 private fun setDefaultParams() {
-    TypeParam(Player::class, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
-        var player = Bukkit.getPlayerExact(it)
-        if (player == null && it.length == 36) {
-            player = try {
-                Bukkit.getPlayer(UUID.fromString(it))
-            } catch (e: IllegalArgumentException) {
-                null
-            }
-        }
-        player
+    TypeParam(Player::class.java, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
+        if (it.length == 36) {
+            runCatching { Bukkit.getPlayer(UUID.fromString(it)) }.getOrNull()
+        } else Bukkit.getPlayerExact(it)
     }
-    TypeParam(OfflinePlayer::class, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
+    TypeParam(OfflinePlayer::class.java, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
         var player: OfflinePlayer? = Bukkit.getOfflinePlayer(it)
         if (!player!!.hasPlayedBefore()) {
-            player = try {
+            player = runCatching {
                 val offlinePlayer = Bukkit.getOfflinePlayer(UUID.fromString(it))
                 if (offlinePlayer.hasPlayedBefore()) offlinePlayer else null
-            } catch (e: IllegalArgumentException) {
-                null
-            }
+            }.getOrNull()
         }
         player
     }
-    TypeParam(Int::class, errorMessage = { "&c${it} &7不是一个有效的整数" }) {
-        try {
-            it.toInt()
-        } catch (e: NumberFormatException) {
-            null
-        }
+    TypeParam(Int::class.java, errorMessage = { "&c${it} &7不是一个有效的整数" }) {
+        runCatching { it.toInt() }.getOrNull()
     }
-    TypeParam(Double::class, errorMessage = { "&c${it} &7不是一个有效的小数" }) {
-        try {
-            it.toDouble()
-        } catch (e: NumberFormatException) {
-            null
-        }
+    TypeParam(Double::class.java, errorMessage = { "&c${it} &7不是一个有效的小数" }) {
+        runCatching { it.toDouble() }.getOrNull()
     }
-    TypeParam(String::class) { it }
+    TypeParam(String::class.java) { it }
     TypeParam(
-        PotionEffectType::class,
+        PotionEffectType::class.java,
         { "&c${it} &7不是一个有效的药水种类" }
     ) {
         PotionEffectType.getByName(it)
-    }
-    TypeParam(Material::class) {
-        Material.getMaterial(it.uppercase())
     }
 
 }

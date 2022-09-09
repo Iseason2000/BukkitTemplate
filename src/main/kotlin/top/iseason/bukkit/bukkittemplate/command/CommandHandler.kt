@@ -1,6 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.command
 
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginCommand
 import org.bukkit.command.SimpleCommandMap
 import org.bukkit.permissions.Permission
@@ -147,4 +148,22 @@ fun node(name: String, modify: (CommandNode.() -> Unit)? = null): CommandNode {
 fun CommandNode.node(node: CommandNode): CommandNode {
     this.addSubNode(node)
     return node
+}
+
+/**
+ * 设置命令执行者
+ */
+fun CommandNode.executor(onExecute: (Params.(sender: CommandSender) -> Unit)? = null) {
+    this.onExecute = onExecute
+}
+
+/**
+ * 添加一个参数
+ */
+fun CommandNode.param(
+    placeholder: String,
+    suggest: Collection<String>? = null,
+    suggestRuntime: (CommandSender.() -> Collection<String>)? = null
+) {
+    params = params.toMutableList().apply { add(Param(placeholder, suggest, suggestRuntime)) }
 }

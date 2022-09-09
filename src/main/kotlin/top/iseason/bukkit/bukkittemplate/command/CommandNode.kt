@@ -41,7 +41,7 @@ open class CommandNode(
     /**
      * 参数列表
      */
-    var params: Array<Param> = emptyArray(),
+    var params: List<Param> = listOf(),
     /**
      * 是否仅玩家执行
      */
