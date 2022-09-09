@@ -12,7 +12,7 @@ import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
 import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
 
-object MyUISer : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L), Pageable {
+class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L), Pageable {
 
     init {
         setBackGround(Icon(ItemStack(Material.STONE), 0))
@@ -30,17 +30,16 @@ object MyUISer : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 50
         .inputFilter {
             it.type == Material.APPLE
         }.onInput {
-            baseInventory?.viewers?.lastOrNull()?.sendColorMessage("&a 放入了苹果")
+            getViewers().lastOrNull()?.sendColorMessage("&a 放入了苹果")
             info("输入了苹果")
             messageButton.displayName = "&a强化苹果".toColor()
             messageButton.onClicked = {
                 it.whoClicked.sendColorMessage("&a 你强化了苹果")
             }
         }.outputFilter {
-            baseInventory?.viewers?.lastOrNull()?.sendColorMessage("无法输出")
+            getViewers().lastOrNull()?.sendColorMessage("无法输出")
             false
         }.setup()
 
     override var container: UIContainer? = null
-    override fun getUI() = this
 }

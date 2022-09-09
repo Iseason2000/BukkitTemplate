@@ -54,7 +54,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
     var isConnected = false
         private set
     private var isConnecting = false
-    public lateinit var connection: Database
+    lateinit var connection: Database
         private set
     private var ds: HikariDataSource? = null
 
