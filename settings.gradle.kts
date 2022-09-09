@@ -11,5 +11,4 @@ pluginManagement {
         id("com.github.johnrengelman.shadow") version shadowJarVersion
     }
 }
-include("core")
-include("plugin")
+include("core", "plugin")

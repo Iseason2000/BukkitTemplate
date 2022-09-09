@@ -8,7 +8,14 @@ repositories {
 
 dependencies {
     api(project(":core"))
+//    反射库
+//    compileOnly(kotlin("reflect"))
 
+//    协程库
+//    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+
+    // 本地依赖放在libs文件夹内
+    compileOnly(fileTree("libs") { include("*.jar") })
     compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
 }
 

@@ -47,22 +47,16 @@ subprojects {
     dependencies {
         //基础库
         compileOnly(kotlin("stdlib-jdk8"))
-//    反射库
-//    compileOnly(kotlin("reflect"))
-
-//    协程库
-//    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
-        // 本地依赖放在libs文件夹内
-        compileOnly(fileTree("libs") { include("*.jar") })
     }
-    tasks.withType<JavaCompile> {
-        options.encoding = "UTF-8"
-    }
-    configure<JavaPluginConvention> {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    tasks {
+        compileJava {
+            options.encoding = "UTF-8"
+            sourceCompatibility = "1.8"
+            targetCompatibility = "1.8"
+        }
     }
 }
+
 repositories {
 //    阿里的服务器速度快一点
     maven {
@@ -71,11 +65,6 @@ repositories {
     }
     google()
     mavenCentral()
-    maven {
-        name = "jitpack"
-        url = uri("https://jitpack.io")
-    }
-    mavenLocal()
 }
 dependencies {
     //基础库
