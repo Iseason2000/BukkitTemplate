@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
 import top.iseason.bukkit.bukkittemplate.DisableHook
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
@@ -301,11 +302,21 @@ fun InventoryClickEvent.ioEvent() {
             if (rawSlot in 0 until inventory.size) {
                 //处理占位符
                 val bottomInventory = view.bottomInventory
-                val item = bottomInventory.getItem(hotbarButton)
-                inputItem = if (item != null)
-                    Pair(rawSlot, item.clone())
-                else null
-                outputItem = if (currentItem != null) Pair(slot, currentItem!!.clone()) else null
+                // 按F
+                if (hotbarButton == -1) {
+                    outputItem = if (currentItem != null) Pair(slot, currentItem!!.clone()) else null
+                    val playerInventory = bottomInventory as PlayerInventory
+                    val item = playerInventory.getItem(playerInventory.size - 1)
+                    inputItem = if (item != null) {
+                        Pair(slot, item.clone())
+                    } else null
+                } else {
+                    val item = bottomInventory.getItem(hotbarButton)
+                    inputItem = if (item != null)
+                        Pair(rawSlot, item.clone())
+                    else null
+                    outputItem = if (currentItem != null) Pair(slot, currentItem!!.clone()) else null
+                }
             } else {
                 inputItem = null
                 outputItem = null
