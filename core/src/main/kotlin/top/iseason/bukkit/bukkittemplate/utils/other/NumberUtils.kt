@@ -1,10 +1,12 @@
 @file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
-package top.iseason.bukkit.bukkittemplate.utils
+package top.iseason.bukkit.bukkittemplate.utils.other
 
 import kotlin.math.abs
 
-
+/**
+ * 数字工具
+ */
 object NumberUtils {
     private val romanMap: MutableMap<Char, Int> = hashMapOf(
         'I' to 1,

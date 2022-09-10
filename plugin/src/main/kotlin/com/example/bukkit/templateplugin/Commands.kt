@@ -9,7 +9,7 @@ import org.bukkit.potion.PotionEffectType
 import top.iseason.bukkit.bukkittemplate.command.*
 import top.iseason.bukkit.bukkittemplate.ui.openPageableUI
 import top.iseason.bukkit.bukkittemplate.ui.openUI
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
 
 fun command1() {
     command("playerutil") {

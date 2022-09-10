@@ -1,7 +1,7 @@
 package top.iseason.bukkit.bukkittemplate.ui.container
 
 import org.bukkit.entity.HumanEntity
-import top.iseason.bukkit.bukkittemplate.utils.submit
+import top.iseason.bukkit.bukkittemplate.utils.other.submit
 
 /**
  * 多页UI

@@ -3,7 +3,6 @@ package top.iseason.bukkit.bukkittemplate;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
-import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig;
 import top.iseason.bukkit.bukkittemplate.dependency.DependencyManager;
 
 import java.io.File;
@@ -18,12 +17,18 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.jar.JarFile;
 
+/**
+ * bukkit插件主类/入口
+ */
 public class BukkitTemplate extends JavaPlugin {
 
     private static List<Class<?>> classes;
     private static KotlinPlugin ktPlugin;
     private static BukkitTemplate plugin = null;
 
+    /**
+     * 构造方法，负责下载/添加依赖，并启动插件
+     */
     public BukkitTemplate() {
         plugin = this;
         //防止卡主线程
@@ -55,24 +60,6 @@ public class BukkitTemplate extends JavaPlugin {
             }
         }
         throw new RuntimeException("can not find plugin instance! you need a object class implement KotlinPlugin");
-    }
-
-    /**
-     * 唤醒所有继承SimpleYAMLConfig 的 object类
-     */
-    public static void loadConfigs() {
-        for (Class<?> aClass : classes) {
-            if (SimpleYAMLConfig.class.isAssignableFrom(aClass)) {
-                try {
-                    Field instance = aClass.getDeclaredField("INSTANCE");
-                    instance.setAccessible(true);
-                    SimpleYAMLConfig config = (SimpleYAMLConfig) instance.get(null);
-                    config.load(false);
-                    instance.setAccessible(false);
-                } catch (NoSuchFieldException | IllegalAccessException ignored) {
-                }
-            }
-        }
     }
 
     /**

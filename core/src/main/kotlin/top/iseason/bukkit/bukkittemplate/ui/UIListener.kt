@@ -19,10 +19,10 @@ import top.iseason.bukkit.bukkittemplate.ui.container.BaseUI
 import top.iseason.bukkit.bukkittemplate.ui.slot.ClickSlot
 import top.iseason.bukkit.bukkittemplate.ui.slot.IOSlot
 import top.iseason.bukkit.bukkittemplate.ui.slot.merge
-import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.checkAir
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.subtract
-import top.iseason.bukkit.bukkittemplate.utils.submit
+import top.iseason.bukkit.bukkittemplate.utils.other.WeakCoolDown
+import top.iseason.bukkit.bukkittemplate.utils.other.submit
 
 /**
  * 负责所有UI的监听动作

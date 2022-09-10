@@ -1,6 +1,6 @@
 @file:Suppress("UNUSED", "MemberVisibilityCanBePrivate")
 
-package top.iseason.bukkit.bukkittemplate.utils
+package top.iseason.bukkit.bukkittemplate.utils.bukkit
 
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
@@ -9,6 +9,9 @@ import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+/**
+ * 消息工具
+ */
 object MessageUtils {
     private val HEX_PATTERN = Pattern.compile("#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})")
     private val hexColorSupport = runCatching {

@@ -62,7 +62,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
         DisableHook.addTask { closeDB() }
     }
 
-    override val onLoaded: (ConfigurationSection.() -> Unit) = {
+    override fun onLoaded(section: ConfigurationSection) {
         isAutoUpdate = autoReload
         reConnected()
         if (tables.isNotEmpty()) {

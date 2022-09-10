@@ -1,6 +1,6 @@
 @file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
-package top.iseason.bukkit.bukkittemplate.utils
+package top.iseason.bukkit.bukkittemplate.utils.other
 
 import java.util.*
 

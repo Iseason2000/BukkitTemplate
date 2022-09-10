@@ -5,6 +5,9 @@ import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.potion.PotionEffectType
 
+/**
+ * 一个命令节点的参数
+ */
 class Params(val params: Array<String>, val node: CommandNode) {
     /**
      * 获取指定参数类型的参数,不存在返回null
@@ -12,7 +15,7 @@ class Params(val params: Array<String>, val node: CommandNode) {
      */
     inline fun <reified T> getOptionalParam(index: Int): T? {
         val param = params.getOrNull(index) ?: return null
-        return TypeParam.getOptionalTypedParam<T>(T::class.java, param)
+        return ParamAdopter.getOptionalTypedParam<T>(T::class.java, param)
     }
 
     /**
@@ -22,7 +25,7 @@ class Params(val params: Array<String>, val node: CommandNode) {
     inline fun <reified T> getParam(index: Int): T {
         val param = params.getOrNull(index)
             ?: throw ParmaException("&c参数 &6${node.params.getOrNull(index)?.placeholder ?: "位置 $index"} &c不存在!")
-        return TypeParam.getTypedParam(T::class.java, param)
+        return ParamAdopter.getTypedParam(T::class.java, param)
     }
 }
 
@@ -35,11 +38,11 @@ open class Param(
      */
     val placeholder: String,
     /**
-     * 建议，存在运行时建议时不会使用
+     * 参数建议，存在运行时建议时不会使用
      */
     var suggest: Collection<String>? = null,
     /**
-     * 运行时建议
+     * 参数建议，运行时生成的建议，优先级高于 suggest
      */
     var suggestRuntime: (CommandSender.() -> Collection<String>)? = null
 )
@@ -48,10 +51,21 @@ open class Param(
  * 参数建议缓存，避免无所谓的内存消耗
  */
 object ParamSuggestCache {
+    /**
+     * 建议在线玩家名称
+     */
     val playerParam: CommandSender.() -> Collection<String> = { Bukkit.getOnlinePlayers().map { it.name } }
+
+    /**
+     * 建议药水效果名
+     */
     val potionTypes = PotionEffectType.values().filterNotNull().map {
         it.name.lowercase()
     }
+
+    /**
+     * 建议物品材质名
+     */
     val materialTypes = Material.values().map {
         it.name.lowercase()
     }

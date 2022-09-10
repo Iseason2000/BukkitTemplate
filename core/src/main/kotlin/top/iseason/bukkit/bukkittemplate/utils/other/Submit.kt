@@ -1,4 +1,4 @@
-package top.iseason.bukkit.bukkittemplate.utils
+package top.iseason.bukkit.bukkittemplate.utils.other
 
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitTask

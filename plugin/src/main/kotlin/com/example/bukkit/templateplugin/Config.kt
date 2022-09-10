@@ -26,11 +26,13 @@ object Config : SimpleYAMLConfig() {
     @Key
     var map = mutableMapOf("test" to mutableMapOf("1" to mutableMapOf('1' to 2), "2" to "2"), "test2" to 2)
 
-    override val onLoaded: ConfigurationSection.() -> Unit = {
-//        println("loaded")
+    override fun onLoaded(section: ConfigurationSection) {
+        println("loaded")
     }
-    override val onSaved: (ConfigurationSection.() -> Unit) = {
-//        println("saved")
+
+    override fun onSaved(section: ConfigurationSection) {
+        println("saved")
+
     }
 
 }

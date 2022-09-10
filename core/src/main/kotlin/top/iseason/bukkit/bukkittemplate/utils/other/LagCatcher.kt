@@ -1,5 +1,10 @@
-package top.iseason.bukkit.bukkittemplate.debug
+package top.iseason.bukkit.bukkittemplate.utils.other
 
+import top.iseason.bukkit.bukkittemplate.debug.warn
+
+/**
+ * 性能测试工具
+ */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 object LagCatcher {
 

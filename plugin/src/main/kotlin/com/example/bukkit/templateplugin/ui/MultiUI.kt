@@ -8,9 +8,9 @@ import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.Button
 import top.iseason.bukkit.bukkittemplate.ui.slot.getContainer
 import top.iseason.bukkit.bukkittemplate.ui.slot.onClicked
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
 
 
 class MultiUI : UIContainer(arrayOf(Page1(), Page2(), Page3())) {

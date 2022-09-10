@@ -10,11 +10,17 @@ import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds
 import java.nio.file.WatchService
 
+/**
+ * 配置文件监听器，负责实现配置修改之后的自动重载
+ */
 class ConfigWatcher private constructor(private val folder: File) : BukkitRunnable() {
     private var isEnable = true
     private var service: WatchService = FileSystems.getDefault().newWatchService()
         .apply { folder.toPath().register(this, StandardWatchEventKinds.ENTRY_MODIFY) }
 
+    /**
+     * 自动重载的实现方法
+     */
     override fun run() {
         FileSystems.getDefault().newWatchService()
         while (isEnable) {
@@ -45,6 +51,9 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
         }
     }
 
+    /**
+     * 取消本监听器
+     */
     override fun cancel() {
         super.cancel()
         isEnable = false
@@ -60,6 +69,9 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
             }
         }
 
+        /**
+         * 监听某个文件夹，如果存在则返回该监听器
+         */
         fun fromFile(file: File): ConfigWatcher {
             val parentFile = file.absoluteFile.parentFile
             val folder = parentFile.toString()
@@ -71,12 +83,11 @@ class ConfigWatcher private constructor(private val folder: File) : BukkitRunnab
             return configWatcher
         }
 
-        fun onDisable() {
+        private fun onDisable() {
             for (v in folders.values) {
                 v.cancel()
             }
             folders.clear()
         }
-
     }
 }

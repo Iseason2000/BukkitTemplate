@@ -26,7 +26,7 @@ import org.bukkit.material.SpawnEgg
 import org.bukkit.potion.*
 import org.bukkit.util.io.BukkitObjectInputStream
 import org.bukkit.util.io.BukkitObjectOutputStream
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.*

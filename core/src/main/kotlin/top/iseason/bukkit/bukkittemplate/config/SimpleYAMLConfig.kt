@@ -9,7 +9,7 @@ import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
 import top.iseason.bukkit.bukkittemplate.config.annotations.Key
 import top.iseason.bukkit.bukkittemplate.debug.debug
 import top.iseason.bukkit.bukkittemplate.debug.info
-import top.iseason.bukkit.bukkittemplate.utils.submit
+import top.iseason.bukkit.bukkittemplate.utils.other.submit
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -60,6 +60,13 @@ open class SimpleYAMLConfig(
     var config: ConfigurationSection = YamlConfiguration.loadConfiguration(configPath)
         private set
 
+    /**
+     * 直接保存ConfigurationSection到文件中,而不是从属性读取
+     */
+    fun saveYaml() {
+        (config as YamlConfiguration).save(configPath)
+    }
+
     private val keys = mutableListOf<ConfigKey>().also { list ->
         //判断是否全为键值
         if (this@SimpleYAMLConfig.javaClass.getAnnotation(Key::class.java) != null) {
@@ -105,6 +112,9 @@ open class SimpleYAMLConfig(
         configs[configPath.absolutePath] = this
     }
 
+    /**
+     * 设置重载或者保存时是否提醒
+     */
     fun setUpdate(enable: Boolean) {
         isAutoUpdate = enable
     }
@@ -137,7 +147,7 @@ open class SimpleYAMLConfig(
     fun save(notify: Boolean = updateNotify) {
         update(false)
         try {
-            onSaved?.invoke(config)
+            onSaved(config)
         } catch (_: Exception) {
         }
         if (notify)
@@ -161,7 +171,7 @@ open class SimpleYAMLConfig(
             return
         }
         try {
-            onLoaded?.invoke(config)
+            onLoaded(config)
         } catch (_: Exception) {
         }
         if (notify)
@@ -237,8 +247,19 @@ open class SimpleYAMLConfig(
         return true
     }
 
-    open val onLoaded: (ConfigurationSection.() -> Unit)? = null
-    open val onSaved: (ConfigurationSection.() -> Unit)? = null
+    /**
+     * 配置读取完毕之后的回调
+     */
+    open fun onLoaded(section: ConfigurationSection) {
+
+    }
+
+    /**
+     * 配置保存完毕之后的回调
+     */
+    open fun onSaved(section: ConfigurationSection) {
+
+    }
 
     /**
      * 转换配置文件的注释

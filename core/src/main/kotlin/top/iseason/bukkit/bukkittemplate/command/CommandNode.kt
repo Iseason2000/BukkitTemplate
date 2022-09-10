@@ -10,10 +10,9 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionDefault
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.debug.SimpleLogger
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessage
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.sendColorMessages
-import top.iseason.bukkit.bukkittemplate.utils.WeakCoolDown
-import top.iseason.bukkit.bukkittemplate.utils.submit
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessages
+import top.iseason.bukkit.bukkittemplate.utils.other.submit
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -101,24 +100,25 @@ open class CommandNode(
     }
 
     /**
+     * 获取子节点
      * @return null if not exists
      */
-    private fun getSubNode(arg: String) = subNodes[arg]
+    fun getSubNode(arg: String) = subNodes[arg]
 
     /**
      * 获取该命令发送者可见的子节点
      * @return null if not exists
      */
-    private fun getSubNode(arg: String, sender: CommandSender): CommandNode? {
+    fun getSubNode(arg: String, sender: CommandSender): CommandNode? {
         val commandNode = getSubNode(arg) ?: return null
         if (!commandNode.canUse(sender)) return null
         return commandNode
     }
 
     /**
-     * 获取命令执行者可见的子节点
+     * 获取命令执行者可见的所有子节点
      */
-    private fun getSubNodes(sender: CommandSender): Set<CommandNode> {
+    fun getSubNodes(sender: CommandSender): Set<CommandNode> {
         val set = mutableSetOf<CommandNode>()
         for (value in subNodes.values) {
             if (!value.canUse(sender)) continue
@@ -130,19 +130,19 @@ open class CommandNode(
     /**
      * 获取根节点
      */
-    private fun getRootNode(): CommandNode = parent?.getRootNode() ?: this
+    fun getRootNode(): CommandNode = parent?.getRootNode() ?: this
 
     /**
      * 判断命令执行者是否可用
      */
-    private fun canUse(sender: CommandSender): Boolean {
+    fun canUse(sender: CommandSender): Boolean {
         return sender.hasPermission(permission)
     }
 
     /**
      * 获取子健
      */
-    private fun getKeys(sender: CommandSender): MutableList<String> {
+    fun getKeys(sender: CommandSender): MutableList<String> {
         val mutableListOf = mutableListOf<String>()
         subNodes.forEach { (k, v) ->
             if (!v.canUse(sender)) return@forEach
@@ -151,7 +151,9 @@ open class CommandNode(
         return mutableListOf
     }
 
-
+    /**
+     * 在命令执行者按下Tab时调用，只调用根节点
+     */
     override fun onTabComplete(
         sender: CommandSender,
         command: Command,
@@ -183,6 +185,9 @@ open class CommandNode(
         return keys.filter { it.startsWith(incomplete, true) }
     }
 
+    /**
+     * 执行命令，由根节点负责转发，最终调用 onExecute 方法
+     */
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<String>): Boolean {
         require(parent == null) { "只有根节点才能使用" }
         if (!canUse(sender)) {
@@ -218,8 +223,8 @@ open class CommandNode(
                 node.onExecute!!.invoke((Params(params, node)), sender)
             } catch (e: ParmaException) {
                 //参数错误的提示
-                if (e.typeParam != null) {
-                    sender.sendColorMessage(e.typeParam.errorMessage(e.arg))
+                if (e.paramAdopter != null) {
+                    sender.sendColorMessage(e.paramAdopter.errorMessage(e.arg))
                 } else {
                     val message = e.message ?: return@submit
                     sender.sendColorMessage(message)
@@ -253,9 +258,9 @@ open class CommandNode(
     fun registerAsRoot() = CommandHandler.register(this)
 
     /**
-     * 获取整个命令
+     * 获取完整的命令结构
      */
-    private fun getWholeCommand(): String {
+    fun getWholeCommand(): String {
         var node = this
         var command = name
         while (node.parent != null) {
@@ -268,7 +273,7 @@ open class CommandNode(
     /**
      * 获取命令的建议
      */
-    private fun getSuggest(): String {
+    fun getSuggest(): String {
         val sb = StringBuilder()
         for (pa in params) {
             sb.append(pa.placeholder).append(" ")
@@ -283,11 +288,14 @@ open class CommandNode(
 
         // 使用提示消息头
         var usageHeader: String? = "  &7=======> &d${BukkitTemplate.getPlugin().name} &7<======="
+
+        /**
+         * 命令用法
+         */
         var usage: String = "&7 - &6%s &a%s &7%s"
 
         // 使用提示消息尾部
         var usageFooter: String? = " "
-        val coolDown = WeakCoolDown<CommandSender>()
     }
 
 }

@@ -9,15 +9,24 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.SimplePluginManager
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 import top.iseason.bukkit.bukkittemplate.DisableHook
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
 import java.lang.reflect.Constructor
 import java.util.*
 import java.util.stream.Collectors
 
+/**
+ * 所有命令的管理类
+ */
 @Suppress("unused")
 object CommandHandler {
+    /**
+     * 储存命令权限
+     */
+    private val commandPermissions = mutableSetOf<Permission>()
 
-    private val pluginPermissions = mutableSetOf<Permission>()
+    /**
+     * 所有注册的命令
+     */
     private val registeredCommands = mutableListOf<PluginCommand>()
     private val simpleCommandMap: SimpleCommandMap
     private val pluginCommandConstructor: Constructor<PluginCommand> = getPluginCommandConstructor()
@@ -53,7 +62,7 @@ object CommandHandler {
         pluginCommand.setExecutor(commandNode)
         pluginCommand.tabCompleter = commandNode
         simpleCommandMap.register(BukkitTemplate.getPlugin().name, pluginCommand)
-        pluginPermissions.add(commandNode.permission)
+        commandPermissions.add(commandNode.permission)
         registeredCommands.add(pluginCommand)
     }
 
@@ -63,6 +72,9 @@ object CommandHandler {
         Bukkit.getServer().getPluginCommand(commandNode.name)?.unregister(simpleCommandMap)
     }
 
+    /**
+     * 注销所有已经注册的插件
+     */
     @JvmStatic
     fun unregisterAll() {
         for (registeredCommand in registeredCommands) {
@@ -70,16 +82,25 @@ object CommandHandler {
         }
     }
 
+    /**
+     * 添加一个命令权限进入缓存，用于注销
+     */
     fun addPermissions(perm: Permission) {
-        pluginPermissions.add(perm)
+        commandPermissions.add(perm)
     }
 
+    /**
+     * 清除所有命令的权限
+     */
     fun clearPermissions() {
-        for (pluginPermission in pluginPermissions) {
+        for (pluginPermission in commandPermissions) {
             Bukkit.getPluginManager().removePermission(pluginPermission)
         }
     }
 
+    /**
+     * 正确地注销所有命令
+     */
     @JvmStatic
     fun onDisable() {
         clearPermissions()

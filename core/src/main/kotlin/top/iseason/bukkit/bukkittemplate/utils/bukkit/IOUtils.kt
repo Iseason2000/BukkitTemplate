@@ -5,11 +5,11 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.scheduler.BukkitTask
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.EventUtils.listen
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.EventUtils.unregister
-import top.iseason.bukkit.bukkittemplate.utils.runSync
-import top.iseason.bukkit.bukkittemplate.utils.submit
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
+import top.iseason.bukkit.bukkittemplate.utils.other.runSync
+import top.iseason.bukkit.bukkittemplate.utils.other.submit
 
 object IOUtils {
     /**

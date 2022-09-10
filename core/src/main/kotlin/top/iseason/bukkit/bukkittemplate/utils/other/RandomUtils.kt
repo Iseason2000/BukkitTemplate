@@ -7,15 +7,14 @@
 
 @file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
-package top.iseason.bukkit.bukkittemplate.utils
+package top.iseason.bukkit.bukkittemplate.utils.other
 
 import java.security.SecureRandom
 import kotlin.math.abs
 
 /**
- * 获取安全随机数，比普通随机更随机，但用时也会多一些
+ * 安全随机数工具，比普通随机更随机，但用时也会多一些
  */
-
 object RandomUtils {
     private val SECURE_RANDOM = SecureRandom()
 

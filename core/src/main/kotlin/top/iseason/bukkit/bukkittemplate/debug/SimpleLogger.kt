@@ -2,7 +2,7 @@ package top.iseason.bukkit.bukkittemplate.debug
 
 import org.bukkit.Bukkit
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
-import top.iseason.bukkit.bukkittemplate.utils.MessageUtils.toColor
+import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
 
 /**
  * 输出日志
@@ -12,7 +12,7 @@ fun info(message: Any?) {
 }
 
 /**
- * 输出debug日志,只有当 SimpleLogger.isDebug 为true 时有效
+ * 输出debug日志,只有当 SimpleLogger.isDebug 为true 时输出
  */
 fun debug(message: Any?) {
     if (SimpleLogger.isDebug)
@@ -26,7 +26,17 @@ fun warn(message: Any?) {
     BukkitTemplate.getPlugin().logger.warning(SimpleLogger.prefix + message.toString())
 }
 
+/**
+ * 日志配置类
+ */
 object SimpleLogger {
+    /**
+     * 消息前缀
+     */
     var prefix = "&a[&6${BukkitTemplate.getPlugin().description.name}&a] &f"
+
+    /**
+     * 是否是debug模式
+     */
     var isDebug = false
 }

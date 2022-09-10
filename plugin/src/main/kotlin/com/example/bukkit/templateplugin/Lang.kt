@@ -12,7 +12,8 @@ object Lang : SimpleYAMLConfig(updateNotify = false) {
     var hello_message = "你好 世界"
     var welcome_message = "欢迎来到我的世界"
     var quit_message = "玩家 %player% 已退出了服务器"
-    override val onLoaded: (ConfigurationSection.() -> Unit) = {
+
+    override fun onLoaded(section: ConfigurationSection) {
         info("语言文件已重载")
     }
 }

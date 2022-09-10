@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
 import top.iseason.bukkit.bukkittemplate.ui.slot.BaseSlot
 import top.iseason.bukkit.bukkittemplate.ui.slot.IOSlot
 import top.iseason.bukkit.bukkittemplate.ui.slot.merge
-import top.iseason.bukkit.bukkittemplate.utils.submit
+import top.iseason.bukkit.bukkittemplate.utils.other.submit
 
 
 abstract class BaseUI(
