@@ -8,6 +8,9 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.EventExecutor
 import top.iseason.bukkit.bukkittemplate.BukkitTemplate
 
+/**
+ * bukkit的事件相关工具
+ */
 object EventUtils {
     /**
      * 快速注册监听器

@@ -36,7 +36,7 @@ import kotlin.math.abs
 
 
 /**
- * 物品通用工具
+ * bukkit的物品相关工具
  */
 object ItemUtils {
 

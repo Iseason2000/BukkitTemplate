@@ -10,7 +10,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
- * 消息工具
+ * bukkit的消息相关工具
  */
 object MessageUtils {
     private val HEX_PATTERN = Pattern.compile("#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})")

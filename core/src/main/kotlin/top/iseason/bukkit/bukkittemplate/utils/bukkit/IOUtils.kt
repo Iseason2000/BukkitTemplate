@@ -11,6 +11,9 @@ import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
 import top.iseason.bukkit.bukkittemplate.utils.other.runSync
 import top.iseason.bukkit.bukkittemplate.utils.other.submit
 
+/**
+ * bukkit的玩家输入工具
+ */
 object IOUtils {
     /**
      * 打开一个界面，让玩家输入物品，当界面关闭时回调方法

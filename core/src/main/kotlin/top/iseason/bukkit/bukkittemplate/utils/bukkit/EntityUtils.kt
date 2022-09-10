@@ -12,6 +12,9 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
 import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.checkAir
 
+/**
+ * bukkit 的实体相关工具
+ */
 object EntityUtils {
 
     /**

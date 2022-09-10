@@ -7,6 +7,9 @@ import org.bukkit.util.Vector
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * bukkit的位置相关工具
+ */
 object LocationUtils {
     /**
      * 根据坐标yaw和pith值获取X方向的单位向量
