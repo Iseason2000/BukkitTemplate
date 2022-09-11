@@ -3,14 +3,14 @@ package com.example.bukkit.templateplugin.ui
 import org.bukkit.ChatColor
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.debug.info
-import top.iseason.bukkit.bukkittemplate.ui.container.ChestUI
-import top.iseason.bukkit.bukkittemplate.ui.container.Pageable
-import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
-import top.iseason.bukkit.bukkittemplate.ui.slot.*
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
+import top.iseason.bukkittemplate.debug.info
+import top.iseason.bukkittemplate.ui.container.ChestUI
+import top.iseason.bukkittemplate.ui.container.Pageable
+import top.iseason.bukkittemplate.ui.container.UIContainer
+import top.iseason.bukkittemplate.ui.slot.*
+import top.iseason.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
+import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
+import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.toColor
 
 class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L), Pageable {
 

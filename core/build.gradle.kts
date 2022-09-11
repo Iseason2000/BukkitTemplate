@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.7.10"
 }
 
-group = "top.iseason.bukkit.bukkittemplate"
+group = "top.iseason.bukkittemplate"
 
 val exposedVersion: String by rootProject
 
@@ -23,7 +23,7 @@ dependencies {
 }
 tasks {
     compileJava {
-        options.isDeprecation = true
+        options.isFailOnError = false
         options.isWarnings = false
         options.isVerbose = false
     }

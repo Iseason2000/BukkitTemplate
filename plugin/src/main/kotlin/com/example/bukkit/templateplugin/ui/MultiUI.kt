@@ -3,14 +3,14 @@ package com.example.bukkit.templateplugin.ui
 
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import top.iseason.bukkit.bukkittemplate.ui.container.ChestUI
-import top.iseason.bukkit.bukkittemplate.ui.container.UIContainer
-import top.iseason.bukkit.bukkittemplate.ui.slot.Button
-import top.iseason.bukkit.bukkittemplate.ui.slot.getContainer
-import top.iseason.bukkit.bukkittemplate.ui.slot.onClicked
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.toColor
+import top.iseason.bukkittemplate.ui.container.ChestUI
+import top.iseason.bukkittemplate.ui.container.UIContainer
+import top.iseason.bukkittemplate.ui.slot.Button
+import top.iseason.bukkittemplate.ui.slot.getContainer
+import top.iseason.bukkittemplate.ui.slot.onClicked
+import top.iseason.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
+import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
+import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.toColor
 
 
 class MultiUI : UIContainer(arrayOf(Page1(), Page2(), Page3())) {

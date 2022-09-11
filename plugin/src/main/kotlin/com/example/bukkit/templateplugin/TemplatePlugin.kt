@@ -1,7 +1,7 @@
 package com.example.bukkit.templateplugin
 
-import top.iseason.bukkit.bukkittemplate.KotlinPlugin
-import top.iseason.bukkit.bukkittemplate.debug.info
+import top.iseason.bukkittemplate.KotlinPlugin
+import top.iseason.bukkittemplate.debug.info
 
 @Suppress("UNUSED")
 object TemplatePlugin : KotlinPlugin() {

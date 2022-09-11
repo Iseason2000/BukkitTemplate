@@ -1,10 +1,10 @@
 package com.example.bukkit.templateplugin
 
 import org.bukkit.configuration.ConfigurationSection
-import top.iseason.bukkit.bukkittemplate.config.SimpleYAMLConfig
-import top.iseason.bukkit.bukkittemplate.config.annotations.FilePath
-import top.iseason.bukkit.bukkittemplate.config.annotations.Key
-import top.iseason.bukkit.bukkittemplate.debug.info
+import top.iseason.bukkittemplate.config.SimpleYAMLConfig
+import top.iseason.bukkittemplate.config.annotations.FilePath
+import top.iseason.bukkittemplate.config.annotations.Key
+import top.iseason.bukkittemplate.debug.info
 
 @Key
 @FilePath("lang.yml")

@@ -6,10 +6,10 @@ import org.bukkit.entity.Player
 import org.bukkit.permissions.PermissionDefault
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import top.iseason.bukkit.bukkittemplate.command.*
-import top.iseason.bukkit.bukkittemplate.ui.openPageableUI
-import top.iseason.bukkit.bukkittemplate.ui.openUI
-import top.iseason.bukkit.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
+import top.iseason.bukkittemplate.command.*
+import top.iseason.bukkittemplate.ui.openPageableUI
+import top.iseason.bukkittemplate.ui.openUI
+import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
 
 fun command1() {
     command("playerutil") {
