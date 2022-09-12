@@ -332,6 +332,8 @@ ItemUtils.fromBase64ToItems(toBase64)
 ...
 ~~~
 
+
+
 ## 快速上手
 
 ### 环境需求
@@ -409,6 +411,23 @@ org.gradle.parallel=true
 `com.example.bukkit.templateplugin`是一个实例插件，你可以参考里面的代码实现
 
 **添加运行依赖**
+
+项目依赖请在plugin模块下的 build.gradle.kts 添加,默认依赖如下
+
+~~~ kotlin
+dependencies {
+    api(project(":core"))
+//    反射库
+//    compileOnly(kotlin("reflect"))
+
+//    协程库
+//    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+
+    // 本地依赖放在libs文件夹内
+    compileOnly(fileTree("libs") { include("*.jar") })
+    compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
+}
+~~~
 
 如果你想动态加载依赖，请在`plugin.yml`文件中添加，格式如下
 
