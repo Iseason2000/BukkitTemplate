@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack
 import top.iseason.bukkittemplate.debug.info
 import top.iseason.bukkittemplate.ui.container.ChestUI
 import top.iseason.bukkittemplate.ui.container.Pageable
-import top.iseason.bukkittemplate.ui.container.UIContainer
 import top.iseason.bukkittemplate.ui.slot.*
 import top.iseason.bukkittemplate.utils.bukkit.ItemUtils.applyMeta
 import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
@@ -40,6 +39,4 @@ class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L),
             getViewers().lastOrNull()?.sendColorMessage("无法输出")
             false
         }.setup()
-
-    override var container: UIContainer? = null
 }

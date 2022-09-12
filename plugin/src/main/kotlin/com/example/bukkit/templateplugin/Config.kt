@@ -8,15 +8,14 @@ import top.iseason.bukkittemplate.config.annotations.Key
 
 @FilePath("config.yml")
 object Config : SimpleYAMLConfig() {
-    @Comment("")
-    @Comment("测试")
-    @Comment("测试2", "6666")
+
     @Key("test.test1.test2")
+    @Comment("", "6666")
     var test = 0
 
     @Key
     @Comment("", "list 测试")
-    var test2 = mutableListOf("12312", "asdfas46", "tew4q5t456wefg6s")
+    var test3 = mutableListOf("12312", "asdfas46", "tew4q5t456wefg6s")
 
     @Key
     @Comment("", "set 测试")
@@ -32,7 +31,5 @@ object Config : SimpleYAMLConfig() {
 
     override fun onSaved(section: ConfigurationSection) {
         println("saved")
-
     }
-
 }

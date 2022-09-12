@@ -9,6 +9,9 @@ import org.bukkit.potion.PotionEffectType
  * 一个命令节点的参数
  */
 class Params(val params: Array<String>, val node: CommandNode) {
+
+    var readIndex = 0
+
     /**
      * 获取指定参数类型的参数,不存在返回null
      * @param index 参数的位置
@@ -27,6 +30,16 @@ class Params(val params: Array<String>, val node: CommandNode) {
             ?: throw ParmaException("&c参数 &6${node.params.getOrNull(index)?.placeholder ?: "位置 $index"} &c不存在!")
         return ParamAdopter.getTypedParam(T::class.java, param)
     }
+
+    /**
+     * 获取下一个参数
+     */
+    inline fun <reified T> next() = getParam<T>(readIndex).also { readIndex++ }
+
+    /**
+     * 获取下一个可选参数
+     */
+    inline fun <reified T> nextOrNull() = getOptionalParam<T>(readIndex)?.also { readIndex++ }
 }
 
 /**

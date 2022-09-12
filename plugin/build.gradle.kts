@@ -56,7 +56,7 @@ tasks {
     }
     processResources {
         filesMatching("plugin.yml") {
-            // 删除注释
+            // 删除注释,你可以返回null以删除整行，但是IDEA有bug会报错，故而返回了""
             filter {
                 if (it.trim().startsWith("#")) "" else it
             }

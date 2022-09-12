@@ -14,12 +14,11 @@ import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
 fun command1() {
     command("playerutil") {
         description = "测试命令1"
-        alias = arrayOf("test1", "test2")
+        alias = arrayOf("playerutil2", "playerutil3")
         node("potion") {
             description = "玩家药水控制"
             default = PermissionDefault.OP
             isPlayerOnly = true
-
             param("<操作>", suggest = listOf("add", "set", "remove"))
             param("<药水类型>", suggest = ParamSuggestCache.potionTypes)
             param("[玩家]", suggestRuntime = ParamSuggestCache.playerParam)
@@ -27,23 +26,13 @@ fun command1() {
             param("[秒]", suggest = listOf("1", "5", "10"))
 
             executor {
-                val operation = getParam<String>(0)
+                val operation = next<String>()
                 if (operation !in setOf("add", "set", "remove"))
                     throw ParmaException("&7参数 &c${operation}&7 不是一个有效的操作,支持的有: add、set、remove")
-                val type = getParam<PotionEffectType>(1)
-                var player = getOptionalParam<Player>(2)
-                var reduce = 0
-                if (player == null) {
-                    player = it as Player
-                    reduce++
-                }
-                var level = getOptionalParam<Int>(3 - reduce)
-                if (level == null) {
-                    level = 0
-                    reduce++
-                }
-                var time = ((getOptionalParam<Double>(4 - reduce) ?: 10.0) * 20.0).toInt()
-
+                val type = next<PotionEffectType>()
+                val player = nextOrNull<Player>() ?: it as Player
+                val level = nextOrNull<Int>() ?: 0
+                var time = ((nextOrNull<Double>() ?: 10.0) * 20.0).toInt()
                 when (operation) {
                     "add" -> {
                         val potionEffect = player.getPotionEffect(type)
@@ -56,7 +45,7 @@ fun command1() {
                         player.addPotionEffect(PotionEffect(type, time, level))
                     }
 
-                    else -> {
+                    "remove" -> {
                         player.removePotionEffect(type)
                     }
                 }

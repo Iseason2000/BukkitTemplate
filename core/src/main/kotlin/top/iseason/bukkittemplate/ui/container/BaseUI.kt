@@ -37,7 +37,7 @@ abstract class BaseUI(
     /**
      * 当玩家打开界面时，分为上下2个Inventory，是否锁住上部分
      */
-    var lockOnTop: Boolean = true
+    var lockOnTop: Boolean = false
 
     /**
      * 当玩家打开界面时，分为上下2个Inventory，是否锁住下部分
