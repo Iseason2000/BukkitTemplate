@@ -195,7 +195,7 @@ class MyUI : ChestUI("${ChatColor.YELLOW}测试UI", row = 6, clickDelay = 500L),
 }
 ```
 
-![image-20220912234202976](https://ispicture.iseason.top//img/202209122342875.png!zip)
+![image](https://user-images.githubusercontent.com/65019366/189704546-8651a8bb-2a68-4973-8133-51f5a987d154.png)
 
 ### 数据库
 
@@ -364,11 +364,11 @@ ItemUtils.fromBase64ToItems(toBase64)
 
 2. 在IDEA的左上角菜单中的 `文件` -> `设置` 中将项目文件编码设置为 `UTF-8`
 
-   ![image-20220912212939624](https://ispicture.iseason.top//img/202209122129469.png!zip)
+   ![image](https://user-images.githubusercontent.com/65019366/189704626-d5f3f488-4997-4fe8-9286-cf63d390e546.png)
 
 ### 项目结构
 
-![image-20220912213151397](https://ispicture.iseason.top//img/202209122131471.png!zip)
+![image](https://user-images.githubusercontent.com/65019366/189704669-881303e3-3032-4763-bb81-2c57ba4b6217.png)
 
 ### 配置插件
 
@@ -466,7 +466,7 @@ runtime-libraries:
 
 #### IDEA
 
-![image-20220912220840241](https://ispicture.iseason.top//img/202209122208856.png!zip)
+![image](https://user-images.githubusercontent.com/65019366/189704739-db3e8e2f-cefa-46d2-9bac-504b5ce7af87.png)
 
 jar包输出路径在 `gradle.properties`中修改
 
