@@ -32,14 +32,26 @@ public class BukkitTemplate extends JavaPlugin {
     public BukkitTemplate() {
         plugin = this;
         //防止卡主线程
-        CompletableFuture.runAsync(() -> {
+        CompletableFuture.supplyAsync(() -> {
             DependencyManager.parsePluginYml();
             classes = loadClass();
-            ktPlugin = findInstance();
-            plugin.onAsyncLoad();
-            plugin.setEnabled(true);
-            Bukkit.getScheduler().runTask(plugin, () -> plugin.onEnabled());
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.onAsyncEnabled());
+            return findInstance();
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            onDisable();
+            this.getLogger().warning("插件依赖异常，已注销插件!");
+            return null;
+        }).thenAcceptAsync(instance -> {
+            if (instance == null) return;
+            ktPlugin = instance;
+            instance.onAsyncLoad();
+            setEnabled(true);
+            Bukkit.getScheduler().runTask(this, instance::onEnable);
+            Bukkit.getScheduler().runTaskAsynchronously(this, instance::onAsyncEnable);
+        }).exceptionally(throwable -> {
+            throwable.printStackTrace();
+            this.getLogger().warning("插件加载异常!");
+            return null;
         });
     }
 
@@ -148,7 +160,8 @@ public class BukkitTemplate extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        ktPlugin.onDisable();
+        if (ktPlugin != null)
+            ktPlugin.onDisable();
         Bukkit.getScheduler().cancelTasks(this);
         HandlerList.unregisterAll(this);
         DisableHook.disableAll();

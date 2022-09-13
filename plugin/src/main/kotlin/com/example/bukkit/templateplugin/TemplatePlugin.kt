@@ -5,9 +5,11 @@ import top.iseason.bukkittemplate.debug.info
 
 @Suppress("UNUSED")
 object TemplatePlugin : KotlinPlugin() {
+    override fun onAsyncLoad() {
+
+    }
 
     override fun onEnable() {
-
 //        SimpleLogger.prefix = "&a[&6${javaPlugin.description.name}&a]&r ".toColor()
     }
 
@@ -35,7 +37,7 @@ object TemplatePlugin : KotlinPlugin() {
 //                .downloadDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 //        }
 
-        info("&a插件已启用! v${javaPlugin.description.version}")
+        info("&a插件已启用!")
     }
 
     override fun onDisable() {
