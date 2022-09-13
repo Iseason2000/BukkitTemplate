@@ -79,11 +79,10 @@ object DatabaseConfig : SimpleYAMLConfig() {
         isConnecting = true
         closeDB()
         runCatching {
-            val dd = DependencyDownloader().apply {
-                repositories.clear()
-                addRepository("https://maven.aliyun.com/repository/public")
-                addRepository("https://repo.maven.apache.org/maven2/")
-            }
+            val dd = DependencyDownloader()
+                .addRepository("https://maven.aliyun.com/repository/public")
+                .addRepository("https://repo.maven.apache.org/maven2/")
+
             val config = when (database) {
                 "MySQL" -> HikariConfig().apply {
                     dd.downloadDependency("mysql:mysql-connector-java:8.0.30")
