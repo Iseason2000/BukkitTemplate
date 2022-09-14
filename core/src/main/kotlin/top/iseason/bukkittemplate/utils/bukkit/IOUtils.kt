@@ -32,13 +32,14 @@ object IOUtils {
             openInventory(inv)
         }
         var task: BukkitTask? = null
-        val listener = listen<InventoryCloseEvent> {
+        var listener: EventUtils.FakeEventListener? = null
+        listener = listen<InventoryCloseEvent> {
             if (inventory != inv) return@listen
             submit(async = async) {
                 onFinish(inv)
             }
             task?.cancel()
-            it.unregister()
+            listener?.unregister()
         }
         task = submit(delay = timeout, async = async) {
             if (openInventory.topInventory == inv) {
@@ -49,6 +50,4 @@ object IOUtils {
             }
         }
     }
-
-
 }
