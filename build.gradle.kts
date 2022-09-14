@@ -47,6 +47,13 @@ subprojects {
     dependencies {
         //基础库
         compileOnly(kotlin("stdlib-jdk8"))
+        // 数据库
+        val exposedVersion: String by rootProject
+        compileOnly("org.jetbrains.exposed:exposed-core:$exposedVersion")
+        compileOnly("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+        compileOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+        compileOnly("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+        compileOnly("com.zaxxer:HikariCP:4.0.3")
     }
     tasks {
         compileJava {
