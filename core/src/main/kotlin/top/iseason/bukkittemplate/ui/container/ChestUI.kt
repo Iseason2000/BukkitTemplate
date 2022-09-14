@@ -18,7 +18,6 @@ open class ChestUI(
         resetSlots()
     }
 
-
     override fun buildInventory(): Inventory = Bukkit.createInventory(this, super.size, title)
 
     override fun clone(): BaseUI {
@@ -36,7 +35,5 @@ open class ChestUI(
             it.onClose = onClose
         }
     }
-
-    override var container: UIContainer? = null
 
 }

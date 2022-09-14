@@ -225,6 +225,7 @@ abstract class BaseUI(
     }
 
     abstract fun clone(): BaseUI
+    override var container: UIContainer? = null
 
     companion object {
         /**

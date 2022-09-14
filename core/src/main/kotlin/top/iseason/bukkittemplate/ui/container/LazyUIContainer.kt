@@ -6,7 +6,7 @@ import org.bukkit.entity.HumanEntity
  * 多页UI，采用懒加载模式，当UI显示时才初始化
  */
 open class LazyUIContainer(
-    protected val pageTypes: List<Class<out BaseUI>>,
+    protected val pageTypes: Array<Class<out BaseUI>>,
     /**
      * 是否启用缓存，如果为false则每人的每个UI都是新对象
      */
