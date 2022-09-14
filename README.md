@@ -29,6 +29,8 @@
 
 JavaDoc: https://www.iseason.top/docs/BukkitTemplate/
 
+WIKI: https://github.com/Iseason2000/BukkitTemplate/wiki
+
 ## 代码速览
 
 ### 命令
