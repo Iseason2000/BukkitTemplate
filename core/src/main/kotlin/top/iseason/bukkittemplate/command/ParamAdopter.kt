@@ -15,9 +15,12 @@ import java.util.*
 @Suppress("unused")
 open class ParamAdopter<T : Any>(
     val type: Class<T>,
-    var errorMessage: (String) -> String = { "Param ${it}is not exist" },
-    val onCast: (String) -> T?
+    var errorMessage: String = "Param %s is not exist",
+    val onCast: ParamTransform<T>
 ) {
+    fun interface ParamTransform<T> {
+        fun onCast(param: String): T?
+    }
 
     companion object {
         private val paramsAdopter = mutableMapOf<Class<*>, ParamAdopter<*>>()
@@ -54,7 +57,7 @@ open class ParamAdopter<T : Any>(
                 return Enums.getIfPresent(clazz as Class<out Enum<*>>, paramStr.uppercase()).orNull() as? T
             }
             if (typeParam == null) throw ParmaException("Param Type is not exist!")
-            return typeParam.onCast(paramStr) as? T
+            return typeParam.onCast.onCast(paramStr) as? T
         }
 
         /**
@@ -77,12 +80,12 @@ open class ParamAdopter<T : Any>(
  * 默认提供的参数
  */
 private fun setDefaultParams() {
-    ParamAdopter(Player::class.java, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
+    ParamAdopter(Player::class.java, errorMessage = "&7玩家 &c%s &7不存在!") {
         if (it.length == 36) {
             runCatching { Bukkit.getPlayer(UUID.fromString(it)) }.getOrNull()
         } else Bukkit.getPlayerExact(it)
     }.register()
-    ParamAdopter(OfflinePlayer::class.java, errorMessage = { "&7玩家 &c${it} &7不存在!" }) {
+    ParamAdopter(OfflinePlayer::class.java, errorMessage = "&7玩家 &c%s &7不存在!") {
         var player: OfflinePlayer? = Bukkit.getOfflinePlayer(it)
         if (!player!!.hasPlayedBefore()) {
             player = runCatching {
@@ -92,16 +95,16 @@ private fun setDefaultParams() {
         }
         player
     }.register()
-    ParamAdopter(Int::class.java, errorMessage = { "&c${it} &7不是一个有效的整数" }) {
+    ParamAdopter(Int::class.java, errorMessage = "&c%s &7不是一个有效的整数") {
         runCatching { it.toInt() }.getOrNull()
     }.register()
-    ParamAdopter(Double::class.java, errorMessage = { "&c${it} &7不是一个有效的小数" }) {
+    ParamAdopter(Double::class.java, errorMessage = "&c%s &7不是一个有效的小数") {
         runCatching { it.toDouble() }.getOrNull()
     }.register()
     ParamAdopter(String::class.java) { it }.register()
     ParamAdopter(
         PotionEffectType::class.java,
-        { "&c${it} &7不是一个有效的药水种类" }
+        "&c%s &7不是一个有效的药水种类"
     ) {
         PotionEffectType.getByName(it)
     }.register()

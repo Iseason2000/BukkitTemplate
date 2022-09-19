@@ -224,7 +224,7 @@ open class CommandNode(
             } catch (e: ParmaException) {
                 //参数错误的提示
                 if (e.paramAdopter != null) {
-                    sender.sendColorMessage(e.paramAdopter.errorMessage(e.arg))
+                    sender.sendColorMessage(e.paramAdopter.errorMessage.format(e.arg))
                 } else {
                     val message = e.message ?: return@submit
                     sender.sendColorMessage(message)

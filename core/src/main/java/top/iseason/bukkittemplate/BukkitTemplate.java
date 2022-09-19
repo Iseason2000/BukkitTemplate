@@ -146,7 +146,6 @@ public class BukkitTemplate extends JavaPlugin {
 
     // 比 onEnabled 先调用
     public void onAsyncLoad() {
-
         ktPlugin.onAsyncLoad();
     }
 
