@@ -18,7 +18,7 @@ class Params(val params: Array<String>, val node: CommandNode) {
      */
     inline fun <reified T> getOptionalParam(index: Int): T? {
         val param = params.getOrNull(index) ?: return null
-        return ParamAdopter.getOptionalTypedParam<T>(T::class.java, param)
+        return ParamAdopter.getOptionalTypedParam<T>(T::class, param)
     }
 
     /**
@@ -28,7 +28,7 @@ class Params(val params: Array<String>, val node: CommandNode) {
     inline fun <reified T> getParam(index: Int): T {
         val param = params.getOrNull(index)
             ?: throw ParmaException("&c参数 &6${node.params.getOrNull(index)?.placeholder ?: "位置 $index"} &c不存在!")
-        return ParamAdopter.getTypedParam(T::class.java, param)
+        return ParamAdopter.getTypedParam(T::class, param)
     }
 
     /**

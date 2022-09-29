@@ -8,13 +8,14 @@ import org.bukkit.OfflinePlayer
 import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
 import java.util.*
+import kotlin.reflect.KClass
 
 /**
  * 参数适配器，负责将参数转为对应类的对象
  */
 @Suppress("unused")
 open class ParamAdopter<T : Any>(
-    val type: Class<T>,
+    val type: KClass<T>,
     var errorMessage: String = "Param %s is not exist",
     val onCast: ParamTransform<T>
 ) {
@@ -23,7 +24,7 @@ open class ParamAdopter<T : Any>(
     }
 
     companion object {
-        private val paramsAdopter = mutableMapOf<Class<*>, ParamAdopter<*>>()
+        private val paramsAdopter = mutableMapOf<KClass<*>, ParamAdopter<*>>()
 
         init {
             setDefaultParams()
@@ -39,22 +40,22 @@ open class ParamAdopter<T : Any>(
         /**
          * 获取负责转换某类型的适配器
          */
-        fun getTypeParam(clazz: Class<*>) = paramsAdopter[clazz]
+        fun getTypeParam(clazz: KClass<*>) = paramsAdopter[clazz]
 
         /**
          * 删除某类型的参数适配器
          */
-        fun removeType(type: Class<*>) = paramsAdopter.remove(type)
+        fun removeType(type: KClass<*>) = paramsAdopter.remove(type)
 
         /**
          * 获取转换后的参数，
          * @return 转换后的参数，不存在则null
          */
-        fun <T> getOptionalTypedParam(clazz: Class<*>, paramStr: String): T? {
+        fun <T> getOptionalTypedParam(clazz: KClass<*>, paramStr: String): T? {
             val typeParam = paramsAdopter[clazz]
             //匹配所有枚举
-            if (typeParam == null && clazz.isEnum) {
-                return Enums.getIfPresent(clazz as Class<out Enum<*>>, paramStr.uppercase()).orNull() as? T
+            if (typeParam == null && clazz.java.isEnum) {
+                return Enums.getIfPresent(clazz.java as Class<out Enum<*>>, paramStr.uppercase()).orNull() as? T
             }
             if (typeParam == null) throw ParmaException("Param Type is not exist!")
             return typeParam.onCast.onCast(paramStr) as? T
@@ -65,7 +66,7 @@ open class ParamAdopter<T : Any>(
          * @return 转换后的参数，不存在则
          * @throws ParmaException
          */
-        fun <T> getTypedParam(clazz: Class<*>, paramStr: String): T {
+        fun <T> getTypedParam(clazz: KClass<*>, paramStr: String): T {
             return getOptionalTypedParam(clazz, paramStr) ?: throw ParmaException(paramStr, paramsAdopter[clazz])
         }
     }
@@ -80,12 +81,12 @@ open class ParamAdopter<T : Any>(
  * 默认提供的参数
  */
 private fun setDefaultParams() {
-    ParamAdopter(Player::class.java, errorMessage = "&7玩家 &c%s &7不存在!") {
+    ParamAdopter(Player::class, errorMessage = "&7玩家 &c%s &7不存在!") {
         if (it.length == 36) {
             runCatching { Bukkit.getPlayer(UUID.fromString(it)) }.getOrNull()
         } else Bukkit.getPlayerExact(it)
     }.register()
-    ParamAdopter(OfflinePlayer::class.java, errorMessage = "&7玩家 &c%s &7不存在!") {
+    ParamAdopter(OfflinePlayer::class, errorMessage = "&7玩家 &c%s &7不存在!") {
         var player: OfflinePlayer? = Bukkit.getOfflinePlayer(it)
         if (!player!!.hasPlayedBefore()) {
             player = runCatching {
@@ -95,15 +96,15 @@ private fun setDefaultParams() {
         }
         player
     }.register()
-    ParamAdopter(Int::class.java, errorMessage = "&c%s &7不是一个有效的整数") {
+    ParamAdopter(Int::class, errorMessage = "&c%s &7不是一个有效的整数") {
         runCatching { it.toInt() }.getOrNull()
     }.register()
-    ParamAdopter(Double::class.java, errorMessage = "&c%s &7不是一个有效的小数") {
+    ParamAdopter(Double::class, errorMessage = "&c%s &7不是一个有效的小数") {
         runCatching { it.toDouble() }.getOrNull()
     }.register()
-    ParamAdopter(String::class.java) { it }.register()
+    ParamAdopter(String::class) { it }.register()
     ParamAdopter(
-        PotionEffectType::class.java,
+        PotionEffectType::class,
         "&c%s &7不是一个有效的药水种类"
     ) {
         PotionEffectType.getByName(it)
