@@ -46,6 +46,7 @@ object EventUtils {
     /**
      * 根据class创建事件监听器
      */
+    @Suppress("UNCHECKED_CAST")
     fun <E : Event> createListener(
         clazz: Class<E>,
         priority: EventPriority = EventPriority.NORMAL,
