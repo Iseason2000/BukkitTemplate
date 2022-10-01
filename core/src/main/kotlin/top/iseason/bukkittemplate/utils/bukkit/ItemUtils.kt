@@ -638,7 +638,7 @@ object ItemUtils {
                     addAttributeModifier(attribute, AttributeModifier(uuid, name, amount, operation, slot))
                 }
             }
-            if (NBTEditor.getMinecraftVersion().lessThanOrEqualTo(NBTEditor.MinecraftVersion.v1_14)) {
+            if (NBTEditor.getMinecraftVersion().greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_14)) {
                 val modelData = section.getInt("custom-model-data")
                 if (modelData != 0) setCustomModelData(modelData)
                 if (this is CrossbowMeta) {
