@@ -264,8 +264,8 @@ object ItemUtils {
                 is FireworkMeta -> {
                     yaml["power"] = power
                     for ((index, effect) in effects.withIndex()) {
-                        yaml["effects.$index.type"] = effect.type.name
                         val fwc: ConfigurationSection = yaml.getConfigurationSection("effects.$index")!!
+                        fwc["type"] = effect.type.name
                         fwc["flicker"] = effect.hasFlicker()
                         fwc["trail"] = effect.hasTrail()
                         val colors = fwc.createSection("colors")
@@ -408,7 +408,7 @@ object ItemUtils {
         if (NBTEditor.getMinecraftVersion()
                 .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_17) && this is AxolotlBucketMeta
         ) {
-            if (hasVariant()) yaml["color"] = variant.toString()
+            if (hasVariant()) yaml["variant"] = variant.toString()
             json.remove("Variant")
         }
         json.remove("display")
@@ -639,6 +639,8 @@ object ItemUtils {
                 }
             }
             if (NBTEditor.getMinecraftVersion().lessThanOrEqualTo(NBTEditor.MinecraftVersion.v1_14)) {
+                val modelData = section.getInt("custom-model-data")
+                if (modelData != 0) setCustomModelData(modelData)
                 if (this is CrossbowMeta) {
                     val section1 = section.getConfigurationSection("projectiles")
                     if (section1 != null) {
@@ -686,7 +688,7 @@ object ItemUtils {
             if (NBTEditor.getMinecraftVersion()
                     .greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_17) && this is AxolotlBucketMeta
             ) {
-                val variantStr = section.getString("color")
+                val variantStr = section.getString("variant")
                 if (variantStr != null) {
                     val variantE: Axolotl.Variant =
                         Enums.getIfPresent(Axolotl.Variant::class.java, variantStr.uppercase())
@@ -861,7 +863,7 @@ object ItemUtils {
     }
 
     /**
-     * 由namespacekey 获取对应的附魔
+     * 由 NamespaceKey 获取对应的附魔
      */
     private fun matchEnchant(key: String): Enchantment? {
         val split = key.split(':')

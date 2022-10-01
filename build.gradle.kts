@@ -55,6 +55,7 @@ subprojects {
         compileOnly("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
         compileOnly("com.zaxxer:HikariCP:4.0.3")
     }
+
     tasks {
         compileJava {
             options.encoding = "UTF-8"
