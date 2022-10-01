@@ -393,13 +393,14 @@ fun InventoryClickEvent.ioEvent() {
             isCancelled = true
             return
         }
-        val ioSlot = baseUI.getSlot(inputItem.first) as? IOSlot ?: return
-        if (ioSlot.input(ioSlot, inputItem.second)) {
+        val slot = baseUI.getSlot(inputItem.first) ?: return
+
+        if (slot is IOSlot && slot.input(slot, inputItem.second)) {
             //能够仅输入的必不存在placeHolder
 //            if (baseUI.inventory.getItem(ioSlot.index)?.isSimilar(ioSlot.placeholder) == true)
 //                ioSlot.itemStack = null
             submit {
-                ioSlot.onInput(ioSlot, inputItem.second)
+                slot.onInput(slot, inputItem.second)
             }
         } else setCancel = true
     }
