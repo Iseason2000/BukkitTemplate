@@ -184,7 +184,7 @@ fun CommandNode.executor(onExecute: (Params.(sender: CommandSender) -> Unit)? = 
 fun CommandNode.param(
     placeholder: String,
     suggest: Collection<String>? = null,
-    suggestRuntime: (CommandSender.() -> Collection<String>)? = null
+    suggestRuntime: Param.RuntimeSuggestParams? = null
 ) {
     params = params.toMutableList().apply { add(Param(placeholder, suggest, suggestRuntime)) }
 }

@@ -57,8 +57,12 @@ open class Param(
     /**
      * 参数建议，运行时生成的建议，优先级高于 suggest
      */
-    var suggestRuntime: (CommandSender.() -> Collection<String>)? = null
-)
+    var suggestRuntime: RuntimeSuggestParams? = null
+) {
+    fun interface RuntimeSuggestParams {
+        fun getParams(sender: CommandSender): Collection<String>
+    }
+}
 
 /**
  * 参数建议缓存，避免无所谓的内存消耗
@@ -67,7 +71,8 @@ object ParamSuggestCache {
     /**
      * 建议在线玩家名称
      */
-    val playerParam: CommandSender.() -> Collection<String> = { Bukkit.getOnlinePlayers().map { it.name } }
+    val playerParam: Param.RuntimeSuggestParams =
+        Param.RuntimeSuggestParams { Bukkit.getOnlinePlayers().map { p -> p.name } }
 
     /**
      * 建议药水效果名
@@ -82,5 +87,7 @@ object ParamSuggestCache {
     val materialTypes = Material.values().map {
         it.name.lowercase()
     }
+
+
 }
 
