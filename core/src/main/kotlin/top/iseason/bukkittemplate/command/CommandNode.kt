@@ -295,7 +295,7 @@ open class CommandNode(
         var usage: String = "&7 - &6%s &a%s &7%s"
 
         // 使用提示消息尾部
-        var usageFooter: String? = " "
+        var usageFooter: String? = "&7所有命令加上 '-silent' 参数可以不显示提示消息\n "
     }
 
 }

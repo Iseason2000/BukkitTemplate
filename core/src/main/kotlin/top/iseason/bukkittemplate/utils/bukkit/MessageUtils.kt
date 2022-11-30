@@ -4,8 +4,10 @@ package top.iseason.bukkittemplate.utils.bukkit
 
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
+import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
 import top.iseason.bukkittemplate.BukkitTemplate
+import top.iseason.bukkittemplate.hook.PlaceHolderHook
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -14,10 +16,12 @@ import java.util.regex.Pattern
  */
 object MessageUtils {
     private val HEX_PATTERN = Pattern.compile("#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})")
-    private val hexColorSupport = runCatching {
+    private val hexColorSupport = try {
         net.md_5.bungee.api.ChatColor.of("#66ccff")
         true
-    }.getOrElse { false }
+    } catch (e: Throwable) {
+        false
+    }
 
 
     /**
@@ -72,7 +76,11 @@ object MessageUtils {
      */
     fun CommandSender.sendColorMessage(message: Any?, prefix: String = defaultPrefix) {
         if (message == null || message.toString().isEmpty()) return
-        sendMessage("$prefix$message".toColor())
+        if (PlaceHolderHook.hasHooked) {
+            sendMessage(PlaceHolderHook.setPlaceHolder("$prefix$message", this as? OfflinePlayer))
+        } else {
+            sendMessage("$prefix$message".toColor())
+        }
     }
 
     /**
