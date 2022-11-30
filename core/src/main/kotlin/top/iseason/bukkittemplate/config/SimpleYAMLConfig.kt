@@ -301,11 +301,7 @@ open class SimpleYAMLConfig(
     private fun copyFileUsingStream(source: File, dest: File) {
         FileInputStream(source).use { fis ->
             FileOutputStream(dest).use { fos ->
-                val buffer = ByteArray(1024)
-                var length: Int
-                while (fis.read(buffer).also { length = it } > 0) {
-                    fos.write(buffer, 0, length)
-                }
+                fos.channel.transferFrom(fis.channel, 0, fis.channel.size())
             }
         }
     }
@@ -313,8 +309,7 @@ open class SimpleYAMLConfig(
     private fun getAllFields(): List<Field> {
         val fields = mutableListOf<Field>()
         var superClass: Class<*> = this::class.java
-        while (true) {
-            if (superClass == SimpleYAMLConfig::class.java) break
+        while (superClass != SimpleYAMLConfig::class.java) {
             fields.addAll(0, superClass.declaredFields.toList())
             superClass = superClass.superclass
         }
