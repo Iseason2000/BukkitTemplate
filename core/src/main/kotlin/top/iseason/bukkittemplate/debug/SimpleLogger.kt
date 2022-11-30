@@ -2,6 +2,7 @@ package top.iseason.bukkittemplate.debug
 
 import org.bukkit.Bukkit
 import top.iseason.bukkittemplate.BukkitTemplate
+import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.noColor
 import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.toColor
 
 /**
@@ -23,7 +24,7 @@ fun debug(message: Any?) {
  * 输出警告日志
  */
 fun warn(message: Any?) {
-    BukkitTemplate.getPlugin().logger.warning(SimpleLogger.prefix + message.toString())
+    BukkitTemplate.getPlugin().logger.warning(SimpleLogger.prefix + message.toString().toColor().noColor())
 }
 
 /**

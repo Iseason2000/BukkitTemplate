@@ -5,9 +5,6 @@ import top.iseason.bukkittemplate.debug.info
 
 @Suppress("UNUSED")
 object TemplatePlugin : KotlinPlugin() {
-    override fun onAsyncLoad() {
-
-    }
 
     override fun onEnable() {
 //        SimpleLogger.prefix = "&a[&6${javaPlugin.description.name}&a]&r ".toColor()

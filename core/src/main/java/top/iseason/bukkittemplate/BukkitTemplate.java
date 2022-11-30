@@ -15,7 +15,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.jar.JarFile;
 
 /**
@@ -156,7 +155,8 @@ public class BukkitTemplate extends JavaPlugin {
     public void onEnable() {
         PlaceHolderHook.INSTANCE.checkHooked();
         ktPlugin.onEnable();
-        CompletableFuture.runAsync(this::onAsyncEnabled);
+        Bukkit.getScheduler().runTaskAsynchronously(this, this::onAsyncEnabled);
+//        CompletableFuture.runAsync(this::onAsyncEnabled);
     }
 
     public void onAsyncEnabled() {
