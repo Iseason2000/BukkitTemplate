@@ -2,6 +2,7 @@ package top.iseason.bukkittemplate.dependency;
 
 import org.bukkit.Bukkit;
 import org.xml.sax.SAXException;
+import top.iseason.bukkittemplate.BukkitTemplate;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
@@ -11,7 +12,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.util.*;
-import java.util.logging.Level;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -21,7 +21,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DependencyDownloader {
 
-    public static File parent = new File(".", "libraries");
+    public static File parent = new File("libraries");
     public List<String> repositories = new ArrayList<>();
     public List<String> dependencies = new ArrayList<>();
     public static Set<String> exists = new HashSet<>();
@@ -37,7 +37,7 @@ public class DependencyDownloader {
     public static boolean downloadDependency(String dependency, boolean recursiveSub, List<String> repositories) {
         String[] split = dependency.split(":");
         if (split.length != 3) {
-            Bukkit.getLogger().warning("invalid dependency " + dependency);
+            Bukkit.getLogger().warning("Invalid dependency " + dependency);
             return false;
         }
         String groupId = split[0];
@@ -56,7 +56,8 @@ public class DependencyDownloader {
         if (jarFile.exists()) {
             try {
                 ClassInjector.addURL(jarFile.toURI().toURL());
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         } else {
             boolean downloaded = false;
@@ -77,8 +78,8 @@ public class DependencyDownloader {
             }
             if (!downloaded) return false;
         }
-
         if (!recursiveSub) return true;
+
         for (String repository : repositories) {
             try {
                 URL pomUrl = new URL(repository + suffix + pomName);
@@ -90,13 +91,12 @@ public class DependencyDownloader {
                     XmlParser xmlDependency = new XmlParser(pomFile);
                     for (String subDependency : xmlDependency.getDependency()) {
                         if (!downloadDependency(subDependency, false, repositories)) {
-                            Bukkit.getLogger().log(Level.FINE, "Loading sub dependency" + subDependency + " error!");
+                            Bukkit.getLogger().warning("Loading sub dependency" + subDependency + " error!");
                         }
                     }
                 } catch (ParserConfigurationException | IOException | SAXException e) {
-                    Bukkit.getLogger().log(Level.WARNING, "Loading file " + pomFile + " error!");
+                    Bukkit.getLogger().warning("Loading file " + pomFile + " error!");
                 }
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -131,7 +131,7 @@ public class DependencyDownloader {
             if (!download(shaUrl, sha)) return false;
             return checkSha(file, sha);
         } catch (IOException e) {
-            return true;
+            return false;
         }
     }
 
@@ -140,7 +140,7 @@ public class DependencyDownloader {
      *
      * @param url  文件链接
      * @param file 保存路径
-     * @return
+     * @return true 下载成功
      */
     private static boolean download(URL url, File file) {
         HttpURLConnection connection;
@@ -236,6 +236,7 @@ public class DependencyDownloader {
     }
 
     public boolean downloadDependency(String dependency) {
+        if (BukkitTemplate.isOfflineLibInstalled()) return true;
         return downloadDependency(dependency, true, repositories);
     }
 }
