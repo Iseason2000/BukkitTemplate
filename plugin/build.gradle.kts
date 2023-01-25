@@ -40,6 +40,12 @@ val exposedVersion: String by rootProject
 val obfuscated: String by rootProject
 val isObfuscated = obfuscated == "true"
 val shrink: String by rootProject
+val defaultFile = File("../build", "${rootProject.name}-${rootProject.version}.jar")
+val output =
+    if (isObfuscated)
+        File(jarOutputFile, "${rootProject.name}-${rootProject.version}-obfuscated.jar")
+    else
+        File(jarOutputFile, "${rootProject.name}-${rootProject.version}.jar")
 
 tasks {
     shadowJar {
@@ -117,13 +123,10 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     keepclassmembers(allowObf, "class * implements org.bukkit.event.Listener {*;}")
     keepclassmembers(allowObf, "class * implements org.jetbrains.exposed.dao.id.IdTable {*;}")
     keepclassmembers(allowObf, "class * implements org.jetbrains.exposed.dao.Entity {*;}")
-    keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
-    keepkotlinmetadata()
+    keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*")
+    keep("class kotlin.Metadata {}")
     repackageclasses()
-    if (isObfuscated)
-        outjars(File(jarOutputFile, "${rootProject.name}-${rootProject.version}-obfuscated.jar"))
-    else
-        outjars(File(jarOutputFile, "${rootProject.name}-${rootProject.version}.jar"))
+    outjars(output)
 }
 
 fun getProperties(properties: String) = rootProject.properties[properties].toString()

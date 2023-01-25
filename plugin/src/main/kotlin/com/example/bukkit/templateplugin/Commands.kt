@@ -25,14 +25,14 @@ fun command1() {
             param("[等级]", suggest = listOf("0", "1", "2", "3", "4"))
             param("[秒]", suggest = listOf("1", "5", "10"))
 
-            executor {
-                val operation = next<String>()
+            executor { params, sender ->
+                val operation = params.next<String>()
                 if (operation !in setOf("add", "set", "remove"))
                     throw ParmaException("&7参数 &c${operation}&7 不是一个有效的操作,支持的有: add、set、remove")
-                val type = next<PotionEffectType>()
-                val player = nextOrNull<Player>() ?: it as Player
-                val level = nextOrNull<Int>() ?: 0
-                var time = ((nextOrNull<Double>() ?: 10.0) * 20.0).toInt()
+                val type = params.next<PotionEffectType>()
+                val player = params.nextOrNull<Player>() ?: sender as Player
+                val level = params.nextOrNull<Int>() ?: 0
+                var time = ((params.nextOrNull<Double>() ?: 10.0) * 20.0).toInt()
                 when (operation) {
                     "add" -> {
                         val potionEffect = player.getPotionEffect(type)
@@ -53,7 +53,7 @@ fun command1() {
         }
     }
     command("testcommand") {
-        description = "测试命令1"
+        description = "测试命令"
         alias = arrayOf("test1", "test2")
         node("other") {
             default = PermissionDefault.OP
@@ -61,8 +61,8 @@ fun command1() {
             node("test3") {
                 alias = arrayOf("test1", "test2")
                 description = "测试命令"
-                onExecute = {
-                    it.sendColorMessage("#66ccff 这是一个测试命令")
+                onExecute = CommandNodeExecutor { params, sender ->
+                    sender.sendColorMessage("#66ccff 这是一个测试命令!")
                 }
             }
         }
@@ -81,11 +81,11 @@ fun command2() {
         Param("<玩家>", suggestRuntime = ParamSuggestCache.playerParam),
         Param("[数字]", listOf("1", "5", "10", "-5", "-1"))
     )
-    node.onExecute = {
-        val param1 = getParam<Int>(0)
-        val param2 = getOptionalParam<Double>(1)
-        it.sendColorMessage(param1)
-        it.sendColorMessage(param2)
+    node.onExecute = CommandNodeExecutor { params, sender ->
+        val param1 = params.getParam<Int>(0)
+        val param2 = params.getOptionalParam<Double>(1)
+        sender.sendColorMessage(param1)
+        sender.sendColorMessage(param2)
     }
 
 }
@@ -112,15 +112,15 @@ fun openUICommand() {
         async = true
         node("UI") {
             isPlayerOnly = true
-        }.onExecute = {
-            (it as Player).openUI<MyUI> {
-                title = it.displayName
+        }.onExecute = CommandNodeExecutor { params, sender ->
+            (sender as Player).openUI<MyUI> {
+                title = sender.displayName
             }
         }
         val node = node("MultiUI")
         node.isPlayerOnly = true
-        node.onExecute = {
-            (it as Player).openPageableUI<MultiUI>()
+        node.onExecute = CommandNodeExecutor { params, sender ->
+            (sender as Player).openPageableUI<MultiUI>()
         }
     }
 
@@ -130,8 +130,8 @@ fun openUICommand() {
  * 结构命令
  */
 fun testNode() = node("node3") {
-    onExecute = {
-        it.sendMessage("hello")
+    onExecute = CommandNodeExecutor { params, sender ->
+        sender.sendMessage("hello")
     }
 }
 
@@ -147,9 +147,9 @@ object TestNode : CommandNode(
     )
 ) {
     init {
-        onExecute = {
-            val player = getParam<Player>(0)
-            val money = getOptionalParam<Double>(1)
+        onExecute = CommandNodeExecutor { params, sender ->
+            val player = params.getParam<Player>(0)
+            val money = params.getOptionalParam<Double>(1)
             player.sendColorMessage(money.toString())
         }
     }

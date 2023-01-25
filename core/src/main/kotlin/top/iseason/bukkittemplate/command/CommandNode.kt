@@ -48,10 +48,10 @@ open class CommandNode(
     /**
      * 命令执行
      */
-    open var onExecute: (Params.(sender: CommandSender) -> Unit)? = null
+    open var onExecute: CommandNodeExecutor? = null
 ) : CommandExecutor, TabExecutor {
     var permission: Permission =
-        Permission("${BukkitTemplate.getPlugin().name.lowercase()}.$name.", default)
+        Permission("${BukkitTemplate.getPlugin().name.lowercase()}.$name", default)
 
     /**
      * 获取父节点
@@ -220,7 +220,7 @@ open class CommandNode(
         }
         submit(async = node.async) {
             try {
-                node.onExecute!!.invoke((Params(params, node)), sender)
+                node.onExecute!!.accept(Params(params, node), sender)
             } catch (e: ParmaException) {
                 //参数错误的提示
                 if (e.paramAdopter != null) {
@@ -295,7 +295,7 @@ open class CommandNode(
         var usage: String = "&7 - &6%s &a%s &7%s"
 
         // 使用提示消息尾部
-        var usageFooter: String? = "&7所有命令加上 '-silent' 参数可以不显示提示消息\n "
+        var usageFooter: String? = " "
     }
 
 }
