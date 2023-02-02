@@ -2,14 +2,21 @@
 
 package top.iseason.bukkittemplate.utils.bukkit
 
+import net.md_5.bungee.api.ChatMessageType
+import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import top.iseason.bukkittemplate.BukkitTemplate
+import top.iseason.bukkittemplate.debug.warn
+import top.iseason.bukkittemplate.hook.BungeeCordHook
 import top.iseason.bukkittemplate.hook.PlaceHolderHook
+import top.iseason.bukkittemplate.utils.other.submit
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+
 
 /**
  * bukkit的消息相关工具
@@ -75,12 +82,59 @@ object MessageUtils {
      * 发送带颜色转换的消息,不输出null与空string
      */
     fun CommandSender.sendColorMessage(message: Any?, prefix: String = defaultPrefix) {
-        if (message == null || message.toString().isEmpty()) return
-        if (PlaceHolderHook.hasHooked) {
-            sendMessage(PlaceHolderHook.setPlaceHolder("$prefix$message", this as? OfflinePlayer))
-        } else {
-            sendMessage("$prefix$message".toColor())
-        }
+        val msg = message?.toString()
+        if (msg.isNullOrEmpty()) return
+        msg.split("\\n", "\n")
+            .forEach { m ->
+                //普通消息
+                if (!m.startsWith('[')) {
+                    sendMessage(PlaceHolderHook.setPlaceHolder("$prefix$m", this as? OfflinePlayer))
+                    return@forEach
+                }
+                //特殊消息
+                if (m.startsWith("[boardcast]", true)) {
+                    broadcast(m.drop(11), prefix)
+                    return@forEach
+                }
+                if (this is Player && m.startsWith("[actionbar]", true)) {
+                    sendActionBar("$prefix${m.drop(11)}".toColor())
+                    return@forEach
+                }
+                if (m.startsWith("[command]", true) ||
+                    m.startsWith("[console]", true) ||
+                    m.startsWith("[op-command]", true)
+                ) {
+                    val opCommand = m.startsWith("[op-command]", true)
+                    val size = if (opCommand) 12 else 9
+                    val command = PlaceHolderHook.setPlaceHolder(m.drop(size).trim(), this as? OfflinePlayer)
+                    val sender = if (m.startsWith("[console]", true)) Bukkit.getConsoleSender() else this
+                    val tempOP = opCommand && !sender.isOp
+                    if (Bukkit.isPrimaryThread()) {
+                        try {
+                            if (tempOP) sender.isOp = true
+                            Bukkit.dispatchCommand(sender, command)
+                        } catch (e: Throwable) {
+                            e.printStackTrace()
+                        } finally {
+                            if (tempOP) sender.isOp = false
+                        }
+                    } else {
+                        submit {
+                            try {
+                                if (tempOP) sender.isOp = true
+                                Bukkit.dispatchCommand(sender, command)
+                            } catch (e: Throwable) {
+                                e.printStackTrace()
+                            } finally {
+                                if (tempOP) sender.isOp = false
+                            }
+                        }
+                    }
+                    return@forEach
+                }
+
+            }
+
     }
 
     /**
@@ -106,8 +160,15 @@ object MessageUtils {
     /**
      * 进行颜色转换并发送给所有人
      */
-    fun broadcast(message: Any?, prefix: String = defaultPrefix) =
-        Bukkit.getOnlinePlayers().forEach { it.sendColorMessage(message, prefix) }
+    fun broadcast(message: Any?, prefix: String = defaultPrefix) {
+        if (message == null || message.toString().isEmpty()) return
+        val finalMessage = PlaceHolderHook.setPlaceHolder("$prefix$message", null)
+        if (BungeeCordHook.bungeeCordEnabled) {
+            BungeeCordHook.broadcast(finalMessage)
+        } else {
+            Bukkit.broadcastMessage(finalMessage)
+        }
+    }
 
     /**
      * 进行颜色转换并发送给控制台
@@ -130,7 +191,7 @@ object MessageUtils {
     /**
      * 去除字符串里的bukkit颜色代码
      */
-    fun String.noColor(): String? = ChatColor.stripColor(this)
+    fun String.noColor(): String = ChatColor.stripColor(this)!!
 
     /**
      * 快速格式化字符串
@@ -149,5 +210,15 @@ object MessageUtils {
         }
         return temp
     }
-}
 
+    fun Player.sendActionBar(message: String?, prefix: String = defaultPrefix) {
+        if (message == null || message.toString().isEmpty()) return
+        val finalMessage = PlaceHolderHook.setPlaceHolder("$prefix$message", this)
+        try {
+            this.spigot().sendMessage(ChatMessageType.ACTION_BAR, *TextComponent.fromLegacyText(finalMessage))
+        } catch (e: Throwable) {
+            e.printStackTrace()
+            warn("该服务端版本不支持 ActionBar 消息!")
+        }
+    }
+}

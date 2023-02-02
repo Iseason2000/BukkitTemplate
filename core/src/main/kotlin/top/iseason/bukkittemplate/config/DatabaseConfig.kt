@@ -172,11 +172,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
                     dd.downloadDependency("mysql:mysql-connector-java:8.0.32")
                     jdbcUrl = "jdbc:mysql://$address/$database_name$params"
                     //可能有旧的mysql驱动
-                    try {
-                        driverClassName = "com.mysql.cj.jdbc.Driver"
-                    } catch (e: Exception) {
-                        driverClassName = "com.mysql.jdbc.Driver"
-                    }
+                    driverClassName = "com.mysql.jdbc.Driver"
                 }
 
                 "MariaDB" -> HikariConfig(props).apply {
@@ -190,7 +186,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
                     jdbcUrl = "jdbc:sqlite:$address$params"
                     driverClassName = "org.sqlite.JDBC"
                 }
-
+// 由于exposed的bug暂时无法使用
 //                "H2" -> HikariConfig().apply {
 //                    dd.downloadDependency("com.h2database:h2:2.1.214")
 //                    jdbcUrl = "jdbc:h2:$url/$dbName$params"
