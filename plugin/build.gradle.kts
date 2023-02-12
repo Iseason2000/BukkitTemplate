@@ -18,7 +18,7 @@ dependencies {
     // 本地依赖放在libs文件夹内
     compileOnly(fileTree("libs") { include("*.jar") })
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    compileOnly("org.spigotmc:spigot-api:1.19.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
 }
 
 // 插件名称，请在gradle.properties 修改
@@ -96,6 +96,8 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     if (shrink != "true") {
         dontshrink()
     }
+    allowaccessmodification() //优化时允许访问并修改有修饰符的类和类的成员
+    dontusemixedcaseclassnames() // 混淆时不要大小写混合
     optimizationpasses(5)
     dontwarn()
     //添加运行环境
@@ -117,14 +119,17 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     //class规则
     if (isObfuscated) keep(allowObf, "class a {}")
     else keep("class $groupS.libs.core.BukkitTemplate {}")
+    keep("class kotlin.Metadata {}")
+    keep(allowObf, "class $groupS.libs.core.PluginBootStrap {*;}")
     keep(allowObf, "class * implements $groupS.libs.core.KotlinPlugin {*;}")
     keepclassmembers("class * extends $groupS.libs.core.config.SimpleYAMLConfig {*;}")
     keepclassmembers("class * implements $groupS.libs.core.ui.container.BaseUI {*;}")
     keepclassmembers(allowObf, "class * implements org.bukkit.event.Listener {*;}")
-    keepclassmembers(allowObf, "class * implements org.jetbrains.exposed.dao.id.IdTable {*;}")
-    keepclassmembers(allowObf, "class * implements org.jetbrains.exposed.dao.Entity {*;}")
+    keepclassmembers(allowObf, "class * extends org.bukkit.event.Event {*;}")
+    keepclassmembers(allowObf, "class * extends org.jetbrains.exposed.dao.id.IdTable {*;}")
+    keepclassmembers(allowObf, "class * extends org.jetbrains.exposed.dao.Entity {*;}")
     keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*")
-    keep("class kotlin.Metadata {}")
+    keepclassmembers("enum * {public static **[] values();public static ** valueOf(java.lang.String);}")
     repackageclasses()
     outjars(output)
 }
