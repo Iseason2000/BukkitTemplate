@@ -1,7 +1,6 @@
 package top.iseason.bukkittemplate;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.iseason.bukkittemplate.dependency.PluginDependency;
 import top.iseason.bukkittemplate.loader.IsolatedClassLoader;
@@ -35,19 +34,19 @@ public class BukkitTemplate extends JavaPlugin {
      */
     public BukkitTemplate() throws ClassNotFoundException {
         plugin = this;
-        Plugin lib = Bukkit.getPluginManager().getPlugin("IseasonOfflineLib");
-        offlineLibInstalled = lib != null;
+        offlineLibInstalled = Bukkit.getPluginManager().getPlugin("IseasonOfflineLib") != null;
         if (!offlineLibInstalled && !PluginDependency.parsePluginYml()) {
             throw new RuntimeException("Loading dependencies error! please check your network!");
         }
-        if (lib != null) {
-            ReflectionUtil.addURL(lib.getClass().getProtectionDomain().getCodeSource().getLocation());
+        if (!offlineLibInstalled) {
+            ReflectionUtil.addURL(BukkitTemplate.class.getProtectionDomain().getCodeSource().getLocation());
+            isolatedClassLoader = new IsolatedClassLoader(
+                    ReflectionUtil.getUrls(),
+                    BukkitTemplate.class.getClassLoader()
+            );
+        } else {
+            isolatedClassLoader = BukkitTemplate.class.getClassLoader();
         }
-        ReflectionUtil.addURL(BukkitTemplate.class.getProtectionDomain().getCodeSource().getLocation());
-        isolatedClassLoader = new IsolatedClassLoader(
-                ReflectionUtil.getUrls(),
-                BukkitTemplate.class.getClassLoader()
-        );
         ReflectionUtil.enable();
         loadInstance();
     }
