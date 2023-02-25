@@ -1,6 +1,7 @@
 package top.iseason.bukkittemplate.config
 
 import org.bukkit.configuration.ConfigurationSection
+import org.bukkit.configuration.MemorySection
 import top.iseason.bukkittemplate.config.annotations.Comment
 import top.iseason.bukkittemplate.debug.SimpleLogger
 import top.iseason.bukkittemplate.utils.bukkit.MessageUtils
@@ -10,6 +11,7 @@ open class Lang(
     isAutoUpdate: Boolean = true,
     updateNotify: Boolean = true
 ) : SimpleYAMLConfig(defaultPath, isAutoUpdate, updateNotify) {
+
     @Comment(
         "",
         "消息留空将不会显示，使用 '\\n' 或换行符 可以换行",
@@ -27,19 +29,26 @@ open class Lang(
     )
     var readme = ""
 
+    @Comment("", "系统消息设置")
+    private var system: MemorySection? = null
+
     @Comment("", "消息前缀")
-    var msg_prefix = MessageUtils.defaultPrefix
+    private var system__msg_prefix = MessageUtils.defaultPrefix
 
-    @Comment("", "日志前缀")
-    var log_prefix = MessageUtils.defaultPrefix
+    @Comment("", "控制台消息前缀")
+    private var system__log_prefix = MessageUtils.defaultPrefix
 
-    @Comment("", "是否使用 minimessage 模式, 将会自动下载依赖")
-    var mini_message = false
+    @Comment(
+        "", "是否使用 MiniMessage 模式, 同时不支持&符号, 第一次开启将会自动下载依赖",
+        "格式: https://docs.advntr.dev/minimessage/format.html",
+        "网页可视化: https://webui.advntr.dev/"
+    )
+    private var system__mini_message = false
 
     override fun onLoaded(section: ConfigurationSection) {
-        if (mini_message) MessageUtils.enableMiniMessage()
+        if (system__mini_message) MessageUtils.enableMiniMessage()
         else MessageUtils.disableMiniMessage()
-        MessageUtils.defaultPrefix = msg_prefix
-        SimpleLogger.prefix = log_prefix
+        MessageUtils.defaultPrefix = system__msg_prefix
+        SimpleLogger.prefix = system__log_prefix
     }
 }
