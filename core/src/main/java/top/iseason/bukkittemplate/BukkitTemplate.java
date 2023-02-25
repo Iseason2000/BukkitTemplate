@@ -1,6 +1,5 @@
 package top.iseason.bukkittemplate;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.iseason.bukkittemplate.dependency.PluginDependency;
 import top.iseason.bukkittemplate.loader.IsolatedClassLoader;
@@ -25,7 +24,6 @@ import java.util.jar.JarFile;
 public class BukkitTemplate extends JavaPlugin {
 
     public static ClassLoader isolatedClassLoader;
-    private static boolean offlineLibInstalled = false;
     private static JavaPlugin plugin = null;
     private static Object bootStrap = null;
 
@@ -34,19 +32,16 @@ public class BukkitTemplate extends JavaPlugin {
      */
     public BukkitTemplate() throws ClassNotFoundException {
         plugin = this;
-        offlineLibInstalled = Bukkit.getPluginManager().getPlugin("IseasonOfflineLib") != null;
-        if (!offlineLibInstalled && !PluginDependency.parsePluginYml()) {
+        if (!PluginDependency.parsePluginYml()) {
             throw new RuntimeException("Loading dependencies error! please check your network!");
         }
-        if (!offlineLibInstalled) {
-            ReflectionUtil.addURL(BukkitTemplate.class.getProtectionDomain().getCodeSource().getLocation());
-            isolatedClassLoader = new IsolatedClassLoader(
-                    ReflectionUtil.getUrls(),
-                    BukkitTemplate.class.getClassLoader()
-            );
-        } else {
-            isolatedClassLoader = BukkitTemplate.class.getClassLoader();
-        }
+
+        ReflectionUtil.addURL(BukkitTemplate.class.getProtectionDomain().getCodeSource().getLocation());
+        isolatedClassLoader = new IsolatedClassLoader(
+                ReflectionUtil.getUrls(),
+                BukkitTemplate.class.getClassLoader()
+        );
+
         ReflectionUtil.enable();
         loadInstance();
     }
@@ -142,15 +137,6 @@ public class BukkitTemplate extends JavaPlugin {
      */
     public static JavaPlugin getPlugin() {
         return plugin;
-    }
-
-    /**
-     * 是否安装了离线的依赖包
-     *
-     * @return tru 表示安装了
-     */
-    public static boolean isOfflineLibInstalled() {
-        return offlineLibInstalled;
     }
 
     /**

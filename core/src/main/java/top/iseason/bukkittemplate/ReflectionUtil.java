@@ -75,6 +75,7 @@ public class ReflectionUtil {
         try {
             if (!isInit)
                 subUrls.add(url);
+            else addUrlHandle.invoke(ucp, url);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

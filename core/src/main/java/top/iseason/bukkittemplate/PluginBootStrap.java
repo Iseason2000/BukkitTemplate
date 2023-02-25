@@ -19,6 +19,7 @@ public class PluginBootStrap {
     }
 
     private void onLoad(Float ignore) {
+        ReflectionUtil.enable();
         try {
             kotlinPlugin.onLoad();
         } catch (Exception e) {

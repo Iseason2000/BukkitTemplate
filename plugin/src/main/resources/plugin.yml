@@ -10,7 +10,8 @@ runtime-libraries:
   repositories:
     - https://maven.aliyun.com/repository/public/
     - https://repo.maven.apache.org/maven2/
-
+  #  libraries will be parallel download
+  parallel: false
   libraries:
     - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
 #    - org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}

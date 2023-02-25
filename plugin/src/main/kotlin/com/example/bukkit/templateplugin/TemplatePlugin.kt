@@ -8,6 +8,10 @@ import top.iseason.bukkittemplate.debug.info
 object TemplatePlugin : KotlinPlugin() {
 
     override fun onEnable() {
+        Lang.load()
+        command1()
+//        //如果使用命令模块，取消注释
+        CommandHandler.updateCommands()
 //        SimpleLogger.prefix = "&a[&6${javaPlugin.description.name}&a]&r ".toColor()
     }
 
@@ -18,9 +22,7 @@ object TemplatePlugin : KotlinPlugin() {
 //        UIListener.register()
         //命令
 //        openUICommand()
-        command1()
-//        //如果使用命令模块，取消注释
-        CommandHandler.updateCommands()
+
         //如果使用UI模块,取消注释
 //        UIListener.register()
         //使用数据库请取消注释以下2行

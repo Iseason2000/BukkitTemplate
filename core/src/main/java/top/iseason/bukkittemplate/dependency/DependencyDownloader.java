@@ -26,18 +26,19 @@ public class DependencyDownloader {
 
     public static File parent = new File("libraries");
     public List<String> repositories = new ArrayList<>();
-    public List<String> dependencies = new ArrayList<>();
+    public Map<String, Integer> dependencies = new LinkedHashMap<>();
     public static Set<String> exists = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * 下载依赖
      * 比如 org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10
      *
-     * @param dependency   依赖地址
-     * @param recursiveSub 是否下载子依赖
+     * @param dependency 依赖地址
+     * @param depth      依赖深度
+     * @param maxDepth   最大依赖深度
      * @return true 表示加载依赖成功
      */
-    public static boolean downloadDependency(String dependency, boolean recursiveSub, List<String> repositories) {
+    public static boolean downloadDependency(String dependency, int depth, int maxDepth, List<String> repositories) {
         String[] split = dependency.split(":");
         if (split.length != 3) {
             Bukkit.getLogger().warning("Invalid dependency " + dependency);
@@ -59,7 +60,7 @@ public class DependencyDownloader {
         //已经存在
         if (jarFile.exists()) {
             try {
-                if (recursiveSub)
+                if (depth == 1)
                     ReflectionUtil.addURL(jarFile.toURI().toURL());
                 else ReflectionUtil.addSubURL(jarFile.toURI().toURL());
             } catch (Exception e) {
@@ -84,7 +85,7 @@ public class DependencyDownloader {
             }
             if (!downloaded) return false;
         }
-        if (!recursiveSub) return true;
+        if (depth == maxDepth) return true;
 
         for (String repository : repositories) {
             try {
@@ -96,7 +97,7 @@ public class DependencyDownloader {
                 try {
                     XmlParser xmlDependency = new XmlParser(pomFile);
                     for (String subDependency : xmlDependency.getDependency()) {
-                        if (!downloadDependency(subDependency, false, repositories)) {
+                        if (!downloadDependency(subDependency, depth + 1, maxDepth, repositories)) {
                             Bukkit.getLogger().warning("Loading sub dependency" + subDependency + " error!");
                         }
                     }
@@ -228,7 +229,7 @@ public class DependencyDownloader {
     }
 
     public DependencyDownloader addDependency(String dependency) {
-        dependencies.add(dependency);
+        dependencies.put(dependency, 1);
         return this;
     }
 
@@ -237,25 +238,31 @@ public class DependencyDownloader {
      *
      * @return
      */
-    public boolean setup() {
-//        for (String dependency : dependencies) {
-//            if (!downloadDependency(dependency, true, repositories)) {
-//                return false;
-//            }
-//        }
-//        return true;
-        AtomicBoolean failure = new AtomicBoolean(false);
-        dependencies.parallelStream().forEach(dependency -> {
-                    if (failure.get()) return;
-                    failure.set(!downloadDependency(dependency, true, repositories));
+    public boolean start(boolean parallel) {
+        if (parallel) {
+            AtomicBoolean failure = new AtomicBoolean(false);
+            dependencies.entrySet().parallelStream().forEach(entry -> {
+                        if (failure.get()) return;
+                        failure.set(!downloadDependency(entry.getKey(), entry.getValue()));
+                    }
+            );
+            dependencies.clear();
+            return !failure.get();
+        } else {
+            for (Map.Entry<String, Integer> entry : dependencies.entrySet()) {
+                if (!downloadDependency(entry.getKey(), entry.getValue())) {
+                    return false;
                 }
-        );
-        dependencies.clear();
-        return !failure.get();
+            }
+            return true;
+        }
+    }
+
+    public boolean downloadDependency(String dependency, int maxDepth) {
+        return downloadDependency(dependency, 1, maxDepth, repositories);
     }
 
     public boolean downloadDependency(String dependency) {
-        if (BukkitTemplate.isOfflineLibInstalled()) return true;
-        return downloadDependency(dependency, true, repositories);
+        return downloadDependency(dependency, 1, 1, repositories);
     }
 }
