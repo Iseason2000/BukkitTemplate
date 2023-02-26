@@ -11,7 +11,7 @@ runtime-libraries:
     - https://maven.aliyun.com/repository/public/
     - https://repo.maven.apache.org/maven2/
   #  parallel downloading
-  parallel: false
+  parallel: true
   # format group:artifact:version[,maxDepth]
   libraries:
     - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}

@@ -46,6 +46,8 @@ public class PluginDependency {
             } else if (split.length == 2) {
                 map.put(split[0], Integer.parseInt(split[1]));
             }
+            String substring = library.substring(0, library.lastIndexOf(":"));
+            DependencyDownloader.parallel.add(substring);
         }
         dd.dependencies = map;
         DependencyDownloader.assembly.addAll(libConfigs.getStringList("assembly"));

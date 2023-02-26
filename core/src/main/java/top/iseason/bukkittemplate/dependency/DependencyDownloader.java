@@ -32,6 +32,10 @@ public class DependencyDownloader {
      */
     private static final Set<String> exists = Collections.newSetFromMap(new ConcurrentHashMap<>());
     /**
+     * 默认为plugin.yml中声明的依赖，覆盖子依赖中的相同依赖的不同版本
+     */
+    public static final Set<String> parallel = new HashSet<>();
+    /**
      * 储存路径
      */
     public static File parent = new File("libraries");
@@ -63,7 +67,7 @@ public class DependencyDownloader {
         String groupId = split[0];
         String artifact = split[1];
         String classId = groupId + ":" + artifact;
-        if (exists.contains(classId)) return true;
+        if (exists.contains(classId) || (depth > 1 && parallel.contains(classId))) return true;
         exists.add(classId);
         String version = split[2];
         String suffix = groupId.replace(".", "/") + "/" + artifact + "/" + version + "/";
