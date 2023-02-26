@@ -10,7 +10,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.LinkedList;
 
-//注入器
+// 反射工具&ClassLoader注入器
 public class ReflectionUtil {
     private static MethodHandle addUrlHandle;
     private static Object ucp;

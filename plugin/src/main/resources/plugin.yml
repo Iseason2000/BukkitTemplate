@@ -10,15 +10,22 @@ runtime-libraries:
   repositories:
     - https://maven.aliyun.com/repository/public/
     - https://repo.maven.apache.org/maven2/
-  #  libraries will be parallel download
+  #  parallel downloading
   parallel: false
+  # format group:artifact:version[,maxDepth]
   libraries:
     - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
-#    - org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}
-#    - org.jetbrains.exposed:exposed-core:${exposedVersion}
-#    - org.jetbrains.exposed:exposed-dao:${exposedVersion}
-#    - org.jetbrains.exposed:exposed-jdbc:${exposedVersion}
-#    - org.jetbrains.exposed:exposed-java-time:${exposedVersion}
-#    - com.zaxxer:HikariCP:4.0.3
+    #    - org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}
+    #    - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2
+    #    - org.jetbrains.exposed:exposed-core:${exposedVersion}
+    #    - org.jetbrains.exposed:exposed-dao:${exposedVersion}
+    #    - org.jetbrains.exposed:exposed-jdbc:${exposedVersion}
+    #    - org.jetbrains.exposed:exposed-java-time:${exposedVersion}
+    #    - com.zaxxer:HikariCP:4.0.3
+
+  # the following libraries will be loaded into plugin classloader instead of isolated classloader
+  assembly:
+    - org.apache.logging.log4j:log4j-api
+    - org.slf4j:slf4j-api
 
 

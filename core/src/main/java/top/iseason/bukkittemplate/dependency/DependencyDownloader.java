@@ -19,15 +19,31 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
- * 依赖下载器
+ * 依赖下载器 仅支持 group:artifact:version 的格式
  */
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class DependencyDownloader {
-
+    /**
+     * 被加载到插件Classloader的依赖，默认是加载到 IsolatedClassLoader
+     */
+    public static final Set<String> assembly = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    /**
+     * 不下载重复的依赖,此为缓存
+     */
+    private static final Set<String> exists = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    /**
+     * 储存路径
+     */
     public static File parent = new File("libraries");
+    /**
+     * 下载源
+     */
     public List<String> repositories = new ArrayList<>();
+    /**
+     * 依赖 group:artifact:version to maxDepth
+     * maxDepth表示最大依赖解析层数
+     */
     public Map<String, Integer> dependencies = new LinkedHashMap<>();
-    public static Set<String> exists = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * 下载依赖
@@ -46,10 +62,9 @@ public class DependencyDownloader {
         }
         String groupId = split[0];
         String artifact = split[1];
-        String classId = groupId + "." + artifact;
+        String classId = groupId + ":" + artifact;
         if (exists.contains(classId)) return true;
         exists.add(classId);
-        Bukkit.getLogger().info("[" + BukkitTemplate.getPlugin().getName() + "] Loading library " + dependency);
         String version = split[2];
         String suffix = groupId.replace(".", "/") + "/" + artifact + "/" + version + "/";
         File saveLocation = new File(parent, suffix.replace("/", File.separator));
@@ -57,12 +72,11 @@ public class DependencyDownloader {
         String pomName = artifact + "-" + version + ".pom";
         File jarFile = new File(saveLocation, jarName);
         File pomFile = new File(saveLocation, pomName);
+        String type = "isolated";
         //已经存在
         if (jarFile.exists()) {
             try {
-                if (depth == 1)
-                    ReflectionUtil.addURL(jarFile.toURI().toURL());
-                else ReflectionUtil.addSubURL(jarFile.toURI().toURL());
+                type = addUrl(classId, jarFile.toURI().toURL());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -76,7 +90,7 @@ public class DependencyDownloader {
                         jarFile.delete();
                         continue;
                     }
-                    ReflectionUtil.addURL(jarFile.toURI().toURL());
+                    type = addUrl(classId, jarFile.toURI().toURL());
                     downloaded = true;
                     break;
                 } catch (Exception e) {
@@ -85,6 +99,7 @@ public class DependencyDownloader {
             }
             if (!downloaded) return false;
         }
+        Bukkit.getLogger().info("[" + BukkitTemplate.getPlugin().getName() + "] Loaded library " + dependency + " " + type);
         if (depth == maxDepth) return true;
 
         for (String repository : repositories) {
@@ -109,6 +124,16 @@ public class DependencyDownloader {
             }
         }
         return true;
+    }
+
+    private static String addUrl(String classId, URL url) {
+        if (assembly.contains(classId)) {
+            ReflectionUtil.addSubURL(url);
+            return "assemble";
+        } else {
+            ReflectionUtil.addURL(url);
+            return "isolated";
+        }
     }
 
     /**
@@ -147,7 +172,7 @@ public class DependencyDownloader {
      *
      * @param url  文件链接
      * @param file 保存路径
-     * @return
+     * @return true if success
      */
     private static boolean download(URL url, File file) {
         HttpURLConnection connection;
@@ -228,15 +253,21 @@ public class DependencyDownloader {
         return this;
     }
 
+    /**
+     * 添加需要的依赖
+     *
+     * @param dependency 依赖, 将会下载依赖的子依赖(2层)
+     * @return 自身
+     */
     public DependencyDownloader addDependency(String dependency) {
-        dependencies.put(dependency, 1);
+        dependencies.put(dependency, 2);
         return this;
     }
 
     /**
      * 下载所有积压的依赖
      *
-     * @return
+     * @return true if success
      */
     public boolean start(boolean parallel) {
         if (parallel) {
@@ -258,11 +289,24 @@ public class DependencyDownloader {
         }
     }
 
+    /**
+     * 直接下载并加载依赖
+     *
+     * @param dependency 依赖
+     * @param maxDepth   依赖解析层数
+     * @return true if success
+     */
     public boolean downloadDependency(String dependency, int maxDepth) {
         return downloadDependency(dependency, 1, maxDepth, repositories);
     }
 
+    /**
+     * 直接下载并加载依赖以及依赖的子依赖
+     *
+     * @param dependency 依赖
+     * @return true if success
+     */
     public boolean downloadDependency(String dependency) {
-        return downloadDependency(dependency, 1, 1, repositories);
+        return downloadDependency(dependency, 1, 2, repositories);
     }
 }

@@ -6,13 +6,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import top.iseason.bukkittemplate.hook.BungeeCordHook;
 import top.iseason.bukkittemplate.hook.PlaceHolderHook;
 
-import java.util.concurrent.CompletableFuture;
-
 /**
- * 插件启动类，由自定义 ClassLoader加载
+ * 插件启动代理类，由自定义 ClassLoader加载
  */
 public class PluginBootStrap {
-    private KotlinPlugin kotlinPlugin;
+    private BukkitPlugin bukkitPlugin;
     private JavaPlugin javaPlugin;
 
     private PluginBootStrap() {
@@ -20,14 +18,12 @@ public class PluginBootStrap {
 
     private void onLoad(Float ignore) {
         ReflectionUtil.enable();
-        try {
-            kotlinPlugin.onLoad();
-        } catch (Exception e) {
-//            e.printStackTrace();
-        }
+        // 加载阶段如果报错直接中断加载
+        bukkitPlugin.onLoad();
     }
 
     private void onEnable(Boolean ignore) {
+        //启动阶段允许报错
         try {
             PlaceHolderHook.INSTANCE.checkHooked();
             BungeeCordHook.onEnable();
@@ -35,16 +31,16 @@ public class PluginBootStrap {
             e.printStackTrace();
         }
         try {
-            kotlinPlugin.onEnable();
-        } catch (Exception e) {
+            bukkitPlugin.onEnable();
+        } catch (Throwable e) {
             e.printStackTrace();
         }
-        CompletableFuture.runAsync(this::onAsyncEnabled);
+        Bukkit.getScheduler().runTaskAsynchronously(javaPlugin, this::onAsyncEnabled);
     }
 
     private void onDisable(Double ignore) {
         try {
-            kotlinPlugin.onDisable();
+            bukkitPlugin.onDisable();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,7 +52,7 @@ public class PluginBootStrap {
 
     private void onAsyncEnabled() {
         try {
-            kotlinPlugin.onAsyncEnable();
+            bukkitPlugin.onAsyncEnable();
         } catch (Exception e) {
             e.printStackTrace();
         }

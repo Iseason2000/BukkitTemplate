@@ -19,6 +19,9 @@ dependencies {
     compileOnly(fileTree("libs") { include("*.jar") })
     implementation("org.bstats:bstats-bukkit:3.0.0")
     compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("net.mamoe:mirai-core-api:2.14.0")
+//    api("net.mamoe:mirai-core:2.14.0")
+//    compileOnly("net.mamoe:mirai-core-api:2.9.1")
 }
 
 // 插件名称，请在gradle.properties 修改
@@ -121,7 +124,7 @@ tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     else keep("class $groupS.libs.core.BukkitTemplate {}")
     keep("class kotlin.Metadata {}")
     keep(allowObf, "class $groupS.libs.core.PluginBootStrap {*;}")
-    keep(allowObf, "class * implements $groupS.libs.core.KotlinPlugin {*;}")
+    keep(allowObf, "class * implements $groupS.libs.core.BukkitPlugin {*;}")
     keepclassmembers("class * extends $groupS.libs.core.config.SimpleYAMLConfig {*;}")
     keepclassmembers("class * implements $groupS.libs.core.ui.container.BaseUI {*;}")
     keepclassmembers(allowObf, "class * implements org.bukkit.event.Listener {*;}")

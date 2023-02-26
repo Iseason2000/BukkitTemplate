@@ -7,6 +7,9 @@ import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 插件自定义的加载器，用于隔离依赖
+ */
 public class IsolatedClassLoader extends URLClassLoader {
 
     public static final Set<String> BLACK_LIST = new HashSet<String>() {{

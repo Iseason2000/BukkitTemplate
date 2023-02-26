@@ -406,7 +406,7 @@ org.gradle.caching=true
 org.gradle.parallel=true
 ~~~
 
-插件的代码位于`plugin`模块内，请确保插件主类继承`top.iseason.bukkittemplate.KotlinPlugin`类并声明为Object单例模式
+插件的代码位于`plugin`模块内，请确保插件主类继承`top.iseason.bukkittemplate.BukkitPlugin`类并声明为Object单例模式
 
 包名应该为 `group` 类名应为`pluginName` (gradle.properties中的键值)
 

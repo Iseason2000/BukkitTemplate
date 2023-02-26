@@ -42,12 +42,13 @@ public class PluginDependency {
         for (String library : libConfigs.getStringList("libraries")) {
             String[] split = library.split(",");
             if (split.length == 1) {
-                map.put(library, 1);
+                map.put(library, 2);
             } else if (split.length == 2) {
                 map.put(split[0], Integer.parseInt(split[1]));
             }
         }
         dd.dependencies = map;
+        DependencyDownloader.assembly.addAll(libConfigs.getStringList("assembly"));
         return dd.start(libConfigs.getBoolean("parallel", false));
     }
 }

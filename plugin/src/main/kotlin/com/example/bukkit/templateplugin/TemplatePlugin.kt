@@ -1,17 +1,16 @@
 package com.example.bukkit.templateplugin
 
-import top.iseason.bukkittemplate.KotlinPlugin
-import top.iseason.bukkittemplate.command.CommandHandler
+import top.iseason.bukkittemplate.BukkitPlugin
 import top.iseason.bukkittemplate.debug.info
 
 @Suppress("UNUSED")
-object TemplatePlugin : KotlinPlugin() {
+object TemplatePlugin : BukkitPlugin {
 
     override fun onEnable() {
-        Lang.load()
-        command1()
-//        //如果使用命令模块，取消注释
-        CommandHandler.updateCommands()
+//        Lang.load()
+//        command1()
+////        //如果使用命令模块，取消注释
+//        CommandHandler.updateCommands()
 //        SimpleLogger.prefix = "&a[&6${javaPlugin.description.name}&a]&r ".toColor()
     }
 
