@@ -15,8 +15,6 @@ runtime-libraries:
   # format group:artifact:version[,maxDepth]
   libraries:
     - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
-    - net.mamoe:mirai-core:2.14.0,3
-    - net.mamoe:mirai-core-jvm:2.14.0
     #    - org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}
     #    - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2
     #    - org.jetbrains.exposed:exposed-core:${exposedVersion}
