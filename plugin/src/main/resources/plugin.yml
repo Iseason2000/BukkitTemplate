@@ -12,7 +12,7 @@ runtime-libraries:
     - https://repo.maven.apache.org/maven2/
   #  parallel downloading
   parallel: true
-  # format group:artifact:version[,maxDepth]
+  # format group:artifact:version[,maxDepth] maxDepth will be set to 2 by default
   libraries:
     - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
     #    - org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}
