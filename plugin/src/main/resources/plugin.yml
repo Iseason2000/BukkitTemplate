@@ -27,5 +27,7 @@ runtime-libraries:
   assembly:
     - org.apache.logging.log4j:log4j-api
     - org.slf4j:slf4j-api
-
+  # skipped libraries
+  excludes:
+#    - io.netty:netty-handler
 
