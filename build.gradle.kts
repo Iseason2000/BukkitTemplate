@@ -23,9 +23,13 @@ subprojects {
 //    阿里的服务器速度快一点
         maven {
             name = "aliyun"
-            url = uri("https://maven.aliyun.com/repository/public/")
+            url = uri("https://maven.aliyun.com/repository/public")
         }
-        google()
+        maven {
+            name = "aliyun-google"
+            url = uri("https://maven.aliyun.com/repository/google")
+        }
+//        google()
         mavenCentral()
         maven {
             name = "spigot"

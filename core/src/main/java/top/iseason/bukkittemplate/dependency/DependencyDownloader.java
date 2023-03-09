@@ -58,7 +58,12 @@ public class DependencyDownloader {
      * @param maxDepth   最大依赖深度
      * @return true 表示加载依赖成功
      */
-    public static boolean downloadDependency(String dependency, int depth, int maxDepth, List<String> repositories) {
+    public static boolean downloadDependency(String dependency,
+                                             int depth,
+                                             int maxDepth,
+                                             List<String> repositories,
+                                             List<String> printCache
+    ) {
         String[] split = dependency.split(":");
         if (split.length != 3) {
             Bukkit.getLogger().warning("Invalid dependency " + dependency);
@@ -76,12 +81,16 @@ public class DependencyDownloader {
         String pomName = artifact + "-" + version + ".pom";
         File jarFile = new File(saveLocation, jarName);
         File pomFile = new File(saveLocation, pomName);
-        String type = "isolated";
+        File sha = new File(jarFile + ".sha1");
+        String type = "I";
+        boolean success = false;
         //已经存在
-        if (jarFile.exists()) {
+        if (jarFile.exists() && sha.exists() && checkSha(jarFile, sha)) {
             try {
                 type = addUrl(classId, jarFile.toURI().toURL());
+                success = true;
             } catch (Exception e) {
+                type = "F";
                 e.printStackTrace();
             }
         } else {
@@ -96,15 +105,19 @@ public class DependencyDownloader {
                     }
                     type = addUrl(classId, jarFile.toURI().toURL());
                     downloaded = true;
+                    success = true;
                     break;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            if (!downloaded) return false;
+            if (!downloaded) type = "N";
         }
-        Bukkit.getLogger().info("[" + BukkitTemplate.getPlugin().getName() + "] Loaded library " + dependency + " " + type);
-        if (depth == maxDepth) return true;
+        if (printCache != null)
+            printCache.add(printTree("[" + type + "] " + dependency, depth - 1));
+        else
+            Bukkit.getLogger().info("[" + BukkitTemplate.getPlugin().getName() + "]" + printTree("[" + type + "] " + dependency, depth - 1));
+        if (!success || depth == maxDepth) return true;
 
         for (String repository : repositories) {
             try {
@@ -116,7 +129,7 @@ public class DependencyDownloader {
                 try {
                     XmlParser xmlDependency = new XmlParser(pomFile);
                     for (String subDependency : xmlDependency.getDependency()) {
-                        if (!downloadDependency(subDependency, depth + 1, maxDepth, repositories)) {
+                        if (!downloadDependency(subDependency, depth + 1, maxDepth, repositories, printCache)) {
                             Bukkit.getLogger().warning("Loading sub dependency" + subDependency + " error!");
                         }
                     }
@@ -130,13 +143,31 @@ public class DependencyDownloader {
         return true;
     }
 
+    public static String printTree(String name, int level) {
+        // 输出的前缀
+        StringBuilder stringBuilder = new StringBuilder();
+        if (level == 0) {
+            return stringBuilder.append(name).toString();
+        }
+        // 按层次进行缩进
+        for (int i = 0; i < level; i++) {
+            if (i == level - 1) {
+                stringBuilder.append("├──");
+            } else {
+                stringBuilder.append("│  ");
+            }
+        }
+        stringBuilder.append("  ").append(name);
+        return stringBuilder.toString();
+    }
+
     private static String addUrl(String classId, URL url) {
         if (assembly.contains(classId)) {
             ReflectionUtil.addSubURL(url);
-            return "assemble";
+            return "A";
         } else {
             ReflectionUtil.addURL(url);
-            return "isolated";
+            return "I";
         }
     }
 
@@ -274,11 +305,18 @@ public class DependencyDownloader {
      * @return true if success
      */
     public boolean start(boolean parallel) {
+        Bukkit.getLogger().info("[" + BukkitTemplate.getPlugin().getName() + "] Loading libraries... [I]: Isolated [A]: Assembly [F]: Failure [N]: NetWork Error");
         if (parallel) {
             AtomicBoolean failure = new AtomicBoolean(false);
             dependencies.entrySet().parallelStream().forEach(entry -> {
                         if (failure.get()) return;
-                        failure.set(!downloadDependency(entry.getKey(), entry.getValue()));
+                        LinkedList<String> printList = new LinkedList<>();
+                        if (!downloadDependency(entry.getKey(), 1, entry.getValue(), repositories, printList)) {
+                            failure.set(true);
+                        }
+                        for (String s : printList) {
+                            Bukkit.getLogger().info(s);
+                        }
                     }
             );
             dependencies.clear();
@@ -301,7 +339,7 @@ public class DependencyDownloader {
      * @return true if success
      */
     public boolean downloadDependency(String dependency, int maxDepth) {
-        return downloadDependency(dependency, 1, maxDepth, repositories);
+        return downloadDependency(dependency, 1, maxDepth, repositories, null);
     }
 
     /**
@@ -311,6 +349,6 @@ public class DependencyDownloader {
      * @return true if success
      */
     public boolean downloadDependency(String dependency) {
-        return downloadDependency(dependency, 1, 2, repositories);
+        return downloadDependency(dependency, 1, 2, repositories, null);
     }
 }
