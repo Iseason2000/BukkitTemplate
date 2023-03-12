@@ -22,7 +22,6 @@ import top.iseason.bukkittemplate.hook.BungeeCordHook
 import top.iseason.bukkittemplate.hook.PlaceHolderHook
 import top.iseason.bukkittemplate.utils.other.submit
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -51,40 +50,43 @@ object MessageUtils {
      */
     init {
         //广播
-        messageHandlers.add { msg, _, tr, prefix ->
+        messageHandlers.add { msg, _, prefix ->
             if (msg.startsWith("[broadcast]", true)) {
                 broadcast(msg.drop(11), prefix)
-                tr.set(false)
+                return@add false
             }
+            true
         }
         // actionbar
-        messageHandlers.add { msg, sender, tr, prefix ->
+        messageHandlers.add { msg, sender, prefix ->
             if (sender is Player && msg.startsWith("[actionbar]", true)) {
                 sender.sendActionBar(msg.drop(11), prefix)
-                tr.set(false)
+                return@add false
             }
+            true
         }
         //大标题
-        messageHandlers.add { msg, sender, tr, prefix ->
+        messageHandlers.add { msg, sender, prefix ->
             if (sender is Player && msg.startsWith("[main-title]", true)) {
                 sender.sendMainTitle(msg.drop(12), prefix)
-                tr.set(false)
+                return@add false
             }
+            true
         }
         //小标题
-        messageHandlers.add { msg, sender, tr, prefix ->
+        messageHandlers.add { msg, sender, prefix ->
             if (sender is Player && msg.startsWith("[sub-title]", true)) {
                 sender.sendSubTitle(msg.drop(11), prefix)
-                tr.set(false)
+                return@add false
             }
+            true
         }
         //命令
-        messageHandlers.add { msg, sender, tr, _ ->
+        messageHandlers.add { msg, sender, _ ->
             if (msg.startsWith("[command]", true) ||
                 msg.startsWith("[console]", true) ||
                 msg.startsWith("[op-command]", true)
             ) {
-                tr.set(false)
                 val opCommand = msg.startsWith("[op-command]", true)
                 val command =
                     PlaceHolderHook.setPlaceHolder(msg.drop(if (opCommand) 12 else 9), sender as? OfflinePlayer).trim()
@@ -111,13 +113,13 @@ object MessageUtils {
                         }
                     }
                 }
-                return@add
-            }
+                return@add false
+            } else true
         }
         // 发送消息
-        messageHandlers.add { msg, sender, tr, prefix ->
+        messageHandlers.add { msg, sender, prefix ->
             sender.sendMsg(PlaceHolderHook.setPlaceHolder("$prefix$msg", sender as? OfflinePlayer))
-            tr.set(false)
+            false
         }
     }
 
@@ -204,15 +206,14 @@ object MessageUtils {
         else message!!.toString().split("\n")
         if (messageList.isEmpty()) return
         //是否传递消息,为了引用传递
-        val isTransitive = AtomicBoolean(true)
         //每个消息都由消费者消费
         for (msg in messageList) {
             if (msg.isEmpty()) continue
-            isTransitive.set(true)
             for (messageHandler in messageHandlers) {
-                if (!isTransitive.get()) break
                 try {
-                    messageHandler.onHandler(msg, this, isTransitive, prefix)
+                    if (!messageHandler.onHandler(msg, this, prefix)) {
+                        break
+                    }
                 } catch (e: Throwable) {
                     e.printStackTrace()
                 }
@@ -367,9 +368,13 @@ object MessageUtils {
      */
     fun interface MessageConsumer {
         /**
-         *
+         * 处理消息
+         * @param msg 原始消息
+         * @param sender 接收发送者
+         * @param prefix 消息前缀
+         * @return 是否传递消息给其他消费者
          */
-        fun onHandler(msg: String, sender: CommandSender, transitive: AtomicBoolean, prefix: String)
+        fun onHandler(msg: String, sender: CommandSender, prefix: String): Boolean
     }
 }
 
