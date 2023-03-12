@@ -7,7 +7,7 @@ import top.iseason.bukkittemplate.debug.info
 object TemplatePlugin : BukkitPlugin {
 
     override fun onEnable() {
-//        Lang.load()
+        Lang.load()
 //        command1()
 ////        //如果使用命令模块，取消注释
 //        CommandHandler.updateCommands()
