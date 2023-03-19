@@ -80,13 +80,6 @@ tasks {
         }
     }
 }
-//task<com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation>("relocateShadowJar") {
-//    target = tasks.shadowJar.get()
-//    prefix = "$groupS.libs"
-//    shadowJar.minimize()
-//}
-//tasks.shadowJar.get().dependsOn(tasks.getByName("relocateShadowJar"))
-
 tasks.register<proguard.gradle.ProGuardTask>("buildPlugin") {
     group = "minecraft"
     verbose()
