@@ -17,7 +17,7 @@ public final class PluginBootStrap {
     }
 
     private void onLoad(Float ignore) {
-        ReflectionUtil.enable();
+//        ReflectionUtil.enable();
         // 加载阶段如果报错直接中断加载
         bukkitPlugin.onLoad();
     }
