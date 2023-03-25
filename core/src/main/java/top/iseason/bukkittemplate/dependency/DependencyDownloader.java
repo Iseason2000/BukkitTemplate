@@ -233,12 +233,8 @@ public class DependencyDownloader {
         HttpURLConnection connection;
         try {
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
-            connection.connect();
-            int responseCode = connection.getResponseCode();
-            if (responseCode != 200) return false;
+            connection.addRequestProperty("User-Agent", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11");
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return false;
         } catch (Exception e) {
             return false;
         }
