@@ -204,6 +204,7 @@ public class DependencyDownloader {
             try {
                 file.createNewFile();
             } catch (IOException e) {
+                e.printStackTrace();
                 return false;
             }
         }
@@ -218,6 +219,7 @@ public class DependencyDownloader {
             if (!download(shaUrl, sha)) return false;
             return checkSha(file, sha);
         } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -236,6 +238,7 @@ public class DependencyDownloader {
             connection.addRequestProperty("User-Agent", "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_0) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.56 Safari/535.11");
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return false;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
         if (url.toString().endsWith(".jar"))
@@ -243,6 +246,7 @@ public class DependencyDownloader {
         try (InputStream is = connection.getInputStream()) {
             Files.copy(is, file.toPath(), REPLACE_EXISTING);
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
         return true;
