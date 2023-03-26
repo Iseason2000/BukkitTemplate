@@ -17,7 +17,7 @@ dependencies {
 
     // 本地依赖放在libs文件夹内
     compileOnly(fileTree("libs") { include("*.jar") })
-    implementation("org.bstats:bstats-bukkit:3.0.0")
+    implementation("org.bstats:bstats-bukkit:3.0.1")
     compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
 }
 
