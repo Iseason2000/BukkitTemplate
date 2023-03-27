@@ -1,6 +1,5 @@
 package top.iseason.bukkittemplate.hook
 
-import com.google.common.io.ByteStreams
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerLoginEvent
@@ -8,6 +7,8 @@ import org.bukkit.plugin.messaging.PluginMessageListener
 import top.iseason.bukkittemplate.BukkitTemplate
 import top.iseason.bukkittemplate.debug.debug
 import top.iseason.bukkittemplate.utils.bukkit.EventUtils.listen
+import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
 
 object BungeeCordHook {
 
@@ -39,10 +40,11 @@ object BungeeCordHook {
     }
 
     private fun check(player: Player) {
-        val byteArrayDataOutput = ByteStreams.newDataOutput()
-        byteArrayDataOutput.writeUTF("IP")
+        val bs = ByteArrayOutputStream()
+        val out = DataOutputStream(bs)
+        out.writeUTF("IP")
         try {
-            player.sendPluginMessage(BukkitTemplate.getPlugin(), BUNGEE_CORD_CHANNEL, byteArrayDataOutput.toByteArray())
+            player.sendPluginMessage(BukkitTemplate.getPlugin(), BUNGEE_CORD_CHANNEL, bs.toByteArray())
         } catch (_: Exception) {
         }
     }
@@ -65,12 +67,14 @@ object BungeeCordHook {
     }
 
     private fun broadcast(message: String, type: String) {
-        val out = ByteStreams.newDataOutput()
+        val bs = ByteArrayOutputStream()
+        val out = DataOutputStream(bs)
         out.writeUTF(type)
         out.writeUTF("ALL")
         out.writeUTF(message)
         try {
-            Bukkit.getServer().sendPluginMessage(BukkitTemplate.getPlugin(), BUNGEE_CORD_CHANNEL, out.toByteArray())
+            Bukkit.getOnlinePlayers()
+                .randomOrNull()?.sendPluginMessage(BukkitTemplate.getPlugin(), BUNGEE_CORD_CHANNEL, bs.toByteArray())
         } catch (e: Exception) {
             e.printStackTrace()
             bungeeCordEnabled = false
