@@ -25,6 +25,9 @@ public class IsolatedClassLoader extends MLet {
         super(urls, parent);
     }
 
+    public IsolatedClassLoader() {
+    }
+
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         synchronized (getClassLoadingLock(name)) {
