@@ -10,6 +10,8 @@ runtime-libraries:
   repositories:
     - https://maven.aliyun.com/repository/public/
     - https://repo.maven.apache.org/maven2/
+    # NBTEditor
+    - https://repo.codemc.org/repository/maven-public
   #  parallel downloading
   parallel: true
   # format group:artifact:version[,maxDepth] maxDepth will be set to 2 by default
