@@ -7,6 +7,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.plugin.messaging.PluginMessageListener
 import top.iseason.bukkittemplate.BukkitTemplate
+import top.iseason.bukkittemplate.DisableHook
 import top.iseason.bukkittemplate.debug.debug
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -29,6 +30,13 @@ object BungeeCordHook : Listener {
             debug("BungeeCord mode was enabled!")
             bungeeCordEnabled = true
         }
+
+    init {
+        onEnable()
+        DisableHook.addTask {
+            onDisable()
+        }
+    }
 
     @JvmStatic
     fun onEnable() {

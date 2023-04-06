@@ -6,6 +6,10 @@ import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.toColor
 
 object PlaceHolderHook : BaseHook("PlaceholderAPI") {
 
+    init {
+        checkHooked()
+    }
+
     fun setPlaceHolder(str: String, player: OfflinePlayer?): String {
         return if (hasHooked)
             PlaceholderAPI.setPlaceholders(player, str).toColor()

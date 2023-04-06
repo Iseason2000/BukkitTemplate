@@ -16,7 +16,6 @@ runtime-libraries:
   parallel: true
   # format group:artifact:version[,maxDepth] maxDepth will be set to 2 by default
   libraries:
-    - io.github.bananapuncher714:nbteditor:${nbtEditorVersion}
     - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
     #    - org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}
     #    - org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2
@@ -28,7 +27,6 @@ runtime-libraries:
 
   # the following libraries will be loaded into plugin classloader instead of isolated classloader
   assembly:
-    - io.github.bananapuncher714:nbteditor
     - org.apache.logging.log4j:log4j-api
     - org.slf4j:slf4j-api
   # skipped libraries
