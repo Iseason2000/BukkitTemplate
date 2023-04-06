@@ -9,6 +9,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener
 import top.iseason.bukkittemplate.BukkitTemplate
 import top.iseason.bukkittemplate.DisableHook
 import top.iseason.bukkittemplate.debug.debug
+import top.iseason.bukkittemplate.utils.other.submit
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 
@@ -32,7 +33,9 @@ object BungeeCordHook : Listener {
         }
 
     init {
-        onEnable()
+        submit(async = true) {
+            onEnable()
+        }
         DisableHook.addTask {
             onDisable()
         }
