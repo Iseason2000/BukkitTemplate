@@ -24,7 +24,7 @@ import java.io.File
 import java.util.*
 
 @FilePath("database.yml")
-object DatabaseConfig : SimpleYAMLConfig() {
+internal object DatabaseConfig : SimpleYAMLConfig() {
 
     @Key
     @Comment("", "修改完配置保存时是否自动重连数据库")
