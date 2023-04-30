@@ -23,7 +23,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * <p>仅支持 group:artifact:version 的格式</p>
  */
 public class RuntimeManager {
-    public static Logger logger = Logger.getLogger(RuntimeManager.class.getName());
+    public static Logger logger = Logger.getLogger(RuntimeManager.class.getSimpleName());
     /**
      * 被加载到插件Classloader的依赖，默认是加载到 IsolatedClassLoader
      */
@@ -137,7 +137,8 @@ public class RuntimeManager {
             return false;
         }
         if (url.toString().endsWith(".jar"))
-            logger.info("Downloading " + url);
+            if (logger != null)
+                logger.info("Downloading " + url);
         try (InputStream is = connection.getInputStream()) {
             Files.copy(is, file.toPath(), REPLACE_EXISTING);
         } catch (Exception e) {
@@ -233,7 +234,7 @@ public class RuntimeManager {
         if (checkLibraryIllegal(dependency)) {
             if (printCache != null)
                 printCache.add(printTree("[F] " + dependency, depth - 1, isLast));
-            else
+            else if (logger != null)
                 logger.info(printTree("[F] " + dependency, depth - 1, isLast));
             return true;
         }
@@ -289,7 +290,7 @@ public class RuntimeManager {
         }
         if (printCache != null)
             printCache.add(printTree("[" + type + "] " + dependency, depth - 1, isLast));
-        else
+        else if (logger != null)
             logger.info(printTree("[" + type + "] " + dependency, depth - 1, isLast));
         if (!success || depth == maxDepth) return true;
 
@@ -312,7 +313,8 @@ public class RuntimeManager {
                     }
                     return true;
                 } catch (ParserConfigurationException | IOException | SAXException e) {
-                    logger.warning("Loading file " + pomFile + " error!");
+                    if (logger != null)
+                        logger.warning("Loading file " + pomFile + " error!");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -405,9 +407,11 @@ public class RuntimeManager {
      */
     public boolean downloadAll() {
         if (dependencies.isEmpty()) return true;
-        logger.info("Loading libraries...");
-        logger.info("Successful Flags: [I]=Loading Isolated [A]=Loading Assembly");
-        logger.info("Failure Flags: [E]=Loading Error [N]=NetWork Error [F]=Library Format Error");
+        if (logger != null) {
+            logger.info("Loading libraries...");
+            logger.info("Successful Flags: [I]=Loading Isolated [A]=Loading Assembly");
+            logger.info("Failure Flags: [E]=Loading Error [N]=NetWork Error [F]=Library Format Error");
+        }
         AtomicBoolean failure = new AtomicBoolean(false);
         Stream<Map.Entry<String, Integer>> stream =
                 isParallel ?
@@ -419,16 +423,20 @@ public class RuntimeManager {
                     if (!downloadDependency(entry.getKey(), 1, entry.getValue(), repositories, printList, false)) {
                         failure.set(true);
                     }
-                    for (String s : printList) {
-                        logger.info(s);
+                    if (logger != null) {
+                        for (String s : printList) {
+                            logger.info(s);
+                        }
                     }
                 }
         );
         boolean isFailure = failure.get();
-        if (isFailure)
-            logger.warning("Loading libraries error.");
-        else logger.info("Loading libraries successfully.");
-        return !failure.get();
+        if (logger != null) {
+            if (isFailure)
+                logger.warning("Loading libraries error.");
+            else logger.info("Loading libraries successfully.");
+        }
+        return !isFailure;
     }
 
     /**
