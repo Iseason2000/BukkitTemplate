@@ -64,7 +64,7 @@ public class RuntimeBuilder {
         }
 
         /**
-         * 添加依赖
+         * 添加依赖<p>
          * 格式为 group:artifact:version<p>
          * 或 group:artifact:version,depth<p>
          * 其中的 depth 表示依赖树层数，默认2
