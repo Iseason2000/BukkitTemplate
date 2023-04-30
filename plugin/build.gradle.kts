@@ -75,7 +75,6 @@ tasks {
             filter {
                 if (it.trim().startsWith("#")) null else it
             }
-            println(obfuscatedMainClass)
             expand(
                 "main" to if (isObfuscated) obfuscatedMainClass else "$groupS.libs.core.BukkitTemplate",
                 "name" to pluginName,
