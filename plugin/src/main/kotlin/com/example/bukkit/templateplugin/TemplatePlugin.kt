@@ -1,6 +1,8 @@
 package com.example.bukkit.templateplugin
 
 import top.iseason.bukkittemplate.BukkitPlugin
+import top.iseason.bukkittemplate.debug.SimpleLogger
+import top.iseason.bukkittemplate.debug.debug
 import top.iseason.bukkittemplate.debug.info
 
 @Suppress("UNUSED")
@@ -8,6 +10,8 @@ object TemplatePlugin : BukkitPlugin {
 
     override fun onEnable() {
         Lang.load()
+        SimpleLogger.isDebug = true
+        debug("${1 + 2 + 3 + 4 + 5}  ${"asdasd"}")
 //        command1()
 ////        //如果使用命令模块，取消注释
 //        CommandHandler.updateCommands()
