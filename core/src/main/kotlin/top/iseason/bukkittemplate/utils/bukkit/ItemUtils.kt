@@ -57,6 +57,16 @@ object ItemUtils {
     }
 
     /**
+     * 修改特定类型的ItemMeta
+     */
+    inline fun <reified M : ItemMeta> ItemStack.applyTypedMeta(block: M.() -> Unit): ItemStack {
+        val itemMeta = itemMeta as? M ?: return this
+        block(itemMeta)
+        this.itemMeta = itemMeta
+        return this
+    }
+
+    /**
      * 减少物品数量，如果小于0则物品变为空气
      */
     fun ItemStack.decrease(count: Int = 1) {
