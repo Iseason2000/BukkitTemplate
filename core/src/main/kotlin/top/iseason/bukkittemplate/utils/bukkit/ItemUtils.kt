@@ -193,7 +193,14 @@ object ItemUtils {
         // 额外的NBt
         val toJson = NBTEditor.getNBTCompound(this, "tag").toJson()
         val json = Gson().fromJson(toJson, Map::class.java).toMutableMap()
-        this.durability
+
+        val data = this.data
+        if (data != null && data.data != 0.toByte()) {
+            var toInt = data.data.toInt()
+            if (toInt < 0) toInt += 256
+            yaml["data"] = toInt
+        }
+
         with(itemMeta!!) {
             // 名字
             if (hasDisplayName()) yaml["name"] = displayName
@@ -468,6 +475,13 @@ object ItemUtils {
         if (url != null) item = NBTEditor.getHead(url)
         item.amount = section.getInt("amount", 1)
         item.durability = section.getInt("damage", 0).toShort()
+        val subId = section.getInt("data", 0)
+        if (subId != 0) {
+            val data = item.data
+            if (data != null) {
+                data.data = if (subId > 128) (subId - 256).toByte() else subId.toByte()
+            }
+        }
         item.applyMeta {
             section.getString("name")?.also { setDisplayName(it.toColor()) }
             section.getStringList("lore").also { if (it.isNotEmpty()) lore = it.toColor() }
