@@ -477,10 +477,7 @@ object ItemUtils {
         item.durability = section.getInt("damage", 0).toShort()
         val subId = section.getInt("data", 0)
         if (subId != 0) {
-            val data = item.data
-            if (data != null) {
-                data.data = if (subId > 128) (subId - 256).toByte() else subId.toByte()
-            }
+            item.data?.data = if (subId > 128) (subId - 256).toByte() else subId.toByte()
         }
         item.applyMeta {
             section.getString("name")?.also { setDisplayName(it.toColor()) }
