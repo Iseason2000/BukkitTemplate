@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.3.2")
+        classpath("com.guardsquare:proguard-gradle:7.4.0-beta01")
     }
 }
 
@@ -53,18 +53,33 @@ subprojects {
 
     dependencies {
         val kotlinVersion: String by rootProject
-        compileOnly(platform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion"))
-        compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-        //基础库
-        compileOnly(kotlin("stdlib"))
-        // 数据库
         val exposedVersion: String by rootProject
         val nbtEditorVersion: String by rootProject
+
+        compileOnly(platform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion"))
+        //基础库
+        compileOnly(kotlin("stdlib"))
+        compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+        compileOnly("me.clip:placeholderapi:2.11.3")
         implementation("io.github.bananapuncher714:nbteditor:$nbtEditorVersion")
-        compileOnly("org.jetbrains.exposed:exposed-core:$exposedVersion")
-        compileOnly("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-        compileOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-        compileOnly("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+
+        // 数据库
+        compileOnly("org.jetbrains.exposed:exposed-core:$exposedVersion") {
+            isTransitive = false
+            targetConfiguration = "runtime"
+        }
+        compileOnly("org.jetbrains.exposed:exposed-dao:$exposedVersion") {
+            isTransitive = false
+            targetConfiguration = "runtime"
+        }
+        compileOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion") {
+            isTransitive = false
+            targetConfiguration = "runtime"
+        }
+        compileOnly("org.jetbrains.exposed:exposed-java-time:$exposedVersion") {
+            isTransitive = false
+            targetConfiguration = "runtime"
+        }
         compileOnly("com.zaxxer:HikariCP:4.0.3")
     }
 
