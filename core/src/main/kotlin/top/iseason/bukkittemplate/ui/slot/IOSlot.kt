@@ -82,6 +82,16 @@ open class IOSlot(
         }
     }
 
+    /**
+     * 直接把物品给某人，不触发别的事件
+     */
+    fun ejectSilently(humanEntity: HumanEntity) {
+        val itemStack = itemStack
+        if (itemStack != null && output(this, itemStack)) {
+            humanEntity.giveItems(itemStack)
+            reset()
+        }
+    }
     override fun reset() {
         itemStack = null
     }
