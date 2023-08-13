@@ -64,22 +64,11 @@ subprojects {
         implementation("io.github.bananapuncher714:nbteditor:$nbtEditorVersion")
 
         // 数据库
-        compileOnly("org.jetbrains.exposed:exposed-core:$exposedVersion") {
-            isTransitive = false
-            targetConfiguration = "runtime"
-        }
-        compileOnly("org.jetbrains.exposed:exposed-dao:$exposedVersion") {
-            isTransitive = false
-            targetConfiguration = "runtime"
-        }
-        compileOnly("org.jetbrains.exposed:exposed-jdbc:$exposedVersion") {
-            isTransitive = false
-            targetConfiguration = "runtime"
-        }
-        compileOnly("org.jetbrains.exposed:exposed-java-time:$exposedVersion") {
-            isTransitive = false
-            targetConfiguration = "runtime"
-        }
+        compileOnly("org.jetbrains.exposed", "exposed-core", exposedVersion, "compile")
+        compileOnly("org.jetbrains.exposed", "exposed-dao", exposedVersion, "compile")
+        compileOnly("org.jetbrains.exposed", "exposed-jdbc", exposedVersion, "compile")
+        compileOnly("org.jetbrains.exposed", "exposed-java-time", exposedVersion, "compile")
+
         compileOnly("com.zaxxer:HikariCP:4.0.3")
     }
 
