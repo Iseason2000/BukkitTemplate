@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.4.0-beta01")
+        classpath("com.guardsquare:proguard-gradle:7.4.1")
     }
 }
 
@@ -59,7 +59,7 @@ subprojects {
         compileOnly(platform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion"))
         //基础库
         compileOnly(kotlin("stdlib"))
-        compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
+        compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
         compileOnly("me.clip:placeholderapi:2.11.3")
         implementation("io.github.bananapuncher714:nbteditor:$nbtEditorVersion")
 
