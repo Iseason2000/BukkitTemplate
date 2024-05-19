@@ -47,7 +47,7 @@ object EntityUtils {
         if (this !is Entity) return
         for (addItem in addItems) {
             if (addItem == null) continue
-            val item = world.spawnEntity(location, EntityType.DROPPED_ITEM) as Item
+            val item = world.spawnEntity(location, EntityType.entries[1]) as Item //1.20.6改了枚举名 目前看来1号都是掉落物
             item.setItemStack(addItem)
         }
     }

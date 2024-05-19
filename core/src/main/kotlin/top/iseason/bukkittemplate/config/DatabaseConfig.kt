@@ -184,13 +184,13 @@ object DatabaseConfig : SimpleYAMLConfig() {
                 }
 
                 "MariaDB" -> HikariConfig(props).apply {
-                    runtimeManager.downloadADependency("org.mariadb.jdbc:mariadb-java-client:3.3.2")
+                    runtimeManager.downloadADependency("org.mariadb.jdbc:mariadb-java-client:3.4.0")
                     jdbcUrl = "jdbc:mariadb://$address/$database_name$params"
                     driverClassName = "org.mariadb.jdbc.Driver"
                 }
 
                 "SQLite" -> HikariConfig(props).apply {
-                    runtimeManager.downloadADependencyAssembly("org.xerial:sqlite-jdbc:3.44.1.0")
+                    runtimeManager.downloadADependencyAssembly("org.xerial:sqlite-jdbc:3.45.3.0")
                     jdbcUrl = "jdbc:sqlite:$address$params"
                     driverClassName = "org.sqlite.JDBC"
                 }
@@ -214,7 +214,7 @@ object DatabaseConfig : SimpleYAMLConfig() {
                 }
 
                 "SQLServer" -> HikariConfig(props).apply {
-                    runtimeManager.downloadADependency("com.microsoft.sqlserver:mssql-jdbc:12.4.2.jre8")
+                    runtimeManager.downloadADependency("com.microsoft.sqlserver:mssql-jdbc:12.6.1.jre8")
                     jdbcUrl = "jdbc:sqlserver://$address;DatabaseName=$database_name$params"
                     driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
                 }

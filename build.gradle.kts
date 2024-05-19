@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.4.1")
+        classpath("com.guardsquare:proguard-gradle:7.4.2")
     }
 }
 
@@ -37,6 +37,10 @@ subprojects {
             url = uri("https://hub.spigotmc.org/nexus/content/repositories/public/")
         }
         maven {
+            name = "papermc"
+            url = uri("https://repo.papermc.io/repository/maven-public/")
+        }
+        maven {
             name = "jitpack"
             url = uri("https://jitpack.io")
         }
@@ -59,7 +63,7 @@ subprojects {
         compileOnly(platform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion"))
         //基础库
         compileOnly(kotlin("stdlib"))
-        compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+        compileOnly("org.spigotmc", "spigot-api", "1.20.3-R0.1-SNAPSHOT", "compile")
         compileOnly("me.clip:placeholderapi:2.11.3")
         implementation("io.github.bananapuncher714:nbteditor:$nbtEditorVersion")
 

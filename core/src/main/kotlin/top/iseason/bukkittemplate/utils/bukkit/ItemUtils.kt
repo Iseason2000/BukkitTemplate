@@ -247,7 +247,11 @@ object ItemUtils {
                 is LeatherArmorMeta -> yaml["color"] = color.toRGBString()
                 // 药水
                 is PotionMeta -> {
-                    if (NBTEditor.getMinecraftVersion().greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_9)) {
+                    val version = NBTEditor.getMinecraftVersion()
+                    if (version.greaterThanOrEqualTo(NBTEditor.MinecraftVersion.v1_9) && version.lessThanOrEqualTo(
+                            NBTEditor.MinecraftVersion.v1_20_R1
+                        )
+                    ) {
                         yaml["base-effect"] =
                             "${basePotionData.type.name},${basePotionData.isExtended},${basePotionData.isUpgraded}"
                         if (customEffects.isNotEmpty())
