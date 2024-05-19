@@ -47,11 +47,12 @@ val obfuscatedMainClass =
 val isObfuscated = obfuscated == "true"
 val shrink: String by rootProject
 val defaultFile = File("../build", "${rootProject.name}-${rootProject.version}.jar")
+val formatJarOutput = jarOutputFile.replace("\${root}", rootProject.projectDir.absolutePath)
 val output: File =
     if (isObfuscated)
-        File(jarOutputFile, "${rootProject.name}-${rootProject.version}-obfuscated.jar").absoluteFile
+        File(formatJarOutput, "${rootProject.name}-${rootProject.version}-obfuscated.jar").absoluteFile
     else
-        File(jarOutputFile, "${rootProject.name}-${rootProject.version}.jar").absoluteFile
+        File(formatJarOutput, "${rootProject.name}-${rootProject.version}.jar").absoluteFile
 
 tasks {
     shadowJar {
