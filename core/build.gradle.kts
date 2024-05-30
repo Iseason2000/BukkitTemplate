@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.dokka") version "1.9.10"
+    id("org.jetbrains.dokka") version "1.9.20"
 }
 
 group = "top.iseason.bukkittemplate"
@@ -18,7 +18,7 @@ repositories {
 }
 dependencies {
 //    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
-    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.8.10")
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:1.9.20")
 
     compileOnly("net.kyori:adventure-text-minimessage:4.17.0")
     compileOnly("net.kyori:adventure-platform-bukkit:4.3.2")
@@ -29,19 +29,13 @@ dependencies {
     compileOnly("io.th0rgal:oraxen:1.175.0") { isTransitive = false }
 }
 tasks {
+    kotlin {
+        jvmToolchain(8)
+    }
+
     compileJava {
-        options.isFailOnError = false
-        options.isWarnings = false
-        options.isVerbose = false
         options.encoding = "UTF-8"
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
-    }
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    build {
-        dependsOn(named("shadowJar"))
+        options.isFailOnError = false
     }
     dokkaHtml.configure {
         dokkaSourceSets {

@@ -1,9 +1,12 @@
 plugins {
     kotlin("jvm")
+    id("com.github.johnrengelman.shadow")
 }
 
-repositories {
-    mavenCentral()
+buildscript {
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.5.0")
+    }
 }
 
 dependencies {
@@ -17,7 +20,6 @@ dependencies {
 
     // 本地依赖放在libs文件夹内
     compileOnly(fileTree("libs") { include("*.jar") })
-
 }
 
 // 插件名称，请在gradle.properties 修改
@@ -55,6 +57,18 @@ val output: File =
         File(formatJarOutput, "${rootProject.name}-${rootProject.version}.jar").absoluteFile
 
 tasks {
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(8))
+        }
+    }
+    kotlin {
+        jvmToolchain(8)
+    }
+
     shadowJar {
         if (isObfuscated) {
             relocate("top.iseason.bukkittemplate.BukkitTemplate", obfuscatedMainClass)
@@ -65,17 +79,6 @@ tasks {
     }
     build {
         dependsOn("buildPlugin")
-    }
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileJava {
-        options.isFailOnError = false
-        options.isWarnings = false
-        options.isVerbose = false
-        options.encoding = "UTF-8"
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
     }
     processResources {
         filesMatching("plugin.yml") {

@@ -15,10 +15,9 @@ object TemplatePlugin : BukkitPlugin {
     }
 
     override fun onAsyncEnable() {
-
 //        Config.load()
 //        openUICommand()
-//        UIListener.register()
+//        UIListener.registerListener()
         //命令
 //        openUICommand()
 
@@ -33,7 +32,6 @@ object TemplatePlugin : BukkitPlugin {
 //            DependencyDownloader().addRepositories("https://maven.aliyun.com/repository/public")
 //                .downloadDependency("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
 //        }
-
         info("&a插件已启用!")
     }
 

@@ -1,6 +1,3 @@
-val pluginName: String by settings
-rootProject.name = pluginName
-
 pluginManagement {
     //kotlin 版本
     val kotlinVersion: String by settings
@@ -11,4 +8,10 @@ pluginManagement {
         id("com.github.johnrengelman.shadow") version shadowJarVersion
     }
 }
+
+val pluginName: String by settings
+
+rootProject.name = pluginName
+
 include("core", "plugin")
+

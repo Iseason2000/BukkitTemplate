@@ -3,25 +3,14 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.4.2")
-    }
-}
-
 subprojects {
     group = rootProject.group
     version = rootProject.version
     apply {
-        plugin<com.github.jengelman.gradle.plugins.shadow.ShadowPlugin>()
         plugin<JavaPlugin>()
         plugin<JavaLibraryPlugin>()
     }
     repositories {
-//    阿里的服务器速度快一点
         maven {
             name = "aliyun"
             url = uri("https://maven.aliyun.com/repository/public")
@@ -54,7 +43,6 @@ subprojects {
         }
         mavenLocal()
     }
-
     dependencies {
         val kotlinVersion: String by rootProject
         val exposedVersion: String by rootProject
@@ -76,13 +64,6 @@ subprojects {
         compileOnly("com.zaxxer:HikariCP:4.0.3")
     }
 
-    tasks {
-        compileJava {
-            options.encoding = "UTF-8"
-            sourceCompatibility = "1.8"
-            targetCompatibility = "1.8"
-        }
-    }
 
 }
 
