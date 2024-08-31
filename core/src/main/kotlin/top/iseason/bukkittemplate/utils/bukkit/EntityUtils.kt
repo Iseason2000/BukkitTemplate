@@ -2,7 +2,6 @@
 
 package top.iseason.bukkittemplate.utils.bukkit
 
-import io.github.bananapuncher714.nbteditor.NBTEditor
 import org.bukkit.Material
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -67,11 +66,6 @@ object EntityUtils {
      * @return 没有或者是空气都返回null
      */
     fun Player.getHeldItem(): ItemStack? = inventory.getHeldItem()
-
-    /**
-     * 序列化为json
-     */
-    fun Entity.toJson(): String = NBTEditor.getNBTCompound(this).toJson()
 
     /**
      * 扣除某种物品数量

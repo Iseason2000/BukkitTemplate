@@ -3,6 +3,8 @@ main: ${main}
 version: ${version}
 authors: [ ${ author } ]
 api-version: 1.13
+depend:
+  - NBTAPI
 runtime-libraries:
   # If not defined, it will be 'libraries'
   # when start with @Plugin: will start with plugin data folder
@@ -10,7 +12,7 @@ runtime-libraries:
   repositories:
     - https://maven.aliyun.com/repository/public/
     - https://repo.maven.apache.org/maven2/
-    # NBTEditor
+    # NBT-API
     - https://repo.codemc.org/repository/maven-public
   #  parallel downloading
   parallel: true

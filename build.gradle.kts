@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
 }
 
 subprojects {
@@ -43,17 +43,16 @@ subprojects {
         }
         mavenLocal()
     }
+
     dependencies {
         val kotlinVersion: String by rootProject
         val exposedVersion: String by rootProject
-        val nbtEditorVersion: String by rootProject
-
+        compileOnly("de.tr7zw:item-nbt-api-plugin:2.13.2")
         compileOnly(platform("org.jetbrains.kotlin:kotlin-bom:$kotlinVersion"))
         //基础库
         compileOnly(kotlin("stdlib"))
         compileOnly("org.spigotmc", "spigot-api", "1.20.3-R0.1-SNAPSHOT", "compile")
         compileOnly("me.clip:placeholderapi:2.11.3")
-        implementation("io.github.bananapuncher714:nbteditor:$nbtEditorVersion")
 
         // 数据库
         compileOnly("org.jetbrains.exposed", "exposed-core", exposedVersion, "compile")
