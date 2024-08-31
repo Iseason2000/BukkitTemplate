@@ -5,7 +5,6 @@ plugins {
 
 group = "top.iseason.bukkittemplate"
 
-val exposedVersion: String by rootProject
 repositories {
     maven {
         name = "MMOItems"
