@@ -52,7 +52,7 @@ subprojects {
         //基础库
         compileOnly(kotlin("stdlib"))
         compileOnly("org.spigotmc", "spigot-api", "1.20.3-R0.1-SNAPSHOT")
-        compileOnly("me.clip:placeholderapi:2.11.3")
+        compileOnly("me.clip:placeholderapi:2.11.6")
 
         // 数据库
         compileOnly("org.jetbrains.exposed", "exposed-core", exposedVersion)
