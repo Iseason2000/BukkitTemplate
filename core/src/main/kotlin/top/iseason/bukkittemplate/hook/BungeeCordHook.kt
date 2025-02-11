@@ -12,7 +12,6 @@ import top.iseason.bukkittemplate.debug.debug
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 
-
 object BungeeCordHook : Listener {
 
     private const val BUNGEE_CORD_CHANNEL = "BungeeCord"
@@ -27,7 +26,7 @@ object BungeeCordHook : Listener {
             if (channel != BUNGEE_CORD_CHANNEL) {
                 return@PluginMessageListener
             }
-            debug("BungeeCord mode was enabled!")
+            debug { "BungeeCord mode was enabled!" }
             bungeeCordEnabled = true
         }
 
@@ -96,7 +95,7 @@ object BungeeCordHook : Listener {
         } catch (e: Exception) {
             e.printStackTrace()
             bungeeCordEnabled = false
-            debug("BungeeCord mode was disabled!")
+            debug { "BungeeCord mode was disabled!" }
         }
     }
 

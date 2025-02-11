@@ -21,8 +21,8 @@ import top.iseason.bukkittemplate.ui.slot.IOSlot
 import top.iseason.bukkittemplate.ui.slot.merge
 import top.iseason.bukkittemplate.utils.bukkit.ItemUtils.checkAir
 import top.iseason.bukkittemplate.utils.bukkit.ItemUtils.decrease
-import top.iseason.bukkittemplate.utils.bukkit.SchedulerUtils.submit
 import top.iseason.bukkittemplate.utils.other.WeakCoolDown
+import top.iseason.bukkittemplate.utils.other.submit
 
 /**
  * 负责所有UI的监听动作
@@ -92,10 +92,10 @@ object UIListener : Listener {
         // 上下锁
         if (rawSlot in 0 until inventory.size && baseUI.lockOnTop) {
             if (clickedClickSlot !is IOSlot) isCancelled = true
-            debug("ui ${baseUI::class.simpleName} lockup, slot $rawSlot")
+            debug { "ui ${baseUI::class.simpleName} lockup, slot $rawSlot" }
         } else if (rawSlot > 0 && baseUI.lockOnBottom) {
             isCancelled = true
-            debug("ui ${baseUI::class.simpleName} lockdown, slot $rawSlot")
+            debug { "ui ${baseUI::class.simpleName} lockdown, slot $rawSlot" }
         }
         runCatching { baseUI.onClick?.invoke(event) }.getOrElse { it.printStackTrace() }
         submit(async = baseUI.async) {
@@ -146,10 +146,10 @@ fun InventoryDragEvent.ioEvent() {
         } else {
             if (ioSlot == null) {
                 if (index in 0 until inventory.size && baseUI.lockOnTop) {
-                    debug("ui ${baseUI::class.simpleName} lockup, slot $index")
+                    debug { "ui ${baseUI::class.simpleName} lockup, slot $index" }
                 } else if (index > 0 && baseUI.lockOnBottom) {
                     isCancelled = true
-                    debug("ui ${baseUI::class.simpleName} lockdown, slot $index")
+                    debug { "ui ${baseUI::class.simpleName} lockdown, slot $index" }
                 } else continue
             }
             if (tempItem == null) tempItem = newItem.clone()

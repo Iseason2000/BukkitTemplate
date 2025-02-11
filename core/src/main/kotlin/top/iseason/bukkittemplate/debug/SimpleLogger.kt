@@ -1,6 +1,7 @@
 package top.iseason.bukkittemplate.debug
 
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import top.iseason.bukkittemplate.BukkitTemplate
 import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.sendColorMessage
 
@@ -14,15 +15,18 @@ fun info(message: Any?) {
 /**
  * 输出debug日志,只有当 SimpleLogger.isDebug 为true 时输出
  */
-fun debug(message: Any?) {
-    if (SimpleLogger.isDebug) info(message)
+inline fun debug(message: () -> String?) {
+    if (SimpleLogger.isDebug) {
+        debugMsg(message())
+    }
 }
 
-/**
- * debug模式才运行代码
- */
-fun debug(runnable: Runnable) {
-    if (SimpleLogger.isDebug) runnable.run()
+fun debugMsg(message: String?) = Bukkit.getConsoleSender()
+    .sendColorMessage("${ChatColor.GRAY}[DEBUG] $message", SimpleLogger.prefix)
+
+inline fun onDebug(action: () -> Unit) {
+    if (SimpleLogger.isDebug)
+        action()
 }
 
 /**

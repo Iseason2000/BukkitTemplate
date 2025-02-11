@@ -2,13 +2,14 @@ package top.iseason.bukkittemplate.hook
 
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
+import top.iseason.bukkittemplate.debug.info
 
 /**
  * 软依赖钩子,需要传入依赖的名字
  */
 abstract class BaseHook(val pluginName: String) {
 
-    private var plugin = Bukkit.getPluginManager().getPlugin(pluginName)
+    private var plugin: Plugin? = null
 
     /**
      * 获取插件入口
@@ -26,8 +27,10 @@ abstract class BaseHook(val pluginName: String) {
     /**
      * 检查软依赖是否存在
      */
-    fun checkHooked() {
+    open fun checkHooked() {
         plugin = Bukkit.getPluginManager().getPlugin(pluginName)
+        if (plugin != null)
+            info("&a检测到兼容插件: &6$pluginName")
     }
 
 }

@@ -34,6 +34,7 @@ public class ReflectionUtil {
     public static MethodHandle getStaticMethod(Class<?> clazz, String name, MethodType methodType) throws NoSuchMethodException, IllegalAccessException {
         return lookup.findStatic(clazz, name, methodType);
     }
+
     /**
      * 替换 object 中的某一个变量
      *

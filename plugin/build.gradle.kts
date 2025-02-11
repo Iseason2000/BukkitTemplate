@@ -8,6 +8,29 @@ buildscript {
         classpath("com.guardsquare:proguard-gradle:7.6.1")
     }
 }
+repositories {
+    mavenCentral()
+    maven {
+        name = "MMOItems"
+        url = uri("https://nexus.phoenixdevt.fr/repository/maven-public/")
+    }
+    maven {
+        name = "McMMO"
+        url = uri("https://nexus.neetgames.com/repository/maven-releases/")
+    }
+    maven {
+        name = "jitpack"
+        url = uri("https://www.jitpack.io")
+    }
+    maven {
+        name = "PlaceholderAPI"
+        url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    }
+    maven {
+        name = "Oraxen"
+        url = uri("https://repo.oraxen.com/releases")
+    }
+}
 
 dependencies {
     // 依赖core模块

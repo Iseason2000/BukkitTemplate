@@ -11,7 +11,7 @@ import top.iseason.bukkittemplate.config.type.DefaultConfigType
 import top.iseason.bukkittemplate.debug.debug
 import top.iseason.bukkittemplate.debug.info
 import top.iseason.bukkittemplate.debug.warn
-import top.iseason.bukkittemplate.utils.bukkit.SchedulerUtils.submit
+import top.iseason.bukkittemplate.utils.other.submit
 import java.io.File
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -71,7 +71,7 @@ open class SimpleYAMLConfig(
     /**
      * 本配置类的所有项
      */
-    private val keys = mutableListOf<ConfigKey>().apply {
+    private val keys: List<ConfigKey> = mutableListOf<ConfigKey>().apply {
         //当前类是否标注了 @Key
         val isAllKey = this@SimpleYAMLConfig.javaClass.getAnnotation(Key::class.java) != null
         var superClass: Class<*>? = this@SimpleYAMLConfig::class.java
@@ -210,7 +210,7 @@ open class SimpleYAMLConfig(
                     try {
                         key.setValue(this, configType.read(value, key.field))
                     } catch (e: Exception) {
-                        debug("Loading config $configPath error! key:${keyName} value: $value")
+                        debug { "Loading config $configPath error! key:${keyName} value: $value" }
                     }
                 } else {
                     //缺少键，重写入
@@ -219,7 +219,7 @@ open class SimpleYAMLConfig(
                         iterator = keys.iterator()
                         temp = YamlConfiguration()
                         commentMap.clear()
-                        debug("completing file $configPath ")
+                        debug { "completing file $configPath " }
                         continue
                     }
                 }
@@ -241,7 +241,7 @@ open class SimpleYAMLConfig(
                     temp.createSection(keyName)
                 }
             } catch (e: Exception) {
-                debug("setting config $configPath error! key:${keyName}")
+                debug { "setting config $configPath error! key:${keyName}" }
             }
         }
         if (!(!incomplete && isReadOnly) || !configPath.exists()) {

@@ -34,8 +34,4 @@ public interface BukkitPlugin {
      */
     default void onDisable() {
     }
-
-    default org.bstats.bukkit.Metrics bStat(int id) {
-        return new org.bstats.bukkit.Metrics(getJavaPlugin(), id);
-    }
 }

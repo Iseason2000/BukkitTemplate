@@ -8,8 +8,8 @@ import org.bukkit.scheduler.BukkitTask
 import top.iseason.bukkittemplate.utils.bukkit.EventUtils.listen
 import top.iseason.bukkittemplate.utils.bukkit.EventUtils.unregister
 import top.iseason.bukkittemplate.utils.bukkit.MessageUtils.toColor
-import top.iseason.bukkittemplate.utils.bukkit.SchedulerUtils.castSync
-import top.iseason.bukkittemplate.utils.bukkit.SchedulerUtils.submit
+import top.iseason.bukkittemplate.utils.other.runSync
+import top.iseason.bukkittemplate.utils.other.submit
 
 /**
  * bukkit的玩家输入工具
@@ -28,6 +28,9 @@ object IOUtils {
         timeout: Long = 12000,
         onFinish: (Inventory) -> Unit
     ) {
+        runSync {
+            openInventory(inv)
+        }
         var task: BukkitTask? = null
         var listener: EventUtils.FakeEventListener? = null
         listener = listen<InventoryCloseEvent> {
@@ -45,9 +48,6 @@ object IOUtils {
                 onFinish(inv)
                 listener.unregister()
             }
-        }
-        castSync {
-            openInventory(inv)
         }
     }
 }

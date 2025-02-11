@@ -19,7 +19,7 @@ import top.iseason.bukkittemplate.DisableHook
 import top.iseason.bukkittemplate.debug.warn
 import top.iseason.bukkittemplate.hook.BungeeCordHook
 import top.iseason.bukkittemplate.hook.PlaceHolderHook
-import top.iseason.bukkittemplate.utils.bukkit.SchedulerUtils.submit
+import top.iseason.bukkittemplate.utils.other.submit
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -68,6 +68,22 @@ object MessageUtils {
             if (sender is Player && msg.startsWith("[title]", true)) {
                 val drop = msg.drop(7).split("\\n")
                 sender.sendCustomTitle(drop.getOrNull(0), drop.getOrNull(1), prefix)
+                return@add false
+            }
+            true
+        }
+        //大标题
+        messageHandlers.add { msg, sender, prefix ->
+            if (sender is Player && msg.startsWith("[main-title]", true)) {
+                sender.sendMainTitle(msg.drop(12), prefix)
+                return@add false
+            }
+            true
+        }
+        //小标题
+        messageHandlers.add { msg, sender, prefix ->
+            if (sender is Player && msg.startsWith("[sub-title]", true)) {
+                sender.sendSubTitle(msg.drop(11), prefix)
                 return@add false
             }
             true
@@ -121,8 +137,8 @@ object MessageUtils {
         val dd = BukkitTemplate.getRuntimeManager()
             .addRepository("https://maven.aliyun.com/repository/public")
             .addRepository("https://repo.maven.apache.org/maven2/")
-        dd.addDependency("net.kyori:adventure-platform-bukkit:4.3.2", 4)
-        dd.addDependency("net.kyori:adventure-text-minimessage:4.14.0", 1)
+        dd.addDependency("net.kyori:adventure-platform-bukkit:4.3.4", 4)
+        dd.addDependency("net.kyori:adventure-text-minimessage:4.18.0", 1)
         dd.downloadAll()
         audiences = BukkitAudiences.create(BukkitTemplate.getPlugin())
         miniMessageLoaded = true
@@ -321,6 +337,34 @@ object MessageUtils {
         } catch (e: Throwable) {
             e.printStackTrace()
             warn("该服务端版本不支持 ActionBar 消息!")
+        }
+    }
+
+    /**
+     * 发送 title 消息
+     */
+    fun Player.sendMainTitle(message: String?, prefix: String = defaultPrefix) {
+        if (message == null || message.toString().isEmpty()) return
+        val finalMessage = PlaceHolderHook.setPlaceHolder("$prefix$message", this)
+        if (miniMessageSupport) {
+            val component = MiniMessage.miniMessage().deserialize(finalMessage)
+            audiences.player(this).showTitle(Title.title(component, Component.empty()))
+        } else {
+            this.sendTitle(finalMessage, "")
+        }
+    }
+
+    /**
+     * 发送 subtitle 消息
+     */
+    fun Player.sendSubTitle(message: String?, prefix: String = defaultPrefix) {
+        if (message == null || message.toString().isEmpty()) return
+        val finalMessage = PlaceHolderHook.setPlaceHolder("$prefix$message", this)
+        if (miniMessageSupport) {
+            val component = MiniMessage.miniMessage().deserialize(finalMessage)
+            audiences.player(this).showTitle(Title.title(Component.empty(), component))
+        } else {
+            this.sendTitle("", finalMessage)
         }
     }
 
